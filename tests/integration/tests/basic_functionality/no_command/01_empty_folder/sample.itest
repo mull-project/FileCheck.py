@@ -1,2 +1,0 @@
-; RUN: %DOORSTOP_EXEC | FileCheck %s
-; CHECK: <check-file> not specified
