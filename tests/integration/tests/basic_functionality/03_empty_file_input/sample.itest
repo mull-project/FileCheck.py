@@ -1,0 +1,3 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.match 2>&1 || true) | %FILECHECK_EXEC %s
+; CHECK: FileCheck error: '-' is empty.
+; CHECK: FileCheck command line:
