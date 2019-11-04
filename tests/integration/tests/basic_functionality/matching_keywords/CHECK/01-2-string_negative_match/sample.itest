@@ -1,0 +1,11 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.match 2>&1 || true) | %FILECHECK_EXEC %s
+; CHECK: FileCheck
+; CHECK: {{.*}}filecheck.match:1:10: error: CHECK: expected string not found in input{{$}}
+; CHECK: {{^}}; CHECK: foo{{$}}
+; CHECK: {{^}}         ^{{$}}
+; CHECK: {{^}}<stdin>:1:1: note: scanning from here{{$}}
+; CHECK: {{^}}hello{{$}}
+; CHECK: {{^}}^{{$}}
+; CHECK: {{^}}<stdin>:1:3: note: possible intended match here{{$}}
+; CHECK: {{^}}hello{{$}}
+; CHECK: {{^}}  ^{{$}}
