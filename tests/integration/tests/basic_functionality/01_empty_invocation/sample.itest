@@ -1,2 +1,4 @@
-; RUN: %DOORSTOP_EXEC | %FILECHECK_EXEC %s
-; CHECK: <check-file> not specified
+; RUN: (%FILECHECK_EXEC 2>&1; true) | %FILECHECK_EXEC %s
+; // TODO: learn how to much %s
+; CHECK: {{.*}}
+; CHECK-NEXT: <check-file> not specified
