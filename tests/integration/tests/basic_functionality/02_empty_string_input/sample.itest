@@ -1,2 +1,3 @@
-; RUN: echo "" | %FILECHECK_EXEC %S/filecheck.match
-; CHECK-NOT: {{.+}}
+; RUN: echo "" | %FILECHECK_EXEC %S/filecheck.match 2>&1 | %FILECHECK_EXEC %s
+; CHECK: FileCheck
+; CHECK-EMPTY
