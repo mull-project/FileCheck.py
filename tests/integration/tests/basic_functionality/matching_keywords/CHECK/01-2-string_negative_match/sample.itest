@@ -9,3 +9,4 @@
 ; CHECK: {{^}}<stdin>:1:3: note: possible intended match here{{$}}
 ; CHECK: {{^}}hello{{$}}
 ; CHECK: {{^}}  ^{{$}}
+; CHECK-EMPTY
