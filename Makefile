@@ -11,7 +11,7 @@ FILECHECK_EXEC=$(PWD)/src/FileCheck.py
 test-lit: ## Run LIT integration tests
 	cd tests/integration && make clean
 	CURRENT_DIR=$(PWD) \
-		DOORSTOP_EXEC=$(FILECHECK_EXEC) \
+		FILECHECK_EXEC=$(FILECHECK_EXEC) \
 		PATH=$(PWD)/tests/integration/tools/FileCheck:$(PWD)/tests/integration/tools:$$PATH \
 		lit \
 		-vv $(PWD)/tests/integration
