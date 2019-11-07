@@ -6,7 +6,7 @@ import sys
 print(sys.argv[0])
 if len(sys.argv) == 1:
     print("<check-file> not specified")
-    exit(1)
+    exit(2)
 
 check_file = sys.argv[1]
 if not os.path.isfile(check_file):
