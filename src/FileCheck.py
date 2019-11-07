@@ -19,5 +19,15 @@ if sys.stdin.isatty():
 
 for line in sys.stdin:
     file_empty = False
-    print(line.rstrip())
+    # print(line.rstrip())
 
+# print("FileCheck")
+# print("{}:1:10: error: CHECK: expected string not found in input".format(match_file))
+# print("; CHECK: foo")
+# print("         ^")
+# print("<stdin>:1:1: note: scanning from here")
+# print("hello")
+# print("^")
+# print("<stdin>:1:3: note: possible intended match here")
+# print("hello")
+# print("  ^")
