@@ -11,7 +11,7 @@ if len(sys.argv) == 1:
 check_file = sys.argv[1]
 if not os.path.isfile(check_file):
     print("Could not open check file '{}': No such file or directory".format(check_file))
-    exit(1)
+    exit(2)
 
 if os.path.getsize(check_file) == 0:
     print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)

@@ -1,4 +1,4 @@
-; RUN: (%FILECHECK_EXEC file/does/not/exist 2>&1; true) | %FILECHECK_TESTER_EXEC %s
+; RUN: (%FILECHECK_EXEC file/does/not/exist 2>&1; test $? = 2) | %FILECHECK_TESTER_EXEC %s
 ; // TODO: learn how to much %s
 ; CHECK: {{.*}}
 ; CHECK: Could not open check file 'file/does/not/exist': No such file or directory
