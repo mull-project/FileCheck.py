@@ -13,11 +13,11 @@ if not os.path.isfile(match_file):
     print("Could not open check file '{}': No such file or directory".format(match_file))
     exit(1)
 
-file_empty = True
+if sys.stdin.isatty():
+    print("CHECK: FileCheck error: '-' is empty.")
+    print("FileCheck command line: {}".format(match_file))
+
 for line in sys.stdin:
     file_empty = False
     print(line.rstrip())
 
-if file_empty:
-    print("CHECK: FileCheck error: '-' is empty.")
-    print("FileCheck command line: {}".format(match_file))
