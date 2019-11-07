@@ -7,11 +7,24 @@ help: all
 .DEFAULT_GOAL := help
 
 .PHONY: test-lit
-FILECHECK_EXEC=$(PWD)/src/FileCheck.py
-test-lit: ## Run LIT integration tests
+test-lit: test-lit-real test-lit-py
+
+FILECHECK_PY_EXEC=$(PWD)/src/FileCheck.py
+test-lit-py: ## Run LIT integration tests
 	cd tests/integration && make clean
+
 	CURRENT_DIR=$(PWD) \
-		FILECHECK_EXEC=$(FILECHECK_EXEC) \
+		FILECHECK_EXEC=$(FILECHECK_PY_EXEC) \
+		PATH=$(PWD)/tests/integration/tools/FileCheck:$(PWD)/tests/integration/tools:$$PATH \
+		lit \
+		-vv $(PWD)/tests/integration
+
+FILECHECK_REAL_EXEC=$(PWD)/tests/integration/tools/FileCheck/FileCheck
+test-lit-real: ## Run LIT integration tests
+	cd tests/integration && make clean
+
+	CURRENT_DIR=$(PWD) \
+		FILECHECK_EXEC=$(FILECHECK_REAL_EXEC) \
 		PATH=$(PWD)/tests/integration/tools/FileCheck:$(PWD)/tests/integration/tools:$$PATH \
 		lit \
 		-vv $(PWD)/tests/integration
