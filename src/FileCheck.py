@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import sys
 
 print(sys.argv[0])
@@ -17,23 +18,44 @@ if os.path.getsize(check_file) == 0:
     print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
     exit(2)
 
-file_empty = True
-for line in sys.stdin:
-    file_empty = False
-    # print(line.rstrip())
+checks = []
+with open(check_file) as f:
+    for line in f:
+        check_match = re.search('; CHECK: (.*)', line)
 
-if file_empty:
+        if check_match:
+            check = check_match.group(1)
+            checks.append((check, line))
+            # print(check)
+
+check_iterator = iter(checks)
+
+line_counter = 0
+for line in sys.stdin:
+    line_counter = 1
+
+    try:
+        current_check = next(check_iterator)
+    except StopIteration:
+        exit(0)
+
+    if current_check[0] not in line:
+        print("{}:{}:10: error: CHECK: expected string not found in input".format(check_file, line_counter))
+        print(current_check[1].rstrip())
+        print("          ^")
+        print("<stdin>:TODO:TODO: note: scanning from here")
+        print("TODO")
+        print("^")
+        print("<stdin>:TODO:TODO: note: possible intended match here")
+        print("TODO")
+        print("  ^")
+        exit(2)
+
+    # print("foo: {}".format(line == "\n"))
+
+if line_counter == 0:
     print("CHECK: FileCheck error: '-' is empty.")
     print("FileCheck command line: {}".format(check_file))
     exit(2)
 
-# print("FileCheck")
-# print("{}:1:10: error: CHECK: expected string not found in input".format(match_file))
-# print("; CHECK: foo")
-# print("         ^")
-# print("<stdin>:1:1: note: scanning from here")
-# print("hello")
-# print("^")
-# print("<stdin>:1:3: note: possible intended match here")
-# print("hello")
-# print("  ^")
+
