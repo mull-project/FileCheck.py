@@ -45,10 +45,10 @@ for line in sys.stdin:
 
         print(current_check[1].rstrip())
         print("          ^")
-        print("<stdin>:TODO:TODO: note: scanning from here")
+        print("<stdin>:?:?: note: scanning from here")
         print("TODO")
         print("^")
-        print("<stdin>:TODO:TODO: note: possible intended match here")
+        print("<stdin>:?:?: note: possible intended match here")
         print("TODO")
         print("  ^")
         exit(2)
