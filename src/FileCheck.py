@@ -17,13 +17,15 @@ if os.path.getsize(check_file) == 0:
     print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
     exit(2)
 
-if sys.stdin.isatty():
-    print("CHECK: FileCheck error: '-' is empty.")
-    print("FileCheck command line: {}".format(check_file))
-
+file_empty = True
 for line in sys.stdin:
     file_empty = False
     # print(line.rstrip())
+
+if file_empty:
+    print("CHECK: FileCheck error: '-' is empty.")
+    print("FileCheck command line: {}".format(check_file))
+    exit(2)
 
 # print("FileCheck")
 # print("{}:1:10: error: CHECK: expected string not found in input".format(match_file))
