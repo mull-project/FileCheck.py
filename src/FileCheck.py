@@ -25,7 +25,7 @@ with open(check_file) as f:
 
         if check_match:
             check = check_match.group(1)
-            checks.append((check, line))
+            checks.append((check, line, check_match.start(1)))
             # print(check)
 
 check_iterator = iter(checks)
@@ -40,7 +40,9 @@ for line in sys.stdin:
         exit(0)
 
     if current_check[0] not in line:
-        print("{}:{}:10: error: CHECK: expected string not found in input".format(check_file, line_counter))
+        print("{}:{}:{}: error: CHECK: expected string not found in input"
+              .format(check_file, line_counter, current_check[2] + 1))
+
         print(current_check[1].rstrip())
         print("          ^")
         print("<stdin>:TODO:TODO: note: scanning from here")
