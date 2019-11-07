@@ -31,27 +31,35 @@ with open(check_file) as f:
 check_iterator = iter(checks)
 
 line_counter = 0
+
+current_check = None
+try:
+    current_check = next(check_iterator)
+except StopIteration:
+    pass
+
 for line in sys.stdin:
     line_counter = 1
 
-    try:
-        current_check = next(check_iterator)
-    except StopIteration:
-        exit(0)
+    if current_check and current_check[0] in line:
+        try:
+            current_check = next(check_iterator)
+        except StopIteration:
+            exit(0)
 
-    if current_check[0] not in line:
-        print("{}:{}:{}: error: CHECK: expected string not found in input"
-              .format(check_file, line_counter, current_check[2] + 1))
+if current_check and current_check[0] not in line:
+    print("{}:{}:{}: error: CHECK: expected string not found in input"
+          .format(check_file, line_counter, current_check[2] + 1))
 
-        print(current_check[1].rstrip())
-        print("          ^")
-        print("<stdin>:?:?: note: scanning from here")
-        print("TODO")
-        print("^")
-        print("<stdin>:?:?: note: possible intended match here")
-        print("TODO")
-        print("  ^")
-        exit(2)
+    print(current_check[1].rstrip())
+    print("          ^")
+    print("<stdin>:?:?: note: scanning from here")
+    print("TODO")
+    print("^")
+    print("<stdin>:?:?: note: possible intended match here")
+    print("TODO")
+    print("  ^")
+    exit(2)
 
     # print("foo: {}".format(line == "\n"))
 

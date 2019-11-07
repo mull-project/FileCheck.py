@@ -1,2 +1,3 @@
-make test-lit
+#!/bin/bash
 
+make test-lit
