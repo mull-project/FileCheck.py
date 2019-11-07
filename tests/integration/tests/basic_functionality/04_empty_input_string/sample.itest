@@ -1,3 +1,4 @@
 ; RUN: echo "" | %FILECHECK_EXEC %S/filecheck.check 2>&1 | %FILECHECK_TESTER_EXEC %s
 ; CHECK: FileCheck
-; CHECK-EMPTY
+; CHECK-EMPTY:
+
