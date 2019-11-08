@@ -92,18 +92,16 @@ for line in sys.stdin:
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
         if line != '\n':
-            assert 0
-        else:
-            try:
-                current_check = next(check_iterator)
-            except StopIteration:
-                exit(0)
+            assert 0, "Not implemented"
 
-    if current_check.check_type == CheckType.CHECK and current_check.expression in line:
-        try:
-            current_check = next(check_iterator)
-        except StopIteration:
-            exit(0)
+    if current_check.check_type == CheckType.CHECK:
+        if current_check.expression not in line:
+            continue
+
+    try:
+        current_check = next(check_iterator)
+    except StopIteration:
+        exit(0)
 
 if line_counter == 0:
     print("CHECK: FileCheck error: '-' is empty.")
