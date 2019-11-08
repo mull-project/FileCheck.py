@@ -4,11 +4,16 @@ import os
 import re
 import sys
 
+from collections import namedtuple
 from enum import Enum
+
 
 class CheckType(Enum):
     CHECK = 1
     CHECK_NOT = 2
+
+
+Check = namedtuple("Check", "check_type expression source_line start_index")
 
 # FileCheck always prints its first argument.
 print(sys.argv[0])
@@ -31,13 +36,25 @@ with open(check_file) as f:
     for line in f:
         check_match = re.search('; CHECK: (.*)', line)
         if check_match:
-            check = check_match.group(1)
-            checks.append((check, line, check_match.start(1), CheckType.CHECK))
+            check_expression = check_match.group(1)
+
+            check = Check(check_type=CheckType.CHECK,
+                          expression=check_expression,
+                          source_line=line,
+                          start_index=check_match.start(1))
+
+            checks.append(check)
 
         check_match = re.search('; CHECK-NOT: (.*)', line)
         if check_match:
-            check = check_match.group(1)
-            checks.append((check, line, check_match.start(1), CheckType.CHECK_NOT))
+            check_expression = check_match.group(1)
+
+            check = Check(check_type=CheckType.CHECK_NOT,
+                          expression=check_expression,
+                          source_line=line,
+                          start_index=check_match.start(1))
+
+            checks.append(check)
 
 
 check_iterator = iter(checks)
@@ -57,7 +74,7 @@ if not current_check:
 for line in sys.stdin:
     line_counter = 1
 
-    if current_check[0] in line and current_check[3] == CheckType.CHECK:
+    if current_check.expression in line and current_check.check_type == CheckType.CHECK:
         try:
             current_check = next(check_iterator)
         except StopIteration:
@@ -68,11 +85,11 @@ if line_counter == 0:
     print("FileCheck command line: {}".format(check_file))
     exit(2)
 
-if current_check[0] not in line and current_check[3] == CheckType.CHECK:
+if current_check.expression not in line and current_check.check_type == CheckType.CHECK:
     print("{}:{}:{}: error: CHECK: expected string not found in input"
-          .format(check_file, line_counter, current_check[2] + 1))
+          .format(check_file, line_counter, current_check.start_index + 1))
 
-    print(current_check[1].rstrip())
+    print(current_check.source_line.rstrip())
     print("          ^")
     print("<stdin>:?:?: note: scanning from here")
     print("TODO")
