@@ -4,6 +4,12 @@ import os
 import re
 import sys
 
+from enum import Enum
+
+class CheckType(Enum):
+    CHECK = 1
+    CHECK_NOT = 2
+
 print(sys.argv[0])
 if len(sys.argv) == 1:
     print("<check-file> not specified")
@@ -22,11 +28,15 @@ checks = []
 with open(check_file) as f:
     for line in f:
         check_match = re.search('; CHECK: (.*)', line)
-
         if check_match:
             check = check_match.group(1)
-            checks.append((check, line, check_match.start(1)))
-            # print(check)
+            checks.append((check, line, check_match.start(1), CheckType.CHECK))
+
+        check_match = re.search('; CHECK-NOT: (.*)', line)
+        if check_match:
+            check = check_match.group(1)
+            checks.append((check, line, check_match.start(1), CheckType.CHECK_NOT))
+
 
 check_iterator = iter(checks)
 
@@ -41,13 +51,13 @@ except StopIteration:
 for line in sys.stdin:
     line_counter = 1
 
-    if current_check and current_check[0] in line:
+    if current_check and current_check[0] in line and current_check[3] == CheckType.CHECK:
         try:
             current_check = next(check_iterator)
         except StopIteration:
             exit(0)
 
-if current_check and current_check[0] not in line:
+if current_check and current_check[0] not in line and current_check[3] == CheckType.CHECK:
     print("{}:{}:{}: error: CHECK: expected string not found in input"
           .format(check_file, line_counter, current_check[2] + 1))
 
@@ -66,6 +76,10 @@ if current_check and current_check[0] not in line:
 if line_counter == 0:
     print("CHECK: FileCheck error: '-' is empty.")
     print("FileCheck command line: {}".format(check_file))
+    exit(2)
+
+if not current_check:
+    print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
     exit(2)
 
 

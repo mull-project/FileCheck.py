@@ -1,0 +1,4 @@
+; RUN: echo "" | (%FILECHECK_EXEC %S/filecheck.check; test $? = 2) 2>&1 | %FILECHECK_TESTER_EXEC %s
+; CHECK: {{.*}}FileCheck
+; CHECK: error: no check strings found with prefix 'CHECK:'
+; CHECK-EMPTY
