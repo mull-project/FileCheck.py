@@ -81,9 +81,6 @@ current_check = None
 try:
     current_check = next(check_iterator)
 except StopIteration:
-    pass
-
-if not current_check:
     print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
     exit(2)
 
