@@ -34,6 +34,7 @@ if os.path.getsize(check_file) == 0:
 checks = []
 with open(check_file) as f:
     for line in f:
+        line = line.rstrip()
         check_match = re.search('; CHECK: (.*)', line)
         if check_match:
             check_expression = check_match.group(1)
@@ -56,6 +57,20 @@ with open(check_file) as f:
 
             checks.append(check)
 
+        check_match = re.search('; CHECK-EMPTY:', line)
+        if check_match:
+            check = Check(check_type=CheckType.CHECK_NOT,
+                          expression=None,
+                          source_line=line,
+                          start_index=-1)
+
+            if len(checks) == 0:
+                print("{}:{}:{}: error: found 'CHECK-EMPTY' without previous 'CHECK: line".format(check_file, 1, 3))
+                print(line)
+                print("  ^")
+                exit(2)
+
+            checks.append(check)
 
 check_iterator = iter(checks)
 
