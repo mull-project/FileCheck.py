@@ -90,12 +90,14 @@ if not current_check:
 for line in sys.stdin:
     line_counter = 1
 
-    # if current_check.check_type == CheckType.CHECK_EMPTY:
-    #     assert 0
-    #     try:
-    #         current_check = next(check_iterator)
-    #     except StopIteration:
-    #         exit(0)
+    if current_check.check_type == CheckType.CHECK_EMPTY:
+        if line != '\n':
+            assert 0
+        else:
+            try:
+                current_check = next(check_iterator)
+            except StopIteration:
+                exit(0)
 
     if current_check.check_type == CheckType.CHECK and current_check.expression in line:
         try:

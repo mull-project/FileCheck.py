@@ -1,0 +1,4 @@
+; CHECK: hello
+; CHECK-EMPTY:
+; CHECK: hello
+; CHECK-EMPTY:
