@@ -11,6 +11,7 @@ from enum import Enum
 class CheckType(Enum):
     CHECK = 1
     CHECK_NOT = 2
+    CHECK_EMPTY = 3
 
 
 Check = namedtuple("Check", "check_type expression source_line start_index")
@@ -59,7 +60,7 @@ with open(check_file) as f:
 
         check_match = re.search('; CHECK-EMPTY:', line)
         if check_match:
-            check = Check(check_type=CheckType.CHECK_NOT,
+            check = Check(check_type=CheckType.CHECK_EMPTY,
                           expression=None,
                           source_line=line,
                           start_index=-1)
@@ -89,7 +90,14 @@ if not current_check:
 for line in sys.stdin:
     line_counter = 1
 
-    if current_check.expression in line and current_check.check_type == CheckType.CHECK:
+    # if current_check.check_type == CheckType.CHECK_EMPTY:
+    #     assert 0
+    #     try:
+    #         current_check = next(check_iterator)
+    #     except StopIteration:
+    #         exit(0)
+
+    if current_check.check_type == CheckType.CHECK and current_check.expression in line:
         try:
             current_check = next(check_iterator)
         except StopIteration:
@@ -100,7 +108,10 @@ if line_counter == 0:
     print("FileCheck command line: {}".format(check_file))
     exit(2)
 
-if current_check.expression not in line and current_check.check_type == CheckType.CHECK:
+if current_check.check_type == CheckType.CHECK_EMPTY:
+    exit(0)
+
+if current_check.check_type == CheckType.CHECK and current_check.expression not in line:
     print("{}:{}:{}: error: CHECK: expected string not found in input"
           .format(check_file, line_counter, current_check.start_index + 1))
 
