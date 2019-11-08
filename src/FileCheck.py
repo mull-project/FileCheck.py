@@ -10,7 +10,9 @@ class CheckType(Enum):
     CHECK = 1
     CHECK_NOT = 2
 
+# FileCheck always prints its first argument.
 print(sys.argv[0])
+
 if len(sys.argv) == 1:
     print("<check-file> not specified")
     exit(2)
@@ -48,16 +50,25 @@ try:
 except StopIteration:
     pass
 
+if not current_check:
+    print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
+    exit(2)
+
 for line in sys.stdin:
     line_counter = 1
 
-    if current_check and current_check[0] in line and current_check[3] == CheckType.CHECK:
+    if current_check[0] in line and current_check[3] == CheckType.CHECK:
         try:
             current_check = next(check_iterator)
         except StopIteration:
             exit(0)
 
-if current_check and current_check[0] not in line and current_check[3] == CheckType.CHECK:
+if line_counter == 0:
+    print("CHECK: FileCheck error: '-' is empty.")
+    print("FileCheck command line: {}".format(check_file))
+    exit(2)
+
+if current_check[0] not in line and current_check[3] == CheckType.CHECK:
     print("{}:{}:{}: error: CHECK: expected string not found in input"
           .format(check_file, line_counter, current_check[2] + 1))
 
@@ -72,14 +83,5 @@ if current_check and current_check[0] not in line and current_check[3] == CheckT
     exit(2)
 
     # print("foo: {}".format(line == "\n"))
-
-if line_counter == 0:
-    print("CHECK: FileCheck error: '-' is empty.")
-    print("FileCheck command line: {}".format(check_file))
-    exit(2)
-
-if not current_check:
-    print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
-    exit(2)
 
 
