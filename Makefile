@@ -7,10 +7,18 @@ help: all
 .DEFAULT_GOAL := help
 
 .PHONY: test-lit
+
+ifdef REAL_ONLY
+test-lit: test-lit-real
+	@echo "Have run real FileCheck C++ tests."
+else
 test-lit: test-lit-real test-lit-py
+	@echo "Have run both real FileCheck C++ and FileCheck.py tests."
+endif
 
 FILECHECK_PY_EXEC=$(PWD)/src/FileCheck.py
 test-lit-py: ## Run LIT integration tests
+	@echo "--- Running integration tests against FileCheck.py ---"
 	cd tests/integration && make clean
 
 	CURRENT_DIR=$(PWD) \
@@ -21,6 +29,7 @@ test-lit-py: ## Run LIT integration tests
 
 FILECHECK_REAL_EXEC=$(PWD)/tests/integration/tools/FileCheck/FileCheck
 test-lit-real: ## Run LIT integration tests
+	@echo "--- Running integration tests against FileCheck C++ ---"
 	cd tests/integration && make clean
 
 	CURRENT_DIR=$(PWD) \
