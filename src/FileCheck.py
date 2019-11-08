@@ -8,13 +8,19 @@ from collections import namedtuple
 from enum import Enum
 
 
+class MatchType(Enum):
+    SUBSTRING = 1
+    EXACT_STRING = 2
+    REGEX = 3
+
+
 class CheckType(Enum):
     CHECK = 1
     CHECK_NOT = 2
     CHECK_EMPTY = 3
 
 
-Check = namedtuple("Check", "check_type expression source_line start_index")
+Check = namedtuple("Check", "check_type match_type expression source_line start_index")
 
 # FileCheck always prints its first argument.
 print(sys.argv[0])
@@ -40,7 +46,16 @@ with open(check_file) as f:
         if check_match:
             check_expression = check_match.group(1)
 
+            match_type = MatchType.SUBSTRING
+
+            regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", check_expression)
+
+            if check_expression != regex_line:
+                match_type = MatchType.REGEX
+                check_expression = regex_line
+
             check = Check(check_type=CheckType.CHECK,
+                          match_type=match_type,
                           expression=check_expression,
                           source_line=line,
                           start_index=check_match.start(1))
@@ -52,6 +67,7 @@ with open(check_file) as f:
             check_expression = check_match.group(1)
 
             check = Check(check_type=CheckType.CHECK_NOT,
+                          match_type=MatchType.SUBSTRING,
                           expression=check_expression,
                           source_line=line,
                           start_index=check_match.start(1))
@@ -61,6 +77,7 @@ with open(check_file) as f:
         check_match = re.search('; CHECK-EMPTY:', line)
         if check_match:
             check = Check(check_type=CheckType.CHECK_EMPTY,
+                          match_type=MatchType.SUBSTRING,
                           expression=None,
                           source_line=line,
                           start_index=-1)
@@ -92,8 +109,12 @@ for line in sys.stdin:
             assert 0, "Not implemented"
 
     if current_check.check_type == CheckType.CHECK:
-        if current_check.expression not in line:
+        if current_check.match_type == MatchType.SUBSTRING and current_check.expression not in line:
             continue
+
+        if current_check.match_type == MatchType.REGEX:
+            if not re.search(current_check.expression, line):
+                continue
 
     try:
         current_check = next(check_iterator)
