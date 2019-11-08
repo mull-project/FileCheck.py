@@ -129,19 +129,31 @@ if line_counter == 0:
 if current_check.check_type == CheckType.CHECK_EMPTY:
     exit(0)
 
-if current_check.check_type == CheckType.CHECK and current_check.expression not in line:
-    print("{}:{}:{}: error: CHECK: expected string not found in input"
-          .format(check_file, line_counter, current_check.start_index + 1))
+if current_check.check_type == CheckType.CHECK:
+    if current_check.match_type == MatchType.SUBSTRING:
+        print("{}:{}:{}: error: CHECK: expected string not found in input"
+              .format(check_file, line_counter, current_check.start_index + 1))
 
-    print(current_check.source_line.rstrip())
-    print("          ^")
-    print("<stdin>:?:?: note: scanning from here")
-    print("TODO")
-    print("^")
-    print("<stdin>:?:?: note: possible intended match here")
-    print("TODO")
-    print("  ^")
-    exit(2)
+        print(current_check.source_line.rstrip())
+        print("          ^")
+        print("<stdin>:?:?: note: scanning from here")
+        print("TODO")
+        print("^")
+        print("<stdin>:?:?: note: possible intended match here")
+        print("TODO")
+        print("  ^")
+        exit(2)
+
+    if current_check.match_type == MatchType.REGEX:
+        print("{}:{}:{}: error: CHECK: expected string not found in input"
+              .format(check_file, line_counter, current_check.start_index + 1))
+
+        print(current_check.source_line.rstrip())
+        print("          ^")
+        print("<stdin>:?:?: note: scanning from here")
+        print("TODO")
+        print("^")
+        exit(1)
 
     # print("foo: {}".format(line == "\n"))
 
