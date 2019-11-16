@@ -179,7 +179,7 @@ if current_check.check_type == CheckType.CHECK:
         print(current_check.source_line.rstrip())
         print("          ^")
         print("<stdin>:?:?: note: scanning from here")
-        print("TODO")
+        print(current_line)
         print("^")
         print("<stdin>:?:?: note: possible intended match here")
         print("TODO")
