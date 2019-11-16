@@ -22,6 +22,14 @@ class CheckType(Enum):
 
 Check = namedtuple("Check", "check_type match_type expression source_line start_index")
 
+def dump_check(check):
+    print("check dump")
+    print("\tcheck_type: {}".format(check.check_type))
+    print("\tmatch_type: {}".format(check.match_type))
+    print("\texpression: {}".format(check.expression))
+    print("\tsource_line: {}".format(check.source_line))
+    print("\tstart_index: {}".format(check.start_index))
+
 # FileCheck always prints its first argument.
 print(sys.argv[0])
 
@@ -63,18 +71,30 @@ with open(check_file) as f:
                           start_index=check_match.start(1))
 
             checks.append(check)
+            continue
 
         check_match = re.search('; CHECK-NOT: (.*)', line)
         if check_match:
+            match_type = MatchType.SUBSTRING
+
             check_expression = check_match.group(1)
 
+            regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", check_expression)
+
+            if check_expression != regex_line:
+                match_type = MatchType.REGEX
+                check_expression = regex_line
+            else:
+                check_expression = re.sub("\\s+", ' ', check_expression).strip()
+
             check = Check(check_type=CheckType.CHECK_NOT,
-                          match_type=MatchType.SUBSTRING,
+                          match_type=match_type,
                           expression=check_expression,
                           source_line=line,
                           start_index=check_match.start(1))
 
             checks.append(check)
+            continue
 
         check_match = re.search('; CHECK-EMPTY:', line)
         if check_match:
@@ -91,6 +111,7 @@ with open(check_file) as f:
                 exit(2)
 
             checks.append(check)
+            continue
 
 check_iterator = iter(checks)
 
@@ -103,7 +124,12 @@ except StopIteration:
     print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
     exit(2)
 
+current_line = None
+current_line_number = 0
 for line in sys.stdin:
+    current_line = line
+    current_line_number += 1
+
     line_counter = 1
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
@@ -117,9 +143,20 @@ for line in sys.stdin:
             if current_check.expression not in line:
                 continue
 
-        if current_check.match_type == MatchType.REGEX:
+        elif current_check.match_type == MatchType.REGEX:
             if not re.search(current_check.expression, line):
                 continue
+
+    if current_check.check_type == CheckType.CHECK_NOT:
+        if current_check.match_type == MatchType.SUBSTRING:
+            line = re.sub("\\s+", ' ', line).strip()
+
+            if current_check.expression in line:
+                break
+
+        elif current_check.match_type == MatchType.REGEX:
+            if re.search(current_check.expression, line):
+                break
 
     try:
         current_check = next(check_iterator)
@@ -156,10 +193,21 @@ if current_check.check_type == CheckType.CHECK:
         print(current_check.source_line.rstrip())
         print("          ^")
         print("<stdin>:?:?: note: scanning from here")
-        print("TODO")
+        print(line)
         print("^")
         exit(1)
 
-    # print("foo: {}".format(line == "\n"))
+if current_check.check_type == CheckType.CHECK_NOT:
+    if current_check.match_type == MatchType.SUBSTRING:
+        print("{}:{}:{}: error: CHECK-NOT: excluded string found in input"
+              .format(check_file, line_counter, current_check.start_index + 1))
 
+        print(current_check.source_line.rstrip())
+        print("^".rjust(current_check.start_index + 1))
+        print("<stdin>:?:?: note: found here")
+        print(current_line)
+        print("^".ljust(len(current_line), '~'))
+        exit(1)
 
+    if current_check.match_type == MatchType.REGEX:
+        assert 0, "Not implemented"
