@@ -53,6 +53,8 @@ with open(check_file) as f:
             if check_expression != regex_line:
                 match_type = MatchType.REGEX
                 check_expression = regex_line
+            else:
+                check_expression = re.sub("\\s+", ' ', check_expression).strip()
 
             check = Check(check_type=CheckType.CHECK,
                           match_type=match_type,
@@ -109,8 +111,11 @@ for line in sys.stdin:
             assert 0, "Not implemented"
 
     if current_check.check_type == CheckType.CHECK:
-        if current_check.match_type == MatchType.SUBSTRING and current_check.expression not in line:
-            continue
+        if current_check.match_type == MatchType.SUBSTRING:
+            line = re.sub("\\s+", ' ', line).strip()
+
+            if current_check.expression not in line:
+                continue
 
         if current_check.match_type == MatchType.REGEX:
             if not re.search(current_check.expression, line):

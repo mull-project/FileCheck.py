@@ -1,4 +1,4 @@
-# HELP ########################################################################
+### HELP #######################################################################
 
 .PHONY: help
 help:
@@ -37,3 +37,4 @@ test-lit-real: ## Run tests against FileCheck C++.
 		PATH=$(PWD)/tests/integration/tools/FileCheck:$(PWD)/tests/integration/tools:$$PATH \
 		lit \
 		-vv $(PWD)/tests/integration
+
