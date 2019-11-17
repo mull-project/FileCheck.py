@@ -198,7 +198,8 @@ if current_check.check_type == CheckType.CHECK:
         exit(1)
 
 if current_check.check_type == CheckType.CHECK_NOT:
-    if current_check.match_type == MatchType.SUBSTRING:
+    if (current_check.match_type == MatchType.SUBSTRING or
+            current_check.match_type == MatchType.REGEX):
         print("{}:{}:{}: error: CHECK-NOT: excluded string found in input"
               .format(check_file, line_counter, current_check.start_index + 1))
 
@@ -209,5 +210,4 @@ if current_check.check_type == CheckType.CHECK_NOT:
         print("^".ljust(len(current_line), '~'))
         exit(1)
 
-    if current_check.match_type == MatchType.REGEX:
-        assert 0, "Not implemented"
+    assert 0, "Not implemented"
