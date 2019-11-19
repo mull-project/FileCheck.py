@@ -16,7 +16,7 @@ test-lit: test-lit-real test-lit-py ## Run tests against both FileCheck C++ and 
 	@echo "Have run both real FileCheck C++ and FileCheck.py tests."
 endif
 
-FILECHECK_PY_EXEC=$(PWD)/src/FileCheck.py
+FILECHECK_PY_EXEC=$(PWD)/src/FileCheck
 test-lit-py: ## Run tests against FileCheck.py.
 	@echo "--- Running integration tests against FileCheck.py ---"
 	cd tests/integration && make clean

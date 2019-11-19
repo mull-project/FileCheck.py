@@ -1,4 +1,3 @@
-; RUN: (%FILECHECK_EXEC 2>&1; test $? = 2) | %FILECHECK_TESTER_EXEC %s
-; // TODO: learn how to much %s
-; CHECK: {{.*}}
+; RUN: (%FILECHECK_EXEC 2>&1; test $? = 2) | %FILECHECK_TESTER_EXEC %s --match-full-lines
+; CHECK: {{^.*}}FileCheck{{$}}
 ; CHECK-NEXT: <check-file> not specified
