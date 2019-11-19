@@ -5,7 +5,7 @@
 ; CHECK-NEXT: {{^}}         ^{{$}}
 ; CHECK-NEXT: {{^<stdin>:.*:.*: note: scanning from here$}}
 ; CHECK-NEXT: hello1
-; CHECK-NEXT: ^
+; CHECK-NEXT: {{^\^$}}
 ; CHECK-NEXT: {{^<stdin>:.*:.*: note: possible intended match here$}}
 ; CHECK: {{^.*$}}
 ; CHECK: ^
