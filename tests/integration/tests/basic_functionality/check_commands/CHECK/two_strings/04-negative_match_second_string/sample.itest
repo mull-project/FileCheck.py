@@ -7,6 +7,6 @@
 ; CHECK: hello2
 ; CHECK: ^{{$}}
 ; CHECK: {{^<stdin>:.*:.*: note: possible intended match here$}}
-; CHECK: {{^.*$}}
+; CHECK: hello2
 ; CHECK: ^
 ; CHECK-EMPTY:

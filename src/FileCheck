@@ -5,6 +5,7 @@ import re
 import sys
 
 from collections import namedtuple
+from difflib import SequenceMatcher
 from enum import Enum
 
 
@@ -21,6 +22,10 @@ class CheckType(Enum):
 
 
 Check = namedtuple("Check", "check_type match_type expression source_line check_line_idx start_index")
+
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 
 def dump_check(check):
@@ -185,6 +190,17 @@ if current_check.check_type == CheckType.CHECK_EMPTY:
 
 if current_check.check_type == CheckType.CHECK:
     if current_check.match_type == MatchType.SUBSTRING:
+        last_read_line = input_lines[current_scan_base]
+
+        candidate_line = None
+        current_best_ratio = 0
+        for read_line in input_lines[current_scan_base:]:
+            similar_ratio = similar(last_read_line, current_check.expression)
+            if current_best_ratio < similar_ratio:
+                candidate_line = read_line
+                current_best_ratio = similar_ratio
+        assert candidate_line
+
         print("{}:{}:{}: error: CHECK: expected string not found in input"
               .format(check_file,
                       current_check.check_line_idx + 1,
@@ -193,11 +209,11 @@ if current_check.check_type == CheckType.CHECK:
         print(current_check.source_line.rstrip())
         print("^".rjust(current_check.start_index + 1))
         print("<stdin>:?:?: note: scanning from here")
-        print(input_lines[current_scan_base])
+        print(last_read_line)
         print("^")
         print("<stdin>:?:?: note: possible intended match here")
-        print("TODO")
-        print("  ^")
+        print(candidate_line)
+        print("^".rjust(len(candidate_line) // 2, ' '))
         exit(1)
 
     if current_check.match_type == MatchType.REGEX:

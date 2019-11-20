@@ -8,5 +8,5 @@
 ; CHECK-NEXT: {{^\^$}}
 ; CHECK-NEXT: {{^<stdin>:.*:.*: note: possible intended match here$}}
 ; CHECK: {{^.*$}}
-; CHECK: ^
+; CHECK: {{^   \^$}}
 ; CHECK-EMPTY:
