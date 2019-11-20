@@ -3,9 +3,8 @@
 ; CHECK: {{.*filecheck.check:2:10: error: CHECK: expected string not found in input$}}
 ; CHECK: {{^}}; CHECK: foo{{$}}
 ; CHECK: {{^}}         ^{{$}}
-; TODO: The array of checks being scanned has to be maintained.
 ; CHECK: {{^<stdin>:.*:.*: note: scanning from here$}}
-; CHECK: {{^.*$}}
+; CHECK: hello2
 ; CHECK: ^{{$}}
 ; CHECK: {{^<stdin>:.*:.*: note: possible intended match here$}}
 ; CHECK: {{^.*$}}
