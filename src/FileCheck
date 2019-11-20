@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import re
 import sys
@@ -57,6 +58,13 @@ if os.path.getsize(check_file) == 0:
     print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
     exit(2)
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument('check_file_arg', type=str, help='TODO')
+parser.add_argument('--strict-whitespace', action='store_true', help='TODO')
+
+args = parser.parse_args()
+
 checks = []
 with open(check_file) as f:
     for line_idx, line in enumerate(f):
@@ -73,7 +81,8 @@ with open(check_file) as f:
                 match_type = MatchType.REGEX
                 check_expression = regex_line
             else:
-                check_expression = re.sub("\\s+", ' ', check_expression).strip()
+                if not args.strict_whitespace:
+                    check_expression = re.sub("\\s+", ' ', check_expression).strip()
 
             check = Check(check_type=CheckType.CHECK,
                           match_type=match_type,
@@ -154,7 +163,8 @@ for line_idx, line in enumerate(sys.stdin):
 
     elif current_check.check_type == CheckType.CHECK:
         if current_check.match_type == MatchType.SUBSTRING:
-            line = re.sub("\\s+", ' ', line).strip()
+            if not args.strict_whitespace:
+                line = re.sub("\\s+", ' ', line).strip()
 
             if current_check.expression not in line:
                 continue
