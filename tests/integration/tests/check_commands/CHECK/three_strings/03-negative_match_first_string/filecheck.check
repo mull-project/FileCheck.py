@@ -1,0 +1,3 @@
+; CHECK: foo
+; CHECK: hello2
+; CHECK: hello3
