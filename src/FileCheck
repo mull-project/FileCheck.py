@@ -132,18 +132,16 @@ except StopIteration:
     sys.stdout.flush()
     exit(2)
 
-current_line = None
-first_line = None
-current_line_number = 0
 line_counter = 0
 
-for line in sys.stdin:
-    if line_counter == 0:
-        first_line = line.rstrip()
-    line_counter = line_counter + 1
+input_lines = []
 
-    current_line = line
-    current_line_number += 1
+current_scan_base = 0
+
+for line_idx, line in enumerate(sys.stdin):
+    input_lines.append(line.rstrip())
+
+    line_counter = line_counter + 1
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
         if line != '\n':
@@ -173,6 +171,7 @@ for line in sys.stdin:
 
     try:
         current_check = next(check_iterator)
+        current_scan_base = line_idx + 1
     except StopIteration:
         exit(0)
 
@@ -194,7 +193,7 @@ if current_check.check_type == CheckType.CHECK:
         print(current_check.source_line.rstrip())
         print("^".rjust(current_check.start_index + 1))
         print("<stdin>:?:?: note: scanning from here")
-        print(first_line)
+        print(input_lines[current_scan_base])
         print("^")
         print("<stdin>:?:?: note: possible intended match here")
         print("TODO")
@@ -217,6 +216,7 @@ if current_check.check_type == CheckType.CHECK:
 if current_check.check_type == CheckType.CHECK_NOT:
     if (current_check.match_type == MatchType.SUBSTRING or
             current_check.match_type == MatchType.REGEX):
+        last_read_line = input_lines[-1]
         print("{}:{}:{}: error: CHECK-NOT: excluded string found in input"
               .format(check_file,
                       current_check.check_line_idx + 1,
@@ -225,8 +225,8 @@ if current_check.check_type == CheckType.CHECK_NOT:
         print(current_check.source_line.rstrip())
         print("^".rjust(current_check.start_index + 1))
         print("<stdin>:?:?: note: found here")
-        print(current_line)
-        print("^".ljust(len(current_line), '~'))
+        print(last_read_line)
+        print("^".ljust(len(last_read_line), '~'))
         exit(1)
 
     assert 0, "Not implemented"
