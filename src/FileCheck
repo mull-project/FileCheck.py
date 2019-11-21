@@ -69,6 +69,10 @@ checks = []
 with open(check_file) as f:
     for line_idx, line in enumerate(f):
         line = line.rstrip()
+
+        if not args.strict_whitespace:
+            line = re.sub("\\s+", ' ', line).strip()
+
         check_match = re.search('; CHECK: (.*)', line)
         if check_match:
             check_expression = check_match.group(1)
@@ -80,9 +84,6 @@ with open(check_file) as f:
             if check_expression != regex_line:
                 match_type = MatchType.REGEX
                 check_expression = regex_line
-            else:
-                if not args.strict_whitespace:
-                    check_expression = re.sub("\\s+", ' ', check_expression).strip()
 
             check = Check(check_type=CheckType.CHECK,
                           match_type=match_type,
@@ -105,9 +106,6 @@ with open(check_file) as f:
             if check_expression != regex_line:
                 match_type = MatchType.REGEX
                 check_expression = regex_line
-            else:
-                if not args.strict_whitespace:
-                    check_expression = re.sub("\\s+", ' ', check_expression).strip()
 
             check = Check(check_type=CheckType.CHECK_NOT,
                           match_type=match_type,
