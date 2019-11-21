@@ -106,7 +106,8 @@ with open(check_file) as f:
                 match_type = MatchType.REGEX
                 check_expression = regex_line
             else:
-                check_expression = re.sub("\\s+", ' ', check_expression).strip()
+                if not args.strict_whitespace:
+                    check_expression = re.sub("\\s+", ' ', check_expression).strip()
 
             check = Check(check_type=CheckType.CHECK_NOT,
                           match_type=match_type,
@@ -175,7 +176,8 @@ for line_idx, line in enumerate(sys.stdin):
 
     elif current_check.check_type == CheckType.CHECK_NOT:
         if current_check.match_type == MatchType.SUBSTRING:
-            line = re.sub("\\s+", ' ', line).strip()
+            if not args.strict_whitespace:
+                line = re.sub("\\s+", ' ', line).strip()
 
             if current_check.expression in line:
                 break
@@ -243,6 +245,9 @@ if current_check.check_type == CheckType.CHECK_NOT:
     if (current_check.match_type == MatchType.SUBSTRING or
             current_check.match_type == MatchType.REGEX):
         last_read_line = input_lines[-1]
+        if not args.strict_whitespace:
+            last_read_line = re.sub("\\s+", ' ', last_read_line).strip()
+
         print("{}:{}:{}: error: CHECK-NOT: excluded string found in input"
               .format(check_file,
                       current_check.check_line_idx + 1,
