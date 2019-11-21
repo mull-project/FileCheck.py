@@ -1,0 +1,15 @@
+; RUN: cat %S/filecheck.input | %FILECHECK_EXEC %S/filecheck.check | %FILECHECK_TESTER_EXEC %s --match-full-lines -check-prefix=NO_OPTION
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check --strict-whitespace 2>&1; test $? = 1) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines -check-prefix=OPTION
+
+; NO_OPTION: {{^.*}}FileCheck{{$}}
+; NO_OPTION-EMPTY:
+
+; OPTION:{{^.*}}FileCheck{{$}}
+; OPTION:{{^.*}}filecheck.check:1:10: error: CHECK: expected string not found in input{{$}}
+; OPTION:; CHECK: hello   world hello  world
+; OPTION:         ^
+; OPTION:{{^<stdin>:.*:.*: note: scanning from here$}}
+; OPTION:hello world hello world
+; OPTION:^
+; TODO: error: OPTION-EMPTY is not on the line after the previous match
+; OPTION-EMPTY
