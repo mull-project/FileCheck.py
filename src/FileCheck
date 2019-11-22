@@ -245,7 +245,7 @@ if current_check.check_type == CheckType.CHECK:
                       current_check.start_index + 1))
 
         print(current_check.source_line.rstrip())
-        print("          ^")
+        print("^".rjust(current_check.start_index + 1))
         print("<stdin>:?:?: note: scanning from here")
         print(line)
         print("^")
