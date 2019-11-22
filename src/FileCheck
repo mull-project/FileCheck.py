@@ -266,7 +266,7 @@ if current_check.check_type == CheckType.CHECK_NOT:
 
         print(current_check.source_line.rstrip())
         print("^".rjust(current_check.start_index + 1))
-        print("<stdin>:?:?: note: found here")
+        print("<stdin>:{}:{}: note: found here".format(current_scan_base + 1, 1))
         print(last_read_line)
 
         if current_check.match_type == MatchType.SUBSTRING:
