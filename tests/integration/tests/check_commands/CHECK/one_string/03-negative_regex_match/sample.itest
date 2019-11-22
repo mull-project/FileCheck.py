@@ -3,7 +3,7 @@
 ; CHECK:{{.*}}filecheck.check:1:10: error: CHECK: expected string not found in input{{$}}
 ; CHECK:{{^; CHECK: .....hello.....$}}
 ; CHECK:{{^         \^$}}
-; CHECK:{{^}}<stdin>:{{.}}:{{.}}: note: scanning from here{{$}}
+; CHECK:<stdin>:1:1: note: scanning from here
 ; CHECK:h e llo
 ; CHECK:^
 ; CHECK-EMPTY:
