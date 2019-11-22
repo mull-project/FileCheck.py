@@ -228,12 +228,14 @@ if current_check.check_type == CheckType.CHECK:
 
         print(current_check.source_line.rstrip())
         print("^".rjust(current_check.start_index + 1))
-        print("<stdin>:?:?: note: scanning from here")
+        print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
         print(last_read_line)
         print("^")
-        print("<stdin>:?:?: note: possible intended match here")
+
+        caret_pos = len(candidate_line) // 2 + 1
+        print("<stdin>:{}:{}: note: possible intended match here".format(current_scan_base + 1, caret_pos))
         print(candidate_line)
-        print("^".rjust(len(candidate_line) // 2, ' '))
+        print("^".rjust(caret_pos, ' '))
         exit(1)
 
     if current_check.match_type == MatchType.REGEX:
