@@ -1,0 +1,14 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; CHECK:{{^.*}}FileCheck{{$}}
+; CHECK-NEXT:{{.*}}filecheck.check:2:15: error: CHECK-NEXT: is not on the line after the previous match{{$}}
+; CHECK-NEXT:; CHECK-NEXT: string 3
+; CHECK-NEXT:              ^
+; CHECK-NEXT:<stdin>:3:1: note: 'next' match was here
+; CHECK-NEXT:string 3
+; CHECK-NEXT:^
+; CHECK-NEXT:<stdin>:1:9: note: previous match ended here
+; CHECK-NEXT:string 1
+; CHECK-NEXT:        ^
+; CHECK-NEXT:<stdin>:2:1: note: non-matching line after previous match is here
+; CHECK-NEXT:string 2
+; CHECK-NEXT:^
