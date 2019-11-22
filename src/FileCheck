@@ -18,8 +18,9 @@ class MatchType(Enum):
 
 class CheckType(Enum):
     CHECK = 1
-    CHECK_NOT = 2
-    CHECK_EMPTY = 3
+    CHECK_NEXT = 2
+    CHECK_NOT = 3
+    CHECK_EMPTY = 4
 
 
 Check = namedtuple("Check", "check_type match_type expression source_line check_line_idx start_index")
@@ -83,9 +84,17 @@ with open(check_file) as f:
         if not args.strict_whitespace:
             line = re.sub("\\s+", ' ', line).strip()
 
+        # CHECK and CHECK-NEXT
         strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " ?"
+
         check_regex = "; {}:{}(.*)".format(check_prefix, strict_whitespace_match)
         check_match = re.search(check_regex, line)
+        check_type = CheckType.CHECK
+        if not check_match:
+            check_regex = "; {}-NEXT:{}(.*)".format(check_prefix, strict_whitespace_match)
+            check_match = re.search(check_regex, line)
+            check_type = CheckType.CHECK_NEXT
+
         if check_match:
             check_expression = check_match.group(1)
 
@@ -97,7 +106,7 @@ with open(check_file) as f:
                 match_type = MatchType.REGEX
                 check_expression = regex_line
 
-            check = Check(check_type=CheckType.CHECK,
+            check = Check(check_type=check_type,
                           match_type=match_type,
                           expression=check_expression,
                           source_line=line,
@@ -192,6 +201,22 @@ for line_idx, line in enumerate(sys.stdin):
         elif current_check.match_type == MatchType.REGEX:
             if not re.search(current_check.expression, line):
                 continue
+
+    elif current_check.check_type == CheckType.CHECK_NEXT:
+        if current_check.match_type == MatchType.SUBSTRING:
+            if not args.strict_whitespace:
+                line = re.sub("\\s+", ' ', line).strip()
+
+            if args.match_full_lines:
+                if current_check.expression != line:
+                    break
+            else:
+                if current_check.expression not in line:
+                    break
+
+        elif current_check.match_type == MatchType.REGEX:
+            if not re.search(current_check.expression, line):
+                break
 
     elif current_check.check_type == CheckType.CHECK_NOT:
         if current_check.match_type == MatchType.SUBSTRING:
@@ -292,3 +317,30 @@ if current_check.check_type == CheckType.CHECK_NOT:
         exit(1)
 
     assert 0, "Not implemented"
+
+if current_check.check_type == CheckType.CHECK_NEXT:
+    if current_check.match_type == MatchType.SUBSTRING:
+        last_read_line = input_lines[current_scan_base]
+        # candidate_line = None
+        # current_best_ratio = 0
+        # for read_line in input_lines[current_scan_base:]:
+        #     similar_ratio = similar(last_read_line, current_check.expression)
+        #     if current_best_ratio < similar_ratio:
+        #         candidate_line = read_line
+        #         current_best_ratio = similar_ratio
+        # assert candidate_line
+
+        print("{}:{}:{}: error: CHECK-NEXT: expected string not found in input"
+              .format(check_file,
+                      current_check.check_line_idx + 1,
+                      current_check.start_index + 1))
+
+        print(current_check.source_line.rstrip())
+        print("^".rjust(current_check.start_index + 1))
+        print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
+        print(last_read_line)
+        print("^")
+
+        exit(1)
+
+    assert 0

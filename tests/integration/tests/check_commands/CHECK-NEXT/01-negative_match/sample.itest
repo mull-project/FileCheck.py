@@ -1,0 +1,9 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; CHECK:{{^.*}}FileCheck{{$}}
+; CHECK:{{.*}}filecheck.check:2:15: error: CHECK-NEXT: expected string not found in input
+; CHECK:; CHECK-NEXT: foo
+; CHECK:              ^
+; CHECK:<stdin>:2:1: note: scanning from here
+; CHECK:string 2
+; CHECK:^
+; CHECK-EMPTY:
