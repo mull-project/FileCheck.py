@@ -175,7 +175,8 @@ input_lines = []
 
 current_scan_base = 0
 
-for line_idx, line in enumerate(sys.stdin):
+stdin_input_iter = enumerate(sys.stdin)
+for line_idx, line in stdin_input_iter:
     line = line.rstrip()
 
     input_lines.append(line)
@@ -319,28 +320,53 @@ if current_check.check_type == CheckType.CHECK_NOT:
     assert 0, "Not implemented"
 
 if current_check.check_type == CheckType.CHECK_NEXT:
+    last_read_line = input_lines[current_scan_base]
+
     if current_check.match_type == MatchType.SUBSTRING:
-        last_read_line = input_lines[current_scan_base]
-        # candidate_line = None
-        # current_best_ratio = 0
-        # for read_line in input_lines[current_scan_base:]:
-        #     similar_ratio = similar(last_read_line, current_check.expression)
-        #     if current_best_ratio < similar_ratio:
-        #         candidate_line = read_line
-        #         current_best_ratio = similar_ratio
-        # assert candidate_line
+        matching_line_idx = -1
+        for line_idx, line in stdin_input_iter:
+            line = line.rstrip()
+            input_lines.append(line)
 
-        print("{}:{}:{}: error: CHECK-NEXT: expected string not found in input"
-              .format(check_file,
-                      current_check.check_line_idx + 1,
-                      current_check.start_index + 1))
+            if current_check.expression in line:
+                matching_line_idx = line_idx
 
-        print(current_check.source_line.rstrip())
-        print("^".rjust(current_check.start_index + 1))
-        print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
-        print(last_read_line)
-        print("^")
+        if matching_line_idx == -1:
+            print("{}:{}:{}: error: CHECK-NEXT: expected string not found in input"
+                  .format(check_file,
+                          current_check.check_line_idx + 1,
+                          current_check.start_index + 1))
 
-        exit(1)
+            print(current_check.source_line.rstrip())
+            print("^".rjust(current_check.start_index + 1))
+            print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
+            print(last_read_line)
+            print("^")
 
-    assert 0
+            exit(1)
+        else:
+            assert current_scan_base > 0
+            previous_matched_line = input_lines[current_scan_base - 1]
+
+            print("{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match"
+                  .format(check_file,
+                          current_check.check_line_idx + 1,
+                          current_check.start_index + 1))
+            print(current_check.source_line.rstrip())
+            print("^".rjust(current_check.start_index + 1))
+
+            matching_line = input_lines[matching_line_idx]
+            print("<stdin>:{}:1: note: 'next' match was here".format(matching_line_idx + 1))
+            print(matching_line)
+            print("^")
+
+            print("<stdin>:{}:{}: note: previous match ended here".format(current_scan_base, len(previous_matched_line) + 1))
+            print(previous_matched_line)
+            print("^".rjust(len(previous_matched_line) + 1))
+            print("<stdin>:{}:{}: note: non-matching line after previous match is here".format(current_scan_base + 1, 1))
+            print(last_read_line)
+            print("^")
+
+            exit(1)
+
+    assert 0, "Not implemented"
