@@ -1,0 +1,4 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check --match-full-lines --strict-whitespace 2>&1; test $? = 0;) | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
+
+; CHECK:{{^.*}}FileCheck{{$}}
+; CHECK-EMPTY:

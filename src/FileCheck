@@ -62,6 +62,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('check_file_arg', type=str, help='TODO')
 parser.add_argument('--strict-whitespace', action='store_true', help='TODO')
+parser.add_argument('--match-full-lines', action='store_true', help='TODO')
 
 args = parser.parse_args()
 
@@ -73,7 +74,10 @@ with open(check_file) as f:
         if not args.strict_whitespace:
             line = re.sub("\\s+", ' ', line).strip()
 
-        check_match = re.search('; CHECK: (.*)', line)
+        strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " ?"
+        check_regex = "; CHECK:{}(.*)".format(strict_whitespace_match)
+
+        check_match = re.search(check_regex, line)
         if check_match:
             check_expression = check_match.group(1)
 
@@ -152,12 +156,14 @@ input_lines = []
 current_scan_base = 0
 
 for line_idx, line in enumerate(sys.stdin):
-    input_lines.append(line.rstrip())
+    line = line.rstrip()
+
+    input_lines.append(line)
 
     line_counter = line_counter + 1
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
-        if line != '\n':
+        if line != '':
             assert 0, "Not implemented"
 
     elif current_check.check_type == CheckType.CHECK:
@@ -165,8 +171,12 @@ for line_idx, line in enumerate(sys.stdin):
             if not args.strict_whitespace:
                 line = re.sub("\\s+", ' ', line).strip()
 
-            if current_check.expression not in line:
-                continue
+            if args.match_full_lines:
+                if current_check.expression != line:
+                    continue
+            else:
+                if current_check.expression not in line:
+                    continue
 
         elif current_check.match_type == MatchType.REGEX:
             if not re.search(current_check.expression, line):
@@ -243,6 +253,7 @@ if current_check.check_type == CheckType.CHECK_NOT:
     if (current_check.match_type == MatchType.SUBSTRING or
             current_check.match_type == MatchType.REGEX):
         last_read_line = input_lines[-1]
+
         if not args.strict_whitespace:
             last_read_line = re.sub("\\s+", ' ', last_read_line).strip()
 
@@ -255,7 +266,16 @@ if current_check.check_type == CheckType.CHECK_NOT:
         print("^".rjust(current_check.start_index + 1))
         print("<stdin>:?:?: note: found here")
         print(last_read_line)
-        print("^".ljust(len(last_read_line), '~'))
+
+        if current_check.match_type == MatchType.SUBSTRING:
+            match_pos = last_read_line.find(current_check.expression)
+            assert match_pos != -1
+
+            highlight_line = "^".rjust(match_pos, ' ')
+            print("^".ljust(len(current_check.expression), '~'))
+        else:
+            print("^".ljust(len(last_read_line), '~'))
+
         exit(1)
 
     assert 0, "Not implemented"
