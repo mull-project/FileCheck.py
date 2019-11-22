@@ -48,9 +48,9 @@ if len(sys.argv) == 1:
 
 check_file = sys.argv[1]
 if not os.path.isfile(check_file):
+    sys.stdout.flush()
     err = "Could not open check file '{}': No such file or directory".format(check_file)
     print(err)
-    sys.stdout.flush()
     exit(2)
 
 if os.path.getsize(check_file) == 0:
@@ -63,8 +63,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument('check_file_arg', type=str, help='TODO')
 parser.add_argument('--strict-whitespace', action='store_true', help='TODO')
 parser.add_argument('--match-full-lines', action='store_true', help='TODO')
+parser.add_argument('--check-prefix', action='store', help='TODO')
 
 args = parser.parse_args()
+
+check_prefix = args.check_prefix if args.check_prefix else "CHECK"
+
+if not re.search('^[A-Za-z][A-Za-z0-9-_]+$', check_prefix):
+    sys.stdout.flush()
+    error_message = "Supplied check-prefix is invalid! Prefixes must be unique and start with a letter and contain only alphanumeric characters, hyphens and underscores"
+    print(error_message, file=sys.stderr)
+    exit(2)
 
 checks = []
 with open(check_file) as f:
@@ -75,8 +84,7 @@ with open(check_file) as f:
             line = re.sub("\\s+", ' ', line).strip()
 
         strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " ?"
-        check_regex = "; CHECK:{}(.*)".format(strict_whitespace_match)
-
+        check_regex = "; {}:{}(.*)".format(check_prefix, strict_whitespace_match)
         check_match = re.search(check_regex, line)
         if check_match:
             check_expression = check_match.group(1)
@@ -99,7 +107,8 @@ with open(check_file) as f:
             checks.append(check)
             continue
 
-        check_match = re.search('; CHECK-NOT: (.*)', line)
+        check_not_regex = "; {}-NOT: (.*)".format(check_prefix)
+        check_match = re.search(check_not_regex, line)
         if check_match:
             match_type = MatchType.SUBSTRING
 
@@ -121,7 +130,8 @@ with open(check_file) as f:
             checks.append(check)
             continue
 
-        check_match = re.search('; CHECK-EMPTY:', line)
+        check_empty_regex = "; {}-EMPTY:".format(check_prefix)
+        check_match = re.search(check_empty_regex, line)
         if check_match:
             check = Check(check_type=CheckType.CHECK_EMPTY,
                           match_type=MatchType.SUBSTRING,
@@ -145,7 +155,8 @@ current_check = None
 try:
     current_check = next(check_iterator)
 except StopIteration:
-    print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
+    error_message = "error: no check strings found with prefix '{}:'".format(check_prefix)
+    print(error_message, file=sys.stderr)
     sys.stdout.flush()
     exit(2)
 
