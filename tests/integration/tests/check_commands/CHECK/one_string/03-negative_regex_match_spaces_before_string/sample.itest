@@ -3,7 +3,10 @@
 ; CHECK-NEXT:{{.*}}filecheck.check:1:10: error: CHECK: expected string not found in input{{$}}
 ; CHECK-NEXT:{{^; CHECK: .....hello.....$}}
 ; CHECK-NEXT:{{^         \^$}}
-; CHECK-NEXT:<stdin>:1:1: note: scanning from here
-; CHECK-NEXT:h e llo
-; CHECK-NEXT:^
+; TODO: It is weird that FileCheck C++ eats whitespaces and therefore does not
+; TODO: show original line which was not possible to match.
+; TODO: We prefer to print original lines, so regex below accommodates this.
+; CHECK-NEXT:{{^<stdin>:1:(1|2): note: scanning from here$}}
+; CHECK-NEXT:{{^ (  )?h e llo$}}
+; CHECK-NEXT:{{^ ?\^$}}
 ; CHECK-EMPTY:

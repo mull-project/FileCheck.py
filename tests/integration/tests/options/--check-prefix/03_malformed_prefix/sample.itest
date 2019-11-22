@@ -1,0 +1,5 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check --check-prefix "GARBAGE1.23.4.2" 2>&1; test $? = 2) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+
+; CHECK:{{^.*}}FileCheck{{$}}
+; CHECK:Supplied check-prefix is invalid! Prefixes must be unique and start with a letter and contain only alphanumeric characters, hyphens and underscores
+; CHECK-EMPTY:

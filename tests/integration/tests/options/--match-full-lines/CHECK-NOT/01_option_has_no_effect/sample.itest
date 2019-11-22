@@ -1,0 +1,11 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1) | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check --match-full-lines 2>&1; test $? = 1) | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
+
+; CHECK:{{^.*}}FileCheck{{$}}
+; CHECK:{{^.*}}filecheck.check:1:14: error: CHECK-NOT: excluded string found in input{{$}}
+; CHECK:; CHECK-NOT: hello world
+; CHECK:             ^
+; CHECK:{{^<stdin>:.:.: note: found here$}}
+; CHECK:hello world hello world
+; CHECK:^~~~~~~~~~~
+; CHECK-EMPTY:
