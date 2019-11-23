@@ -1,0 +1,73 @@
+Extracting bitcode from executable (threads: 1): 0/1
+Extracting bitcode from executable (threads: 1): 1/1. Finished in 3ms.
+
+Loading bitcode files (threads: 1): 0/1
+Loading bitcode files (threads: 1): 1/1. Finished in 12ms.
+
+AST Search: looking for mutations in the source files (threads: 1): 0/1
+AST Search: looking for mutations in the source files (threads: 1): 1/1. Finished in 12ms.
+
+Compiling instrumented code (threads: 1): 0/1
+Compiling instrumented code (threads: 1): 1/1. Finished in 12ms.
+
+Loading dynamic libraries (threads: 1): 0/1
+Loading dynamic libraries (threads: 1): 1/1. Finished in 0ms.
+
+Searching tests (threads: 1): 0/1
+Searching tests (threads: 1): 1/1. Finished in 0ms.
+
+Preparing original test run (threads: 1): 0/1
+Preparing original test run (threads: 1): 1/1. Finished in 1ms.
+
+Running original tests (threads: 1): 0/1
+Running original tests (threads: 1): 1/1. Finished in 10ms.
+
+Applying function filter: no debug info (threads: 1): 0/1
+Applying function filter: no debug info (threads: 1): 1/1. Finished in 13ms.
+
+Applying function filter: file path (threads: 1): 0/1
+Applying function filter: file path (threads: 1): 1/1. Finished in 10ms.
+
+Instruction selection (threads: 1): 0/1
+Instruction selection (threads: 1): 1/1. Finished in 13ms.
+
+Searching mutants across functions (threads: 1): 0/1
+Searching mutants across functions (threads: 1): 1/1. Finished in 10ms.
+MutationsFinder: found 1 mutations.
+
+Applying filter: no debug info (threads: 1): 0/1
+Applying filter: no debug info (threads: 1): 1/1. Finished in 0ms.
+
+Applying filter: file path (threads: 1): 0/1
+Applying filter: file path (threads: 1): 1/1. Finished in 1ms.
+
+Prepare mutations (threads: 1): 0/1
+Prepare mutations (threads: 1): 1/1. Finished in 0ms.
+
+Cloning functions for mutation (threads: 1): 0/1
+Cloning functions for mutation (threads: 1): 1/1. Finished in 12ms.
+
+Removing original functions (threads: 1): 0/1
+Removing original functions (threads: 1): 1/1. Finished in 11ms.
+
+Redirect mutated functions (threads: 1): 0/1
+Redirect mutated functions (threads: 1): 1/1. Finished in 0ms.
+
+Applying mutations (threads: 1): 0/1
+Applying mutations (threads: 1): 1/1. Finished in 0ms.
+
+Compiling original code (threads: 1): 0/1
+Compiling original code (threads: 1): 1/1. Finished in 11ms.
+
+Running mutants (threads: 1): 0/1
+Running mutants (threads: 1): 1/1. Finished in 11ms.
+
+Survived mutants (0/1):
+
+/opt/mull-integration-tests/tests/mutations/scalar_value/13_enum_value/sample.cpp:17:3: warning: Replacing scalar with 0 or 42
+  return SUCCESS;
+  ^
+Mutation score: 100%
+Mutation Testing Elements reporter: generating report to /opt/mull-integration-tests/tests/mutations/scalar_value/13_enum_value/report.json
+
+Total execution time: 146ms
