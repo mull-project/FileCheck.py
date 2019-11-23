@@ -1,0 +1,23 @@
+/**
+; RUN: cd / && %CLANG_EXEC -fembed-bitcode -g -O0 -MJ %S/raw_compilation_database.tmp %s -o %s.exe
+; RUN: cd %CURRENT_DIR
+; RUN: compilation_database.sh %S/raw_compilation_database.tmp %S/compile_commands.tmp
+; RUN: compilation_database.py %S/compile_commands.tmp %S/compile_commands.json
+; RUN: %MULL_EXEC -enable-ast -test-framework CustomTest -compdb-path %S/compile_commands.json -compilation-flags="" -mutators=scalar_value_mutator -reporters=IDE -reporters=Elements -report-dir=%S -report-name=report %s.exe| %FILECHECK_EXEC %s --strict-whitespace
+; CHECK-NOT: No mutants found. Mutation score: infinitely high
+; CHECK: Running mutants (threads: 1): 0/1{{.*$}}
+; CHECK: {{.*}}:17:3: warning: Replacing scalar with 0 or 42
+; CHECK: {{^  }}return SUCCESS;{{$}}
+; CHECK: {{^  }}^{{$}}
+**/
+
+enum Enum { SUCCESS = 1234 };
+
+Enum foo() {
+  return SUCCESS;
+};
+
+int main() {
+  return foo() != SUCCESS;
+}
+
