@@ -1,0 +1,3 @@
+; CHECK: foo
+; CHECK-EMPTY:
+; CHECK-NEXT: bar
