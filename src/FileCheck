@@ -44,6 +44,16 @@ def escape_non_regex_parts(string):
 
     return regex_line
 
+
+# By default, FileCheck canonicalizes input horizontal whitespace (spaces and
+# tabs) which causes it to ignore these differences (a space will match a tab).
+# The --strict-whitespace argument disables this behavior.
+# https://llvm.org/docs/CommandGuide/FileCheck.html#cmdoption-filecheck-strict-whitespace
+def canonicalize_whitespace(input):
+    output = re.sub("\\s+", ' ', input)
+    return output
+
+
 def dump_check(check):
     print("check dump")
     print("\tcheck_type: {}".format(check.check_type))
@@ -96,7 +106,7 @@ with open(check_file) as f:
         line = line.rstrip()
 
         if not args.strict_whitespace:
-            line = re.sub("\\s+", ' ', line)
+            line = canonicalize_whitespace(line)
 
         # CHECK and CHECK-NEXT
         strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " ?"
@@ -193,7 +203,7 @@ stdin_input_iter = enumerate(sys.stdin)
 for line_idx, line in stdin_input_iter:
     line = line.rstrip()
     if not args.strict_whitespace:
-        line = re.sub("\\s+", ' ', line)
+        line = canonicalize_whitespace(line)
 
     input_lines.append(line)
 
