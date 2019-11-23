@@ -137,9 +137,9 @@ with open(check_file) as f:
 
             check_expression = check_match.group(1)
 
-            regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", check_expression)
-
-            if check_expression != regex_line:
+            if re.search(r"\{\{.*\}\}", check_expression):
+                regex_line = escape_non_regex_parts(check_expression)
+                regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", regex_line)
                 match_type = MatchType.REGEX
                 check_expression = regex_line
 

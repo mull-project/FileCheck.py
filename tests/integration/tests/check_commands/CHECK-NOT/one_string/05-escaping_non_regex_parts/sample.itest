@@ -1,0 +1,12 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; CHECK:{{^.*}}FileCheck{{$}}
+; CHECK-NEXT:{{^.*}}filecheck.check:1:14: error: CHECK-NOT: excluded string found in input{{$}}
+; TODO: Here we could do a better match.
+; CHECK-NEXT:{{^; CHECK-NOT: .....The following braces must be escaped by FileCheck: \( inside braces \): 0\/1.....$}}
+; TODO: Real FileCheck ignores whitespaces even when regex is passed.
+; TODO: The next step is to check the --strict-whitespace option.
+; CHECK-NEXT:{{^             \^$}}
+; CHECK-NEXT:{{^<stdin>:1:1: note: found here$}}
+; CHECK-NEXT:{{^}}The following braces must be escaped by FileCheck: ( inside braces ): 0/1{{$}}
+; CHECK-NEXT:{{^}}^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{{$}}
+; CHECK-EMPTY:
