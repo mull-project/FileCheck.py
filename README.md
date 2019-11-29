@@ -27,14 +27,15 @@ tests suite which uses only a very limited subset of FileCheck's features which
 are as follows:
 
 - Commands (both substring and regex matching):
-  - [ ] `CHECK`
-  - [ ] `CHECK-NEXT`
-  - [ ] `CHECK-NOT`
-  - [ ] `CHECK-EMPTY`
+  - [x] `CHECK`
+  - [x] `CHECK-NEXT`
+  - [x] `CHECK-NOT`
+  - [x] `CHECK-EMPTY`
+  
 - Options:
-  - [ ] `--strict-whitespace`
-  - [ ] `--match-full-lines`
-  - [ ] `--check-prefix`
+  - [x] `--strict-whitespace`
+  - [x] `--match-full-lines`
+  - [x] `--check-prefix`
 
 When this is done, it feels like a good idea to implement full FileCheck's
 contract and be 100% compatible with the C++ version.
