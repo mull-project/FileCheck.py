@@ -39,16 +39,19 @@ the check file:
 .. code-block:: bash
 
    $ echo "Hello world" | filecheck hello-world.check
-   /usr/local/bin/FileCheck
+   /usr/local/bin/filecheck
    $ echo $?
    0
+
+**Note:** By convention, original LLVM's ``FileCheck`` always prints a full
+path to its executable and ``FileCheck.py`` follows this convention.
 
 If we provide give an invalid output we will see an error message:
 
 .. code-block:: bash
 
    $ echo "What is FileCheck" | filecheck hello-world.check
-   /usr/local/bin/FileCheck
+   /usr/local/bin/filecheck
    examples/hello-world.check:1:10: error: CHECK: expected string not found in input
    ; CHECK: Hello world
             ^
@@ -75,8 +78,8 @@ Let's run it with a valid input:
 
 .. code-block:: bash
 
-   echo "Hello world" | ./src/FileCheck examples/hello-world-regex.check
-   /usr/local/bin/FileCheck
+   echo "Hello world" | filecheck examples/hello-world-regex.check
+   /usr/local/bin/filecheck
    $ echo $?
    0
 
@@ -84,8 +87,8 @@ With invalid input:
 
 .. code-block:: bash
 
-   $ echo "Hello world Hello world" | ./src/FileCheck examples/hello-world-regex.check
-   /usr/local/bin/FileCheck
+   $ echo "Hello world Hello world" | filecheck examples/hello-world-regex.check
+   /usr/local/bin/filecheck
    examples/hello-world-regex.check:1:10: error: CHECK: expected string not found in input
    ; CHECK: {{^Hello world$}}
             ^
