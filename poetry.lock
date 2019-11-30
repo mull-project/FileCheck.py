@@ -1,0 +1,14 @@
+[[package]]
+category = "dev"
+description = "A Software Testing Tool"
+name = "lit"
+optional = false
+python-versions = "*"
+version = "0.9.0"
+
+[metadata]
+content-hash = "50f47cfff0a332393b8edae898b2a7e4efd01d4f306246d32bb98c52e8701baa"
+python-versions = "^3.4"
+
+[metadata.hashes]
+lit = ["c035aa0a233633f7046745164a153a57d8bbcaf9b833232438cf4d2923d8786e"]
