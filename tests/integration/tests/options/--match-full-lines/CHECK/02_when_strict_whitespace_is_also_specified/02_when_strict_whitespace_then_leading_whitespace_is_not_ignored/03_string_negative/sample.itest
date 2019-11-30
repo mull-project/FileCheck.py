@@ -1,6 +1,6 @@
 ; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check --match-full-lines --strict-whitespace 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
 
-; CHECK:{{^.*}}FileCheck{{$}}
+; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
 ; TODO: Is this FileCheck bug? (caret is -1 wrong and therefore position is either 9 or 10)
 ; CHECK:{{^.*filecheck.check:1:(9|10): error: CHECK: expected string not found in input$}}
 ; CHECK:; CHECK: hello world
