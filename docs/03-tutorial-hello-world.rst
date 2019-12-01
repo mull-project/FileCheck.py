@@ -13,8 +13,8 @@ available in your PATH:
 FileCheck can be seen as an improved version of ``grep`` that makes automated
 testing of the command-line tools easier. FileCheck reads an input and scans it
 against a number of checks which can be substring or regex matches. If all check
-matches are found, ``FileCheck`` exists with an exit code ``0``. When a check
-without a match found, the FileCheck prints an error message and exists with an
+matches are found, ``FileCheck`` exits with an exit code ``0``. When a check
+without a match found, the FileCheck prints an error message and exits with an
 exit code ``1``.
 
 The FileCheck program expects a path to a check file and a number of optional
@@ -46,7 +46,7 @@ the check file:
 **Note:** By convention, original LLVM's ``FileCheck`` always prints a full
 path to its executable and ``FileCheck.py`` follows this convention.
 
-If we provide give an invalid output we will see an error message:
+If we provide an invalid output we will see an error message:
 
 .. code-block:: bash
 
