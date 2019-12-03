@@ -1,0 +1,19 @@
+; RUN: (%FILECHECK_EXEC --help 2>&1; test $? = 0) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
+; CHECK-NEXT:{{^USAGE: FileCheck.* \[options\] <check-file>$}}
+; CHECK-EMPTY:
+; CHECK-NEXT:OPTIONS:
+; CHECK-EMPTY:
+
+; FileCheck C++ prints options without -- but with - only.
+; FileCheck.py is made consistent so below we use regex matches to accomodate
+; for both - and -- versions.
+; CHECK:General options:
+; CHECK-EMPTY:
+; CHECK:{{^  --?match-full-lines             - Require all positive matches to cover an entire input line.$}}
+; CHECK-NEXT:{{^                                   ?Allows leading and trailing whitespace if --strict-whitespace$}}
+; CHECK-NEXT:{{^                                   ?is not also passed.$}}
+; CHECK-NEXT:{{^  --?strict-whitespace            - Do not treat all horizontal whitespace as equivalent$}}
+
+; CHECK:{{Generic [Oo]ptions:}}
+; CHECK-EMPTY:
