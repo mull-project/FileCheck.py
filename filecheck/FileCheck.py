@@ -30,6 +30,26 @@ def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
 
+def print_help():
+    print("USAGE: FileCheck-macOS [options] <check-file>")
+    print("")
+
+    print("OPTIONS:")
+    print("")
+
+    print("General options:")
+    print("")
+    print("  --match-full-lines             - Require all positive matches to cover an entire input line.")
+    print("                                   Allows leading and trailing whitespace if --strict-whitespace")
+    print("                                   is not also passed.")
+    print("  --strict-whitespace            - Do not treat all horizontal whitespace as equivalent")
+    print("")
+
+    print("Generic options:")
+    print("")
+    print("--help                         - Display available options")
+
+
 def escape_non_regex_or_skip(match_obj):
     non_regex = match_obj.group('non_regex')
     if non_regex:
@@ -74,6 +94,11 @@ print(filecheck_path)
 if len(sys.argv) == 1:
     print("<check-file> not specified")
     exit(2)
+
+for arg in sys.argv:
+    if arg == '--help':
+        print_help()
+        exit(0)
 
 check_file = sys.argv[1]
 if not os.path.isfile(check_file):
