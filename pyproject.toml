@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "filecheck"
-version = "0.0.2"
+version = "0.0.3"
 description = "Python port of LLVM's FileCheck, flexible pattern matching file verifier"
 authors = ["Stanislav Pankevich <s.pankevich@gmail.com>"]
 
@@ -9,6 +9,7 @@ python = "^3.4"
 
 [tool.poetry.dev-dependencies]
 lit = "^0.9"
+bump2version = "0.5.11"
 
 [tool.poetry.scripts]
 filecheck = "filecheck.FileCheck:main"

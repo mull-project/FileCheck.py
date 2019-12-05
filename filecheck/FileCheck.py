@@ -8,17 +8,8 @@ import sys
 from collections import namedtuple
 from difflib import SequenceMatcher
 from enum import Enum
-from pkg_resources import DistributionNotFound, get_distribution
 
-
-__project__ = 'filecheck'
-
-try:
-    __version__ = get_distribution(__project__).version
-except DistributionNotFound:
-    __version__ = '(local)'
-
-VERSION = "{0} v{1}".format(__project__, __version__)
+__version__ = '0.0.3'
 
 
 class MatchType(Enum):
@@ -62,7 +53,8 @@ def print_help():
 
 
 def print_version():
-    print(VERSION)
+    print(__version__)
+
 
 def escape_non_regex_or_skip(match_obj):
     non_regex = match_obj.group('non_regex')
