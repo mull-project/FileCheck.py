@@ -31,7 +31,7 @@ def similar(a, b):
 
 
 def print_help():
-    print("USAGE: FileCheck-macOS [options] <check-file>")
+    print("USAGE: filecheck [options] <check-file>")
     print("")
 
     print("OPTIONS:")
