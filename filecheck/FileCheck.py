@@ -8,6 +8,17 @@ import sys
 from collections import namedtuple
 from difflib import SequenceMatcher
 from enum import Enum
+from pkg_resources import DistributionNotFound, get_distribution
+
+
+__project__ = 'filecheck'
+
+try:
+    __version__ = get_distribution(__project__).version
+except DistributionNotFound:
+    __version__ = '(local)'
+
+VERSION = "{0} v{1}".format(__project__, __version__)
 
 
 class MatchType(Enum):
@@ -49,6 +60,9 @@ def print_help():
     print("")
     print("--help                         - Display available options")
 
+
+def print_version():
+    print(VERSION)
 
 def escape_non_regex_or_skip(match_obj):
     non_regex = match_obj.group('non_regex')
@@ -99,6 +113,11 @@ def main():
     for arg in sys.argv:
         if arg == '--help':
             print_help()
+            exit(0)
+
+    for arg in sys.argv:
+        if arg == '--version':
+            print_version()
             exit(0)
 
     check_file = sys.argv[1]
