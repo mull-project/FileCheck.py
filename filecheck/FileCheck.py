@@ -318,15 +318,6 @@ def main():
         if current_check.match_type == MatchType.SUBSTRING:
             last_read_line = input_lines[current_scan_base]
 
-            candidate_line = None
-            current_best_ratio = 0
-            for read_line in input_lines[current_scan_base:]:
-                similar_ratio = similar(last_read_line, current_check.expression)
-                if current_best_ratio < similar_ratio:
-                    candidate_line = read_line
-                    current_best_ratio = similar_ratio
-            assert candidate_line
-
             print("{}:{}:{}: error: CHECK: expected string not found in input"
                   .format(check_file,
                           current_check.check_line_idx + 1,
@@ -338,10 +329,19 @@ def main():
             print(last_read_line)
             print("^")
 
-            caret_pos = len(candidate_line) // 2 + 1
-            print("<stdin>:{}:{}: note: possible intended match here".format(current_scan_base + 1, caret_pos))
-            print(candidate_line)
-            print("^".rjust(caret_pos, ' '))
+            candidate_line = None
+            current_best_ratio = 0
+            for read_line in input_lines[current_scan_base:]:
+                similar_ratio = similar(read_line, current_check.expression)
+                if current_best_ratio < similar_ratio:
+                    candidate_line = read_line
+                    current_best_ratio = similar_ratio
+            if candidate_line:
+                caret_pos = len(candidate_line) // 2 + 1
+                print("<stdin>:{}:{}: note: possible intended match here".format(current_scan_base + 1, caret_pos))
+                print(candidate_line)
+                print("^".rjust(caret_pos, ' '))
+
             exit(1)
 
         if current_check.match_type == MatchType.REGEX:
