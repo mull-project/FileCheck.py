@@ -274,9 +274,6 @@ def main():
 
         elif current_check.check_type == CheckType.CHECK_NEXT:
             if current_check.match_type == MatchType.SUBSTRING:
-                if not args.strict_whitespace:
-                    line = re.sub("\\s+", ' ', line).strip()
-
                 if args.match_full_lines:
                     if current_check.expression != line:
                         break
@@ -290,9 +287,6 @@ def main():
 
         elif current_check.check_type == CheckType.CHECK_NOT:
             if current_check.match_type == MatchType.SUBSTRING:
-                if not args.strict_whitespace:
-                    line = re.sub("\\s+", ' ', line).strip()
-
                 if current_check.expression in line:
                     break
 
