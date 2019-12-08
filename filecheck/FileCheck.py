@@ -28,6 +28,11 @@ class CheckType(Enum):
 Check = namedtuple("Check", "check_type match_type expression source_line check_line_idx start_index")
 
 
+def debug_print(string):
+    # print(string)
+    pass
+
+
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
@@ -81,13 +86,13 @@ def canonicalize_whitespace(input):
 
 
 def dump_check(check):
-    print("check dump")
-    print("\tcheck_type: {}".format(check.check_type))
-    print("\tmatch_type: {}".format(check.match_type))
-    print("\texpression: {}".format(check.expression))
-    print("\tsource_line: {}".format(check.source_line))
-    print("\tcheck_line_idx: {}".format(check.check_line_idx))
-    print("\tstart_index: {}".format(check.start_index))
+    debug_print("check dump")
+    debug_print("\tcheck_type: {}".format(check.check_type))
+    debug_print("\tmatch_type: {}".format(check.match_type))
+    debug_print("\texpression: {}".format(check.expression))
+    debug_print("\tsource_line: {}".format(check.source_line))
+    debug_print("\tcheck_line_idx: {}".format(check.check_line_idx))
+    debug_print("\tstart_index: {}".format(check.start_index))
 
 
 def main():
