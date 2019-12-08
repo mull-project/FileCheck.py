@@ -28,6 +28,11 @@ class CheckType(Enum):
 Check = namedtuple("Check", "check_type match_type expression source_line check_line_idx start_index")
 
 
+def debug_print(string):
+    # print(string)
+    pass
+
+
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
@@ -81,13 +86,13 @@ def canonicalize_whitespace(input):
 
 
 def dump_check(check):
-    print("check dump")
-    print("\tcheck_type: {}".format(check.check_type))
-    print("\tmatch_type: {}".format(check.match_type))
-    print("\texpression: {}".format(check.expression))
-    print("\tsource_line: {}".format(check.source_line))
-    print("\tcheck_line_idx: {}".format(check.check_line_idx))
-    print("\tstart_index: {}".format(check.start_index))
+    debug_print("check dump")
+    debug_print("\tcheck_type: {}".format(check.check_type))
+    debug_print("\tmatch_type: {}".format(check.match_type))
+    debug_print("\texpression: {}".format(check.expression))
+    debug_print("\tsource_line: {}".format(check.source_line))
+    debug_print("\tcheck_line_idx: {}".format(check.check_line_idx))
+    debug_print("\tstart_index: {}".format(check.start_index))
 
 
 def main():
@@ -313,15 +318,6 @@ def main():
         if current_check.match_type == MatchType.SUBSTRING:
             last_read_line = input_lines[current_scan_base]
 
-            candidate_line = None
-            current_best_ratio = 0
-            for read_line in input_lines[current_scan_base:]:
-                similar_ratio = similar(last_read_line, current_check.expression)
-                if current_best_ratio < similar_ratio:
-                    candidate_line = read_line
-                    current_best_ratio = similar_ratio
-            assert candidate_line
-
             print("{}:{}:{}: error: CHECK: expected string not found in input"
                   .format(check_file,
                           current_check.check_line_idx + 1,
@@ -333,10 +329,19 @@ def main():
             print(last_read_line)
             print("^")
 
-            caret_pos = len(candidate_line) // 2 + 1
-            print("<stdin>:{}:{}: note: possible intended match here".format(current_scan_base + 1, caret_pos))
-            print(candidate_line)
-            print("^".rjust(caret_pos, ' '))
+            candidate_line = None
+            current_best_ratio = 0
+            for read_line in input_lines[current_scan_base:]:
+                similar_ratio = similar(read_line, current_check.expression)
+                if current_best_ratio < similar_ratio:
+                    candidate_line = read_line
+                    current_best_ratio = similar_ratio
+            if candidate_line:
+                caret_pos = len(candidate_line) // 2 + 1
+                print("<stdin>:{}:{}: note: possible intended match here".format(current_scan_base + 1, caret_pos))
+                print(candidate_line)
+                print("^".rjust(caret_pos, ' '))
+
             exit(1)
 
         if current_check.match_type == MatchType.REGEX:
