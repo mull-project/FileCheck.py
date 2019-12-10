@@ -306,7 +306,14 @@ def main():
     stdin_input_iter = enumerate(sys.stdin)
 
     try:
-        for line_idx, line in stdin_input_iter:
+        line_idx, line = next(stdin_input_iter)
+    except StopIteration:
+        print("CHECK: FileCheck error: '-' is empty.")
+        print("FileCheck command line: {}".format(check_file))
+        exit(2)
+
+    try:
+        while True:
             line = line.rstrip()
             if not args.strict_whitespace:
                 line = canonicalize_whitespace(line)
@@ -319,16 +326,19 @@ def main():
                 if check_result == CheckResult.PASS:
                     try:
                         current_check = next(check_iterator)
-                        current_scan_base = line_idx + 1
                     except StopIteration:
                         exit(0)
 
-                    break
+                    try:
+                        line_idx, line = next(stdin_input_iter)
+                        current_scan_base = line_idx
+                        break
+                    except StopIteration:
+                        raise CheckFailedException()
 
                 elif check_result == CheckResult.CHECK_NOT_WITHOUT_MATCH:
                     try:
                         current_check = next(check_iterator)
-                        current_scan_base = line_idx + 1
                     except StopIteration:
                         exit(0)
 
@@ -336,17 +346,15 @@ def main():
                     raise CheckFailedException()
 
                 elif check_result == CheckResult.FAIL_SKIP_LINE:
-                    break
-
+                    try:
+                        line_idx, line = next(stdin_input_iter)
+                        break
+                    except StopIteration:
+                        raise CheckFailedException()
                 else:
                     assert 0
     except CheckFailedException:
         pass
-
-    if not input_lines:
-        print("CHECK: FileCheck error: '-' is empty.")
-        print("FileCheck command line: {}".format(check_file))
-        exit(2)
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
         if check_result == CheckResult.PASS:
@@ -367,6 +375,8 @@ def main():
 
     if current_check.check_type == CheckType.CHECK:
         if current_check.match_type == MatchType.SUBSTRING:
+            assert current_scan_base < len(input_lines)
+
             last_read_line = input_lines[current_scan_base]
 
             print("{}:{}:{}: error: CHECK: expected string not found in input"
