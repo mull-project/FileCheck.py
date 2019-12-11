@@ -1,0 +1,4 @@
+; CHECK: string1
+; CHECK-NOT: hello
+; CHECK: string2
+; CHECK: string3
