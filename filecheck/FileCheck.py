@@ -245,6 +245,8 @@ def main():
 
     current_scan_base = 0
 
+    check_failed = False
+
     stdin_input_iter = enumerate(sys.stdin)
     for line_idx, line in stdin_input_iter:
         line = line.rstrip()
@@ -257,7 +259,8 @@ def main():
 
         if current_check.check_type == CheckType.CHECK_EMPTY:
             if line != '':
-                assert 0, "Not implemented"
+                check_failed = True
+                break
 
         elif current_check.check_type == CheckType.CHECK:
             if current_check.match_type == MatchType.SUBSTRING:
@@ -276,22 +279,27 @@ def main():
             if current_check.match_type == MatchType.SUBSTRING:
                 if args.match_full_lines:
                     if current_check.expression != line:
+                        check_failed = True
                         break
                 else:
                     if current_check.expression not in line:
+                        check_failed = True
                         break
 
             elif current_check.match_type == MatchType.REGEX:
                 if not re.search(current_check.expression, line):
+                    check_failed = True
                     break
 
         elif current_check.check_type == CheckType.CHECK_NOT:
             if current_check.match_type == MatchType.SUBSTRING:
                 if current_check.expression in line:
+                    check_failed = True
                     break
 
             elif current_check.match_type == MatchType.REGEX:
                 if re.search(current_check.expression, line):
+                    check_failed = True
                     break
 
         try:
@@ -306,7 +314,21 @@ def main():
         exit(2)
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
-        exit(0)
+        if not check_failed:
+            exit(0)
+
+        last_read_line = input_lines[current_scan_base]
+        print("{}:{}:{}: error: CHECK-EMPTY: expected string not found in input"
+              .format(check_file,
+                      current_check.check_line_idx + 1,
+                      len(current_check.source_line) + 1))
+        print("{}".format(current_check.source_line))
+        print("^".rjust(len(current_check.source_line) + 1))
+        print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
+        print(last_read_line)
+        print("^")
+
+        exit(1)
 
     if current_check.check_type == CheckType.CHECK:
         if current_check.match_type == MatchType.SUBSTRING:
