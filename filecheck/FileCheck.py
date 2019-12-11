@@ -385,7 +385,8 @@ def main():
     if current_check.check_type == CheckType.CHECK_NEXT:
         last_read_line = input_lines[current_scan_base]
 
-        if current_check.match_type == MatchType.SUBSTRING:
+        if current_check.match_type == MatchType.SUBSTRING or \
+                current_check.match_type == MatchType.REGEX:
             matching_line_idx = -1
             for line_idx, line in stdin_input_iter:
                 line = line.rstrip()
@@ -432,7 +433,7 @@ def main():
 
                 exit(1)
 
-        assert 0, "Not implemented"
+        raise NotImplementedError()
 
 
 if __name__ == "__main__":
