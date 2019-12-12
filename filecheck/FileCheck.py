@@ -288,8 +288,6 @@ def main():
         sys.stdout.flush()
         exit(2)
 
-    line_counter = 0
-
     input_lines = []
 
     current_scan_base = 0
@@ -303,8 +301,6 @@ def main():
             line = canonicalize_whitespace(line)
 
         input_lines.append(line)
-
-        line_counter = line_counter + 1
 
         check_result = check_line(line, current_check, args.match_full_lines)
 
@@ -321,7 +317,7 @@ def main():
         except StopIteration:
             exit(0)
 
-    if line_counter == 0:
+    if not input_lines:
         print("CHECK: FileCheck error: '-' is empty.")
         print("FileCheck command line: {}".format(check_file))
         exit(2)
