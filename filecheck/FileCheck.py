@@ -95,6 +95,55 @@ def dump_check(check):
     debug_print("\tstart_index: {}".format(check.start_index))
 
 
+class CheckResult(Enum):
+    PASS = 1
+    FAIL_SKIP = 2
+    FAIL_FATAL = 3
+
+
+def check_line(line, current_check, match_full_lines):
+    if current_check.check_type == CheckType.CHECK_EMPTY:
+        if line != '':
+            return CheckResult.FAIL_FATAL
+
+    elif current_check.check_type == CheckType.CHECK:
+        if current_check.match_type == MatchType.SUBSTRING:
+            if match_full_lines:
+                if current_check.expression != line:
+                    return CheckResult.FAIL_SKIP
+            else:
+                if current_check.expression not in line:
+                    return CheckResult.FAIL_SKIP
+
+        elif current_check.match_type == MatchType.REGEX:
+            if not re.search(current_check.expression, line):
+                return CheckResult.FAIL_SKIP
+
+    elif current_check.check_type == CheckType.CHECK_NEXT:
+        if current_check.match_type == MatchType.SUBSTRING:
+            if match_full_lines:
+                if current_check.expression != line:
+                    return CheckResult.FAIL_FATAL
+            else:
+                if current_check.expression not in line:
+                    return CheckResult.FAIL_FATAL
+
+        elif current_check.match_type == MatchType.REGEX:
+            if not re.search(current_check.expression, line):
+                return CheckResult.FAIL_FATAL
+
+    elif current_check.check_type == CheckType.CHECK_NOT:
+        if current_check.match_type == MatchType.SUBSTRING:
+            if current_check.expression in line:
+                return CheckResult.FAIL_FATAL
+
+        elif current_check.match_type == MatchType.REGEX:
+            if re.search(current_check.expression, line):
+                return CheckResult.FAIL_FATAL
+
+    return CheckResult.PASS
+
+
 def main():
     # FileCheck always prints its first argument.
     filecheck_path = sys.argv[0]
@@ -245,7 +294,7 @@ def main():
 
     current_scan_base = 0
 
-    check_failed = False
+    check_result = None
 
     stdin_input_iter = enumerate(sys.stdin)
     for line_idx, line in stdin_input_iter:
@@ -257,50 +306,14 @@ def main():
 
         line_counter = line_counter + 1
 
-        if current_check.check_type == CheckType.CHECK_EMPTY:
-            if line != '':
-                check_failed = True
-                break
+        check_result = check_line(line, current_check, args.match_full_lines)
 
-        elif current_check.check_type == CheckType.CHECK:
-            if current_check.match_type == MatchType.SUBSTRING:
-                if args.match_full_lines:
-                    if current_check.expression != line:
-                        continue
-                else:
-                    if current_check.expression not in line:
-                        continue
-
-            elif current_check.match_type == MatchType.REGEX:
-                if not re.search(current_check.expression, line):
-                    continue
-
-        elif current_check.check_type == CheckType.CHECK_NEXT:
-            if current_check.match_type == MatchType.SUBSTRING:
-                if args.match_full_lines:
-                    if current_check.expression != line:
-                        check_failed = True
-                        break
-                else:
-                    if current_check.expression not in line:
-                        check_failed = True
-                        break
-
-            elif current_check.match_type == MatchType.REGEX:
-                if not re.search(current_check.expression, line):
-                    check_failed = True
-                    break
-
-        elif current_check.check_type == CheckType.CHECK_NOT:
-            if current_check.match_type == MatchType.SUBSTRING:
-                if current_check.expression in line:
-                    check_failed = True
-                    break
-
-            elif current_check.match_type == MatchType.REGEX:
-                if re.search(current_check.expression, line):
-                    check_failed = True
-                    break
+        if check_result == CheckResult.FAIL_FATAL:
+            break
+        elif check_result == CheckResult.FAIL_SKIP:
+            continue
+        else:
+            pass
 
         try:
             current_check = next(check_iterator)
@@ -314,7 +327,7 @@ def main():
         exit(2)
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
-        if not check_failed:
+        if check_result == CheckResult.PASS:
             exit(0)
 
         last_read_line = input_lines[current_scan_base]
