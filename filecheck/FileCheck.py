@@ -12,6 +12,10 @@ from enum import Enum
 __version__ = '0.0.4'
 
 
+class CheckFailedException(Exception):
+    pass
+
+
 class MatchType(Enum):
     SUBSTRING = 1
     EXACT_STRING = 2
@@ -97,8 +101,9 @@ def dump_check(check):
 
 class CheckResult(Enum):
     PASS = 1
-    FAIL_SKIP = 2
+    FAIL_SKIP_LINE = 2
     FAIL_FATAL = 3
+    CHECK_NOT_WITHOUT_MATCH = 4
 
 
 def check_line(line, current_check, match_full_lines):
@@ -110,14 +115,14 @@ def check_line(line, current_check, match_full_lines):
         if current_check.match_type == MatchType.SUBSTRING:
             if match_full_lines:
                 if current_check.expression != line:
-                    return CheckResult.FAIL_SKIP
+                    return CheckResult.FAIL_SKIP_LINE
             else:
                 if current_check.expression not in line:
-                    return CheckResult.FAIL_SKIP
+                    return CheckResult.FAIL_SKIP_LINE
 
         elif current_check.match_type == MatchType.REGEX:
             if not re.search(current_check.expression, line):
-                return CheckResult.FAIL_SKIP
+                return CheckResult.FAIL_SKIP_LINE
 
     elif current_check.check_type == CheckType.CHECK_NEXT:
         if current_check.match_type == MatchType.SUBSTRING:
@@ -136,10 +141,14 @@ def check_line(line, current_check, match_full_lines):
         if current_check.match_type == MatchType.SUBSTRING:
             if current_check.expression in line:
                 return CheckResult.FAIL_FATAL
+            else:
+                return CheckResult.CHECK_NOT_WITHOUT_MATCH
 
         elif current_check.match_type == MatchType.REGEX:
             if re.search(current_check.expression, line):
                 return CheckResult.FAIL_FATAL
+            else:
+                return CheckResult.CHECK_NOT_WITHOUT_MATCH
 
     return CheckResult.PASS
 
@@ -295,27 +304,44 @@ def main():
     check_result = None
 
     stdin_input_iter = enumerate(sys.stdin)
-    for line_idx, line in stdin_input_iter:
-        line = line.rstrip()
-        if not args.strict_whitespace:
-            line = canonicalize_whitespace(line)
 
-        input_lines.append(line)
+    try:
+        for line_idx, line in stdin_input_iter:
+            line = line.rstrip()
+            if not args.strict_whitespace:
+                line = canonicalize_whitespace(line)
 
-        check_result = check_line(line, current_check, args.match_full_lines)
+            input_lines.append(line)
 
-        if check_result == CheckResult.FAIL_FATAL:
-            break
-        elif check_result == CheckResult.FAIL_SKIP:
-            continue
-        else:
-            pass
+            while True:
+                check_result = check_line(line, current_check, args.match_full_lines)
 
-        try:
-            current_check = next(check_iterator)
-            current_scan_base = line_idx + 1
-        except StopIteration:
-            exit(0)
+                if check_result == CheckResult.PASS:
+                    try:
+                        current_check = next(check_iterator)
+                        current_scan_base = line_idx + 1
+                    except StopIteration:
+                        exit(0)
+
+                    break
+
+                elif check_result == CheckResult.CHECK_NOT_WITHOUT_MATCH:
+                    try:
+                        current_check = next(check_iterator)
+                        current_scan_base = line_idx + 1
+                    except StopIteration:
+                        exit(0)
+
+                elif check_result == CheckResult.FAIL_FATAL:
+                    raise CheckFailedException()
+
+                elif check_result == CheckResult.FAIL_SKIP_LINE:
+                    break
+
+                else:
+                    assert 0
+    except CheckFailedException:
+        pass
 
     if not input_lines:
         print("CHECK: FileCheck error: '-' is empty.")
