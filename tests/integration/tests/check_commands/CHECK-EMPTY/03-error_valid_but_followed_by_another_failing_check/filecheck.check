@@ -1,0 +1,3 @@
+; CHECK: string1
+; CHECK-EMPTY:
+; CHECK: string2

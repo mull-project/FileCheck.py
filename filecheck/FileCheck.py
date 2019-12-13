@@ -66,6 +66,7 @@ def print_version():
     print("https://github.com/stanislaw/FileCheck.py")
     print("Version: {}".format(__version__))
 
+
 def escape_non_regex_or_skip(match_obj):
     non_regex = match_obj.group('non_regex')
     if non_regex:
@@ -357,10 +358,23 @@ def main():
     except CheckFailedException:
         pass
 
-    if current_check.check_type == CheckType.CHECK_EMPTY:
-        if check_result == CheckResult.PASS:
+    # CHECK-EMPTY is special: if there is no output anymore and this check is
+    # the 1) current and 2) the last one we want to declare success.
+    # Otherwise we switch to a next check, make it current and go to do error
+    # reporting below.
+    if current_check.check_type == CheckType.CHECK_EMPTY and \
+            check_result == CheckResult.PASS:
+        try:
+            current_check = next(check_iterator)
+            input_lines.append("")
+            current_scan_base += 1
+        except StopIteration:
             exit(0)
 
+    # Error reporting part. By now we know that we have failed and we just want
+    # to report a check that has failed.
+
+    if current_check.check_type == CheckType.CHECK_EMPTY:
         last_read_line = input_lines[current_scan_base]
         print("{}:{}:{}: error: CHECK-EMPTY: expected string not found in input"
               .format(check_file,
