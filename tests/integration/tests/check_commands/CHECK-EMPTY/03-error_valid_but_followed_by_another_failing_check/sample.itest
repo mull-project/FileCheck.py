@@ -1,0 +1,9 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
+; CHECK:{{.*}}filecheck.check:3:10: error: CHECK: expected string not found in input{{$}}
+; CHECK:; CHECK: string2
+; CHECK:         ^
+; CHECK:<stdin>:2:1: note: scanning from here
+; CHECK-EMPTY:
+; CHECK:^
+; CHECK-EMPTY:
