@@ -33,6 +33,7 @@ test-lit-real: ## Run tests against FileCheck C++.
 	cd tests/integration && make clean
 
 	CURRENT_DIR=$(PWD) \
+		REAL_ONLY=1 \
 		FILECHECK_EXEC=$(FILECHECK_REAL_EXEC) \
 		PATH=$(PWD)/tests/integration/tools/FileCheck:$(PWD)/tests/integration/tools:$$PATH \
 		lit \

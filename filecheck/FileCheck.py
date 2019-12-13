@@ -62,8 +62,9 @@ def print_help():
 
 
 def print_version():
-    print(__version__)
-
+    print("filecheck: Python port of LLVM's FileCheck, flexible pattern matching file verifier")
+    print("https://github.com/stanislaw/FileCheck.py")
+    print("Version: {}".format(__version__))
 
 def escape_non_regex_or_skip(match_obj):
     non_regex = match_obj.group('non_regex')
