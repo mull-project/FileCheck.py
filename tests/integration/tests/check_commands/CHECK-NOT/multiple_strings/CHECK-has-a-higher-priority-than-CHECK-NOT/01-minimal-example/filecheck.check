@@ -1,0 +1,2 @@
+; CHECK-NOT:String1
+; CHECK:String2

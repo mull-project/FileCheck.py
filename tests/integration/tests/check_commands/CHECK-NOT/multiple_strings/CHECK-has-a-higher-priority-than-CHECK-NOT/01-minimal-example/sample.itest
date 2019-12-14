@@ -1,0 +1,11 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
+; CHECK:{{^.*}}filecheck.check:2:9: error: CHECK: expected string not found in input
+; CHECK:; CHECK:String2
+; CHECK:        ^
+; CHECK:<stdin>:1:1: note: scanning from here
+; CHECK:String1
+; CHECK:^
+; TODO: Difference in behavior: FileCheck.py prints possible intended match,
+; TODO: while FileCheck C++ does not.
+; CHECK-EMPTY
