@@ -12,8 +12,20 @@ from enum import Enum
 __version__ = '0.0.5'
 
 
-class CheckFailedException(Exception):
-    pass
+class FailedCheck:
+    def __init__(self, check, line_idx):
+        self.check = check
+        self.line_idx = line_idx
+
+
+class CheckFailedException(BaseException):
+    def __init__(self, failed_check):
+        self.failed_check = failed_check
+
+
+class InputFinishedException(BaseException):
+    def __init__(self):
+        pass
 
 
 class MatchType(Enum):
@@ -105,7 +117,8 @@ class CheckResult(Enum):
     PASS = 1
     FAIL_SKIP_LINE = 2
     FAIL_FATAL = 3
-    CHECK_NOT_WITHOUT_MATCH = 4
+    CHECK_NOT_MATCH = 4
+    CHECK_NOT_WITHOUT_MATCH = 5
 
 
 def check_line(line, current_check, match_full_lines):
@@ -142,13 +155,13 @@ def check_line(line, current_check, match_full_lines):
     elif current_check.check_type == CheckType.CHECK_NOT:
         if current_check.match_type == MatchType.SUBSTRING:
             if current_check.expression in line:
-                return CheckResult.FAIL_FATAL
+                return CheckResult.CHECK_NOT_MATCH
             else:
                 return CheckResult.CHECK_NOT_WITHOUT_MATCH
 
         elif current_check.match_type == MatchType.REGEX:
             if re.search(current_check.expression, line):
-                return CheckResult.FAIL_FATAL
+                return CheckResult.CHECK_NOT_MATCH
             else:
                 return CheckResult.CHECK_NOT_WITHOUT_MATCH
 
@@ -246,7 +259,7 @@ def main():
                 checks.append(check)
                 continue
 
-            check_not_regex = "; {}-NOT: (.*)".format(check_prefix)
+            check_not_regex = "; {}-NOT:{}(.*)".format(check_prefix, strict_whitespace_match)
             check_match = re.search(check_not_regex, line)
             if check_match:
                 match_type = MatchType.SUBSTRING
@@ -291,6 +304,11 @@ def main():
     check_iterator = iter(checks)
 
     current_check = None
+    # This variable is currently only used for CHECK-NOT checks which do not
+    # necessarily fail with a last input line. So we have to keep the failing
+    # line index.
+    current_check_line_idx = None
+
     try:
         current_check = next(check_iterator)
     except StopIteration:
@@ -315,6 +333,9 @@ def main():
         exit(2)
 
     try:
+        current_not_checks = []
+        failed_check = None
+
         while True:
             line = line.rstrip()
             if not args.strict_whitespace:
@@ -323,9 +344,25 @@ def main():
             input_lines.append(line)
 
             while True:
+                if not failed_check:
+                    for current_not_check in current_not_checks:
+                        check_result = check_line(line,
+                                                  current_not_check,
+                                                  args.match_full_lines)
+                        if check_result == CheckResult.CHECK_NOT_MATCH:
+                            failed_check = FailedCheck(current_not_check, line_idx)
+
                 check_result = check_line(line, current_check, args.match_full_lines)
 
-                if check_result == CheckResult.PASS:
+                if check_result == CheckResult.FAIL_FATAL:
+                    failed_check = FailedCheck(current_check, line_idx)
+                    raise CheckFailedException(failed_check)
+
+                elif check_result == CheckResult.PASS:
+                    if failed_check:
+                        raise CheckFailedException(failed_check)
+
+                    current_not_checks.clear()
                     try:
                         current_check = next(check_iterator)
                     except StopIteration:
@@ -336,27 +373,54 @@ def main():
                         current_scan_base = line_idx
                         break
                     except StopIteration:
-                        raise CheckFailedException()
+                        raise InputFinishedException
+
+                elif check_result == CheckResult.CHECK_NOT_MATCH:
+                    failed_check = FailedCheck(current_check, line_idx)
+                    try:
+                        current_not_checks.append(current_check)
+                        current_check = next(check_iterator)
+                        continue
+                    except StopIteration:
+                        raise CheckFailedException(failed_check)
 
                 elif check_result == CheckResult.CHECK_NOT_WITHOUT_MATCH:
                     try:
+                        current_not_checks.append(current_check)
                         current_check = next(check_iterator)
+                        continue
                     except StopIteration:
                         exit(0)
-
-                elif check_result == CheckResult.FAIL_FATAL:
-                    raise CheckFailedException()
 
                 elif check_result == CheckResult.FAIL_SKIP_LINE:
                     try:
                         line_idx, line = next(stdin_input_iter)
                         break
                     except StopIteration:
-                        raise CheckFailedException()
-                else:
-                    assert 0
-    except CheckFailedException:
-        pass
+                        failed_check = FailedCheck(current_check, line_idx)
+                        raise CheckFailedException(failed_check)
+
+                assert 0, "Should not reach here"
+    except InputFinishedException:
+        # We reach here if there is no input anymore and no check has failed so
+        # far. This means we can remove all CHECK-NOT checks from the input
+        # checks and see if there any other checks left.
+        if current_check.check_type == CheckType.CHECK_NOT:
+            still_actual_check = None
+            for check in check_iterator:
+                if check.check_type != CheckType.CHECK_NOT:
+                    still_actual_check = check
+                    break
+            else:
+                # No checks which are still actual have been found. Declare success.
+                exit(0)
+
+            current_check = still_actual_check
+            current_check_line_idx = line_idx
+
+    except CheckFailedException as e:
+        current_check = e.failed_check.check
+        current_check_line_idx = e.failed_check.line_idx
 
     # CHECK-EMPTY is special: if there is no output anymore and this check is
     # the 1) current and 2) the last one we want to declare success.
@@ -436,7 +500,8 @@ def main():
     if current_check.check_type == CheckType.CHECK_NOT:
         if (current_check.match_type == MatchType.SUBSTRING or
                 current_check.match_type == MatchType.REGEX):
-            last_read_line = input_lines[-1]
+            assert current_check_line_idx != None
+            last_read_line = input_lines[current_check_line_idx]
 
             if not args.strict_whitespace:
                 last_read_line = re.sub("\\s+", ' ', last_read_line).strip()
@@ -448,15 +513,16 @@ def main():
 
             print(current_check.source_line.rstrip())
             print("^".rjust(current_check.start_index + 1))
-            print("<stdin>:{}:{}: note: found here".format(current_scan_base + 1, 1))
+            print("<stdin>:{}:{}: note: found here".format(current_check_line_idx + 1, 1))
             print(last_read_line)
 
             if current_check.match_type == MatchType.SUBSTRING:
                 match_pos = last_read_line.find(current_check.expression)
                 assert match_pos != -1
 
+                # TODO: check on lines which start with spaces
                 highlight_line = "^".rjust(match_pos, ' ')
-                print("^".ljust(len(current_check.expression), '~'))
+                print(highlight_line.ljust(len(current_check.expression), '~'))
             else:
                 print("^".ljust(len(last_read_line), '~'))
 

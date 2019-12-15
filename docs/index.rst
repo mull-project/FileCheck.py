@@ -10,6 +10,7 @@ Welcome to FileCheck.py's documentation!
    04-tutorial-llvm-lit-and-filecheck
    05-check-commands
    06-options
+   07-known-issues
 
 .. Indices and tables
    ==================

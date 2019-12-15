@@ -1,0 +1,3 @@
+; CHECK:String2
+; CHECK-NOT:{{.*String1.*}}
+; CHECK:String3

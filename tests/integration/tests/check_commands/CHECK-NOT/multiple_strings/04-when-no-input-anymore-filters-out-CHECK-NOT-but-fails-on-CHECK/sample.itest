@@ -1,0 +1,13 @@
+; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
+; CHECK:{{^.*}}filecheck.check:3:9: error: CHECK: expected string not found in input{{$}}
+; CHECK:; CHECK:String3
+; CHECK:        ^
+; TODO: Without --match-full-lines, LLVM FileCheck allows multiple checks on a same line #52
+; TODO: https://github.com/stanislaw/FileCheck.py/issues/52
+; CHECK:{{<stdin>:(1|2):(8|1): note: scanning from here}}
+; CHECK:{{.*}}
+; CHECK:{{.*^}}
+; TODO: "note: possible intended match here" feature: not clear when FileCheck decides to show it or not #63
+; TODO: https://github.com/stanislaw/FileCheck.py/issues/63
+; CHECK-EMPTY
