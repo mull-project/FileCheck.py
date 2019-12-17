@@ -453,15 +453,22 @@ def main():
         exit(1)
 
     if current_check.check_type == CheckType.CHECK:
-        if current_check.match_type == MatchType.SUBSTRING:
-            assert current_scan_base < len(input_lines)
+        assert current_scan_base < len(input_lines)
 
+        # FileCheck prefers to show non-empty lines when printing
+        # "Scanning from here" so we are skipping through empty lines if any.
+        last_read_line = input_lines[current_scan_base]
+        while last_read_line == "" and current_scan_base < (len(input_lines) - 1):
+            current_scan_base += 1
             last_read_line = input_lines[current_scan_base]
 
-            print("{}:{}:{}: error: CHECK: expected string not found in input"
+        if current_check.match_type == MatchType.SUBSTRING or \
+                current_check.match_type == MatchType.REGEX:
+            print("{}:{}:{}: error: {}: expected string not found in input"
                   .format(check_file,
                           current_check.check_line_idx + 1,
-                          current_check.start_index + 1))
+                          current_check.start_index + 1,
+                          check_prefix))
 
             print(current_check.source_line.rstrip())
             print("^".rjust(current_check.start_index + 1))
@@ -469,32 +476,29 @@ def main():
             print(last_read_line)
             print("^")
 
-            candidate_line = None
-            current_best_ratio = 0
-            for read_line in input_lines[current_scan_base:]:
-                similar_ratio = similar(read_line, current_check.expression)
-                if current_best_ratio < similar_ratio:
-                    candidate_line = read_line
-                    current_best_ratio = similar_ratio
-            if candidate_line:
-                caret_pos = len(candidate_line) // 2 + 1
-                print("<stdin>:{}:{}: note: possible intended match here".format(current_scan_base + 1, caret_pos))
-                print(candidate_line)
-                print("^".rjust(caret_pos, ' '))
+            # This is rather weird but it looks like with the REGEX case, the
+            # FileCheck C++ only prints possible intended matches starting from
+            # the line next to the current_scan_base (and only when such line
+            # exists!).
+            # TODO: this needs more real-world input.
+            if current_check.match_type == MatchType.SUBSTRING or \
+                    (current_check.match_type == MatchType.REGEX and
+                     current_scan_base < (len(input_lines) - 1)):
+                candidate_line = None
+                candidate_line_idx = None
+                current_best_ratio = 0
+                for read_line_idx, read_line in enumerate(input_lines[current_scan_base:]):
+                    similar_ratio = similar(read_line, current_check.expression)
+                    if current_best_ratio < similar_ratio:
+                        candidate_line = read_line
+                        candidate_line_idx = current_scan_base + read_line_idx
+                        current_best_ratio = similar_ratio
+                if candidate_line:
+                    caret_pos = len(candidate_line) // 2 + 1
+                    print("<stdin>:{}:{}: note: possible intended match here".format(candidate_line_idx + 1, caret_pos))
+                    print(candidate_line)
+                    print("^".rjust(caret_pos, ' '))
 
-            exit(1)
-
-        if current_check.match_type == MatchType.REGEX:
-            print("{}:{}:{}: error: CHECK: expected string not found in input"
-                  .format(check_file,
-                          current_check.check_line_idx + 1,
-                          current_check.start_index + 1))
-
-            print(current_check.source_line.rstrip())
-            print("^".rjust(current_check.start_index + 1))
-            print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
-            print(line)
-            print("^")
             exit(1)
 
     if current_check.check_type == CheckType.CHECK_NOT:
