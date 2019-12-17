@@ -1,0 +1,76 @@
+
+Extracting bitcode from executable (threads: 1): 0/1
+Extracting bitcode from executable (threads: 1): 1/1. Finished in 2ms.
+
+Loading bitcode files (threads: 1): 0/1
+Loading bitcode files (threads: 1): 1/1. Finished in 11ms.
+
+Compiling instrumented code (threads: 1): 0/1
+Compiling instrumented code (threads: 1): 1/1. Finished in 13ms.
+
+Loading dynamic libraries (threads: 1): 0/1
+Loading dynamic libraries (threads: 1): 1/1. Finished in 0ms.
+
+Searching tests (threads: 1): 0/1
+Searching tests (threads: 1): 1/1. Finished in 0ms.
+
+Preparing original test run (threads: 1): 0/1
+Preparing original test run (threads: 1): 1/1. Finished in 1ms.
+
+Running original tests (threads: 1): 0/1
+Running original tests (threads: 1): 1/1. Finished in 11ms.
+
+Applying function filter: no debug info (threads: 1): 0/1
+Applying function filter: no debug info (threads: 1): 1/1. Finished in 11ms.
+
+Applying function filter: file path (threads: 1): 0/1
+Applying function filter: file path (threads: 1): 1/1. Finished in 13ms.
+
+Instruction selection (threads: 1): 0/1
+Instruction selection (threads: 1): 1/1. Finished in 13ms.
+
+Searching mutants across functions (threads: 1): 0/1
+Searching mutants across functions (threads: 1): 1/1. Finished in 10ms.
+
+Applying filter: no debug info (threads: 2): 0/2
+Applying filter: no debug info (threads: 2): 2/2. Finished in 1ms.
+
+Applying filter: file path (threads: 2): 0/2
+Applying filter: file path (threads: 2): 2/2. Finished in 0ms.
+
+Prepare mutations (threads: 1): 0/1
+Prepare mutations (threads: 1): 1/1. Finished in 0ms.
+
+Cloning functions for mutation (threads: 1): 0/1
+Cloning functions for mutation (threads: 1): 1/1. Finished in 12ms.
+
+Removing original functions (threads: 1): 0/1
+Removing original functions (threads: 1): 1/1. Finished in 13ms.
+
+Redirect mutated functions (threads: 1): 0/1
+Redirect mutated functions (threads: 1): 1/1. Finished in 13ms.
+
+Applying mutations (threads: 1): 0/2
+Applying mutations (threads: 1): 2/2. Finished in 0ms.
+
+Compiling original code (threads: 1): 0/1
+Compiling original code (threads: 1): 1/1. Finished in 11ms.
+
+Running mutants (threads: 2): 0/2
+Running mutants (threads: 2): 2/2. Finished in 12ms.
+
+Killed mutants (1/2):
+
+/sandbox/mull/tests-lit/tests/options/-ide-reporter-show-killed/03_one_surviving_one_killed/sample.cpp:41:18: warning: Killed: Replaced + with -
+  int result = a + b;
+                 ^
+
+Survived mutants (1/2):
+
+/sandbox/mull/tests-lit/tests/options/-ide-reporter-show-killed/03_one_surviving_one_killed/sample.cpp:42:19: warning: Survived: Replaced + with -
+  result = result + 0;
+                  ^
+
+Mutation score: 50%
+
+Total execution time: 148ms
