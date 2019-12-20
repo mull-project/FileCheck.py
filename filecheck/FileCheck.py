@@ -23,6 +23,10 @@ class CheckFailedException(BaseException):
         self.failed_check = failed_check
 
 
+class CheckNOTIsLastException(BaseException):
+    pass
+
+
 class InputFinishedException(BaseException):
     def __init__(self):
         pass
@@ -390,7 +394,7 @@ def main():
                         current_check = next(check_iterator)
                         continue
                     except StopIteration:
-                        exit(0)
+                        raise CheckNOTIsLastException
 
                 elif check_result == CheckResult.FAIL_SKIP_LINE:
                     try:
@@ -417,6 +421,20 @@ def main():
 
             current_check = still_actual_check
             current_check_line_idx = line_idx
+    except CheckNOTIsLastException:
+        # Here we catch the case when the last check is known to be CHECK-NOT.
+        # We have to iterate over the remaining input lines and check them all
+        # against this last check.
+        try:
+            while True:
+                line_idx, line = next(stdin_input_iter)
+                input_lines.append(line)
+                if check_line(line, current_check, args.match_full_lines) == \
+                        CheckResult.CHECK_NOT_MATCH:
+                    current_check_line_idx = line_idx
+                    break
+        except StopIteration:
+            exit(0)
 
     except CheckFailedException as e:
         current_check = e.failed_check.check
