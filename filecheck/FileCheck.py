@@ -9,7 +9,7 @@ from collections import namedtuple
 from difflib import SequenceMatcher
 from enum import Enum
 
-__version__ = '0.0.8'
+__version__ = '0.0.10'
 
 
 class FailedCheck:
@@ -321,13 +321,26 @@ def main():
         sys.stdout.flush()
         exit(2)
 
-    input_lines = []
-
     current_scan_base = 0
 
     check_result = None
 
-    stdin_input_iter = enumerate(sys.stdin)
+    # We don't need to read the full input in most of the cases because it is
+    # usually much less check lines than the lines in the input.
+    # But if we don't read the full input and exit while the input is still
+    # being written to the pipe, we will get exit code 141 (caused by SIGPIPE).
+    # This happens only when "set -o pipefail" is set and it looks like LIT
+    # always does it by default.
+    # We have created a minimal example that reproduces this and it seems like
+    # there is nothing we can do on the Python's side except reading ALL of the
+    # stdin's output.
+    # TODO: Maybe there is still a better workaround for this but we see there
+    # TODO: is nothing too bad about simply reading the stdin until end.
+    # TODO: Performance implications?
+    # "Getting exit code 141 when reading from stdin with a Python script with “set -o pipefail” set"
+    # https://stackoverflow.com/questions/59436858/getting-exit-code-141-when-reading-from-stdin-with-a-python-script-with-set-o/59436997?noredirect=1#comment105058533_59436997
+    input_lines = sys.stdin.readlines()
+    stdin_input_iter = enumerate(input_lines)
 
     try:
         line_idx, line = next(stdin_input_iter)
@@ -344,8 +357,6 @@ def main():
             line = line.rstrip()
             if not args.strict_whitespace:
                 line = canonicalize_whitespace(line)
-
-            input_lines.append(line)
 
             while True:
                 if not failed_check:
@@ -428,7 +439,6 @@ def main():
         try:
             while True:
                 line_idx, line = next(stdin_input_iter)
-                input_lines.append(line)
                 if check_line(line, current_check, args.match_full_lines) == \
                         CheckResult.CHECK_NOT_MATCH:
                     current_check_line_idx = line_idx
@@ -453,31 +463,11 @@ def main():
         except StopIteration:
             exit(0)
 
-    # By now we have passed some of the known edge cases and by now we know
-    # that there is a check that has failed.
-    # We want to continue reading from stdin because otherwise we might later
-    # exit while the input is still being written to the pipe which causes exit
-    # code 141 (caused by SIGPIPE). This happens only when "set -o pipefail" is
-    # set and it looks like LIT always does it by default.
-    # We have created a minimal example that reproduces this and it seems like
-    # there is nothing we can do on the Python's side except reading ALL of the
-    # stdin's output.
-    # TODO: Maybe there is still a better workaround for this but we see there
-    # TODO: is nothing too bad about simply reading the stdin until end.
-    # "Getting exit code 141 when reading from stdin with a Python script with “set -o pipefail” set"
-    # https://stackoverflow.com/questions/59436858/getting-exit-code-141-when-reading-from-stdin-with-a-python-script-with-set-o/59436997?noredirect=1#comment105058533_59436997
-    try:
-        while True:
-            line_idx, line = next(stdin_input_iter)
-            input_lines.append(line.rstrip())
-    except StopIteration:
-        pass
-
     # Error reporting part. By now we know that we have failed and we just want
     # to report a check that has failed.
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
-        last_read_line = input_lines[current_scan_base]
+        last_read_line = input_lines[current_scan_base].rstrip()
         print("{}:{}:{}: error: CHECK-EMPTY: expected string not found in input"
               .format(check_file,
                       current_check.check_line_idx + 1,
@@ -495,10 +485,10 @@ def main():
 
         # FileCheck prefers to show non-empty lines when printing
         # "Scanning from here" so we are skipping through empty lines if any.
-        last_read_line = input_lines[current_scan_base]
+        last_read_line = input_lines[current_scan_base].rstrip()
         while last_read_line == "" and current_scan_base < (len(input_lines) - 1):
             current_scan_base += 1
-            last_read_line = input_lines[current_scan_base]
+            last_read_line = input_lines[current_scan_base].rstrip()
 
         if current_check.match_type == MatchType.SUBSTRING or \
                 current_check.match_type == MatchType.REGEX:
@@ -528,7 +518,7 @@ def main():
                 for read_line_idx, read_line in enumerate(input_lines[current_scan_base:]):
                     similar_ratio = similar(read_line, current_check.expression)
                     if current_best_ratio < similar_ratio:
-                        candidate_line = read_line
+                        candidate_line = read_line.rstrip()
                         candidate_line_idx = current_scan_base + read_line_idx
                         current_best_ratio = similar_ratio
                 if candidate_line:
@@ -543,7 +533,7 @@ def main():
         if (current_check.match_type == MatchType.SUBSTRING or
                 current_check.match_type == MatchType.REGEX):
             assert current_check_line_idx != None
-            last_read_line = input_lines[current_check_line_idx]
+            last_read_line = input_lines[current_check_line_idx].rstrip()
 
             if not args.strict_whitespace:
                 last_read_line = re.sub("\\s+", ' ', last_read_line).strip()
@@ -573,7 +563,7 @@ def main():
         assert 0, "Not implemented"
 
     if current_check.check_type == CheckType.CHECK_NEXT:
-        last_read_line = input_lines[current_scan_base]
+        last_read_line = input_lines[current_scan_base].rstrip()
 
         if current_check.match_type == MatchType.SUBSTRING or \
                 current_check.match_type == MatchType.REGEX:
@@ -597,7 +587,7 @@ def main():
                 exit(1)
             else:
                 assert current_scan_base > 0
-                previous_matched_line = input_lines[current_scan_base - 1]
+                previous_matched_line = input_lines[current_scan_base - 1].rstrip()
 
                 print("{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match"
                       .format(check_file,
@@ -606,7 +596,7 @@ def main():
                 print(current_check.source_line.rstrip())
                 print("^".rjust(current_check.start_index + 1))
 
-                matching_line = input_lines[matching_line_idx]
+                matching_line = input_lines[matching_line_idx].rstrip()
                 print("<stdin>:{}:1: note: 'next' match was here".format(matching_line_idx + 1))
                 print(matching_line)
                 print("^")
