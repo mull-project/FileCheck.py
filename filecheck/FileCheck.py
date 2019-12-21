@@ -453,6 +453,26 @@ def main():
         except StopIteration:
             exit(0)
 
+    # By now we have passed some of the known edge cases and by now we know
+    # that there is a check that has failed.
+    # We want to continue reading from stdin because otherwise we might later
+    # exit while the input is still being written to the pipe which causes exit
+    # code 141 (caused by SIGPIPE). This happens only when "set -o pipefail" is
+    # set and it looks like LIT always does it by default.
+    # We have created a minimal example that reproduces this and it seems like
+    # there is nothing we can do on the Python's side except reading ALL of the
+    # stdin's output.
+    # TODO: Maybe there is still a better workaround for this but we see there
+    # TODO: is nothing too bad about simply reading the stdin until end.
+    # "Getting exit code 141 when reading from stdin with a Python script with “set -o pipefail” set"
+    # https://stackoverflow.com/questions/59436858/getting-exit-code-141-when-reading-from-stdin-with-a-python-script-with-set-o/59436997?noredirect=1#comment105058533_59436997
+    try:
+        while True:
+            line_idx, line = next(stdin_input_iter)
+            input_lines.append(line.rstrip())
+    except StopIteration:
+        pass
+
     # Error reporting part. By now we know that we have failed and we just want
     # to report a check that has failed.
 
@@ -558,12 +578,9 @@ def main():
         if current_check.match_type == MatchType.SUBSTRING or \
                 current_check.match_type == MatchType.REGEX:
             matching_line_idx = -1
-            for line_idx, line in stdin_input_iter:
-                line = line.rstrip()
-                input_lines.append(line)
-
+            for line_idx, line in enumerate(input_lines[current_scan_base:]):
                 if current_check.expression in line:
-                    matching_line_idx = line_idx
+                    matching_line_idx = current_scan_base + line_idx
 
             if matching_line_idx == -1:
                 print("{}:{}:{}: error: CHECK-NEXT: expected string not found in input"
