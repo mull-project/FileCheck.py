@@ -327,7 +327,20 @@ def main():
 
     check_result = None
 
-    stdin_input_iter = enumerate(sys.stdin)
+    # We don't need to read the full input in most of the cases because it is
+    # usually much less check lines than the lines in the input.
+    # But if we don't read the full input and exit while the input is still
+    # being written to the pipe, we will get exit code 141 (caused by SIGPIPE).
+    # This happens only when "set -o pipefail" is set and it looks like LIT
+    # always does it by default.
+    # We have created a minimal example that reproduces this and it seems like
+    # there is nothing we can do on the Python's side except reading ALL of the
+    # stdin's output.
+    # TODO: Maybe there is still a better workaround for this but we see there
+    # TODO: is nothing too bad about simply reading the stdin until end.
+    # "Getting exit code 141 when reading from stdin with a Python script with “set -o pipefail” set"
+    # https://stackoverflow.com/questions/59436858/getting-exit-code-141-when-reading-from-stdin-with-a-python-script-with-set-o/59436997?noredirect=1#comment105058533_59436997
+    stdin_input_iter = enumerate(sys.stdin.readlines())
 
     try:
         line_idx, line = next(stdin_input_iter)
@@ -453,19 +466,6 @@ def main():
         except StopIteration:
             exit(0)
 
-    # By now we have passed some of the known edge cases and by now we know
-    # that there is a check that has failed.
-    # We want to continue reading from stdin because otherwise we might later
-    # exit while the input is still being written to the pipe which causes exit
-    # code 141 (caused by SIGPIPE). This happens only when "set -o pipefail" is
-    # set and it looks like LIT always does it by default.
-    # We have created a minimal example that reproduces this and it seems like
-    # there is nothing we can do on the Python's side except reading ALL of the
-    # stdin's output.
-    # TODO: Maybe there is still a better workaround for this but we see there
-    # TODO: is nothing too bad about simply reading the stdin until end.
-    # "Getting exit code 141 when reading from stdin with a Python script with “set -o pipefail” set"
-    # https://stackoverflow.com/questions/59436858/getting-exit-code-141-when-reading-from-stdin-with-a-python-script-with-set-o/59436997?noredirect=1#comment105058533_59436997
     try:
         while True:
             line_idx, line = next(stdin_input_iter)
