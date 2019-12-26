@@ -98,11 +98,10 @@ With invalid input:
    $ echo $?
    1
 
-What next?
-----------
+What's next?
+------------
 
 `FileCheck` is rarely used alone. The main use case for `FileCheck` is to serve
 as an assertion matcher tool when it is used in a combination with the
-`LLVM LIT Integrated Tester <https://llvm.org/docs/CommandGuide/lit.html>`_ and
-this is what our next tutorial is about. Don't stop here and check it out right
-away.
+LLVM LIT Integrated Tester and this is what our next tutorial is about. Don't
+stop here and check it out right away: :doc:`04-tutorial-lit-and-filecheck`.
