@@ -1,0 +1,2 @@
+RUN: echo "Hello world" | filecheck %s
+CHECK: Hello world
