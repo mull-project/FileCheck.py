@@ -234,11 +234,11 @@ def main():
             # CHECK and CHECK-NEXT
             strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " ?"
 
-            check_regex = "; {}:{}(.*)".format(check_prefix, strict_whitespace_match)
+            check_regex = ".*{}:{}(.*)".format(check_prefix, strict_whitespace_match)
             check_match = re.search(check_regex, line)
             check_type = CheckType.CHECK
             if not check_match:
-                check_regex = "; {}-NEXT:{}(.*)".format(check_prefix, strict_whitespace_match)
+                check_regex = ".*{}-NEXT:{}(.*)".format(check_prefix, strict_whitespace_match)
                 check_match = re.search(check_regex, line)
                 check_type = CheckType.CHECK_NEXT
 
@@ -263,7 +263,7 @@ def main():
                 checks.append(check)
                 continue
 
-            check_not_regex = "; {}-NOT:{}(.*)".format(check_prefix, strict_whitespace_match)
+            check_not_regex = ".*{}-NOT:{}(.*)".format(check_prefix, strict_whitespace_match)
             check_match = re.search(check_not_regex, line)
             if check_match:
                 match_type = MatchType.SUBSTRING
@@ -286,7 +286,7 @@ def main():
                 checks.append(check)
                 continue
 
-            check_empty_regex = "; {}-EMPTY:".format(check_prefix)
+            check_empty_regex = ".*{}-EMPTY:".format(check_prefix)
             check_match = re.search(check_empty_regex, line)
             if check_match:
                 check = Check(check_type=CheckType.CHECK_EMPTY,
