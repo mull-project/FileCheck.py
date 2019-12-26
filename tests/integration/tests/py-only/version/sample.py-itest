@@ -1,4 +1,4 @@
 ; RUN: %FILECHECK_EXEC --version | %FILECHECK_TESTER_EXEC %s --match-full-lines
 ; CHECK: {{^.*}}FileCheck{{(\.py)?$}}
-; CHECK: Version: 0.0.10
+; CHECK: Version: 0.0.11
 ; CHECK-EMPTY:
