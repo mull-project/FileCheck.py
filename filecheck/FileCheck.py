@@ -322,6 +322,11 @@ def main():
         exit(2)
 
     current_scan_base = 0
+    # Keeping track of a current scan column is a simplified feature which is
+    # not implemented yet:
+    # "Without --match-full-lines, LLVM FileCheck allows multiple checks on a
+    # same line #52", https://github.com/stanislaw/FileCheck.py/issues/52
+    current_scan_col = 0
 
     check_result = None
 
@@ -378,6 +383,8 @@ def main():
                         raise CheckFailedException(failed_check)
 
                     current_not_checks.clear()
+                    current_scan_col = len(line)
+
                     try:
                         current_check = next(check_iterator)
                     except StopIteration:
@@ -386,6 +393,7 @@ def main():
                     try:
                         line_idx, line = next(stdin_input_iter)
                         current_scan_base = line_idx
+                        current_scan_col = 0
                         break
                     except StopIteration:
                         raise InputFinishedException
@@ -460,6 +468,7 @@ def main():
             current_check = next(check_iterator)
             input_lines.append("")
             current_scan_base += 1
+            current_scan_col = 0
         except StopIteration:
             exit(0)
 
@@ -500,15 +509,22 @@ def main():
 
             print(current_check.source_line.rstrip())
             print("^".rjust(current_check.start_index + 1))
-            print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
+
+            print("<stdin>:{}:{}: note: scanning from here".format(
+                current_scan_base + 1, current_scan_col + 1)
+            )
             print(last_read_line)
-            print("^")
+            print("^".rjust(current_scan_col + 1))
 
             # This is rather weird but it looks like with the REGEX case, the
             # FileCheck C++ only prints possible intended matches starting from
             # the line next to the current_scan_base (and only when such line
             # exists!).
             # TODO: this needs more real-world input.
+
+            if current_scan_col != 0:
+                current_scan_base += 1
+
             if current_check.match_type == MatchType.SUBSTRING or \
                     (current_check.match_type == MatchType.REGEX and
                      current_scan_base < (len(input_lines) - 1)):
