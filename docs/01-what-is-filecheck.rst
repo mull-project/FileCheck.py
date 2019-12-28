@@ -27,6 +27,9 @@ possible to keep third-party binary artifacts in source code
 (see
 https://github.com/doorstop-dev/doorstop/pull/431#issuecomment-549237579).
 
+**Note:** FileCheck.py is not intended to be a replacement for LLVM's FileCheck
+in any way. See :doc:`07-roadmap`.
+
 What's next?
 ------------
 
