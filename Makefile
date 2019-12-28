@@ -39,3 +39,10 @@ test-lit-real: ## Run tests against FileCheck C++.
 		lit \
 		-vv $(PWD)/tests/integration
 
+# https://github.com/github-changelog-generator/github-changelog-generator
+# gem install github_changelog_generator
+changelog:
+	github_changelog_generator \
+		--user stanislaw \
+		--project FileCheck.py
+
