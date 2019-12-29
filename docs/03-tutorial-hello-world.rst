@@ -98,33 +98,6 @@ With invalid input:
    $ echo $?
    1
 
-Order of matching
------------------
-
-CHECK commands are checked one after another. If a CHECK string is not found in
-output, FileCheck exits with an error.
-
-Create a new file ``order-of-matching.check`` with the following contents:
-
-.. code-block:: text
-
-    CHECK: String1
-    CHECK: String2
-    CHECK: String3
-
-And run with invalid input:
-
-.. code-block:: text
-
-    echo "String1" | filecheck order-of-matching.check
-    ...
-    order-of-matching.check:2:8: error: CHECK: expected string not found in input
-    CHECK: String2
-           ^
-    <stdin>:1:8: note: scanning from here
-    String1
-           ^
-
 What's next?
 ------------
 

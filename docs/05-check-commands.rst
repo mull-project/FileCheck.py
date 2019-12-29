@@ -18,7 +18,8 @@ For all of the examples below, please note:
 CHECK
 -----
 
-``CHECK`` command simply means something has to be in input given to FileCheck.
+``CHECK`` command means that a given string or a regular expression must be
+present in input provided to FileCheck.
 
 Create a new file ``CHECK.check`` with the following contents:
 
@@ -39,9 +40,36 @@ Invalid input results in the exit code ``1`` and error message:
 
 .. code-block:: bash
 
-    echo -e "String1" | filecheck CHECK.check
+    echo "String1" | filecheck CHECK.check
     /Users/Stanislaw/.pyenv/versions/3.5.0/bin/filecheck
     CHECK.check:2:8: error: CHECK: expected string not found in input
+    CHECK: String2
+           ^
+    <stdin>:1:8: note: scanning from here
+    String1
+           ^
+
+Order of matching
+~~~~~~~~~~~~~~~~~
+
+CHECK commands are checked one after another. If a CHECK string is not found in
+output, FileCheck exits with error immediately.
+
+Create a new file ``order-of-matching.check`` with the following contents:
+
+.. code-block:: text
+
+    CHECK: String1
+    CHECK: String2
+    CHECK: String3
+
+And run with invalid input:
+
+.. code-block:: text
+
+    echo "String1" | filecheck order-of-matching.check
+    ...
+    order-of-matching.check:2:8: error: CHECK: expected string not found in input
     CHECK: String2
            ^
     <stdin>:1:8: note: scanning from here
@@ -51,7 +79,30 @@ Invalid input results in the exit code ``1`` and error message:
 CHECK-NOT
 ---------
 
-...
+``CHECK-NOT`` is the opposite of ``CHECK``: a given string or a regular
+expression must not be present in input provided to FileCheck.
+
+Example
+~~~~~~~
+
+``CHECK-NOT.check`` file:
+
+.. code-block:: text
+
+    CHECK-NOT: String1
+    CHECK-NOT: String2
+    CHECK-NOT: String3
+
+.. code-block:: bash
+
+    $ echo "String3" | filecheck CHECK-NOT.check
+    filecheck
+    CHECK-NOT.check:3:12: error: CHECK-NOT: excluded string found in input
+    CHECK-NOT: String3
+               ^
+    <stdin>:1:1: note: found here
+    String3
+    ^~~~~~~
 
 CHECK-NEXT
 ----------
