@@ -1,0 +1,2 @@
+CHECK: String1
+CHECK-NEXT: String2 

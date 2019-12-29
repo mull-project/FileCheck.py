@@ -107,7 +107,42 @@ Example
 CHECK-NEXT
 ----------
 
-...
+``CHECK-NEXT`` command means that a given string or a regular expression must be
+present in input provided to FileCheck. Additionally, there must be another
+check right before ``CHECK-NEXT``, that has passed on the input line just before
+the current input line. ``CHECK-NEXT`` cannot be the first check in the check
+file.
+
+Check file ``CHECK-NEXT.check``:
+
+.. code-block:: text
+
+    CHECK: String1
+    CHECK-NEXT: String2
+
+.. code-block:: bash
+
+    $ echo -e "String1\nString2" | filecheck CHECK-NEXT.check
+    ...filecheck
+    $ echo ?0
+    0
+
+.. code-block:: bash
+
+    $ echo -e "String1\nfoo\nString2" | filecheck CHECK-NEXT.check
+    ...filecheck
+    CHECK-NEXT.check:2:13: error: CHECK-NEXT: is not on the line after the previous match
+    CHECK-NEXT: String2
+                ^
+    <stdin>:3:1: note: 'next' match was here
+    String2
+    ^
+    <stdin>:1:8: note: previous match ended here
+    String1
+           ^
+    <stdin>:2:1: note: non-matching line after previous match is here
+    foo
+    ^
 
 CHECK-EMPTY
 -----------
