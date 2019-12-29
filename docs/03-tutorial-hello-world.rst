@@ -98,10 +98,37 @@ With invalid input:
    $ echo $?
    1
 
+Order of matching
+-----------------
+
+CHECK commands are checked one after another. If a CHECK string is not found in
+output, FileCheck exits with an error.
+
+Create a new file ``order-of-matching.check`` with the following contents:
+
+.. code-block:: text
+
+    CHECK: String1
+    CHECK: String2
+    CHECK: String3
+
+And run with invalid input:
+
+.. code-block:: text
+
+    echo "String1" | filecheck order-of-matching.check
+    ...
+    order-of-matching.check:2:8: error: CHECK: expected string not found in input
+    CHECK: String2
+           ^
+    <stdin>:1:8: note: scanning from here
+    String1
+           ^
+
 What's next?
 ------------
 
-`FileCheck` is rarely used alone. The main use case for `FileCheck` is to serve
-as an assertion matcher tool when it is used in a combination with the
-LLVM LIT Integrated Tester and this is what our next tutorial is about. Don't
+FileCheck is rarely used alone. The main use case for FileCheck is to serve
+as an string matching tool when it is used in a combination with LIT
+(LLVM Integrated Tester) and this is what our next tutorial is about. Don't
 stop here and check it out right away: :doc:`04-tutorial-lit-and-filecheck`.
