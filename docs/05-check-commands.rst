@@ -9,8 +9,6 @@ For all of the examples below, please note:
 
 - ``.check`` extension is chosen arbitrarily. FileCheck can work with any file
   names.
-- FileCheck always prints its own path to the output. This always happens
-  regardless of input.
 - When ``echo`` is used with the ``-e`` flag, the ``\n`` symbols are
   treated as newline symbols. We use it to simulate multiline input for
   FileCheck.
