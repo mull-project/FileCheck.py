@@ -1,5 +1,5 @@
 /**
-; RUN: clang %s -o %S/hello-world && %S/hello-world | filecheck %s
+; RUN: gcc %s -o %S/hello-world && %S/hello-world | filecheck %s
 ; CHECK: Hello world
  */
 

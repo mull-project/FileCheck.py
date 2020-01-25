@@ -1,4 +1,3 @@
 CHECK-NOT: String1
 CHECK-NOT: String2
 CHECK-NOT: String3
-
