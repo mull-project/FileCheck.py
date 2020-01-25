@@ -3,8 +3,7 @@
 ; CHECK: {{.*}}CHECK.check:2:8: error: CHECK: expected string not found in input
 ; CHECK: CHECK: String2
 ; CHECK:        ^
-; TODO
-; CHECK <stdin>:1:8: note: scanning from here
-; CHECK String1
-; CHECK:        ^
+; CHECK: <stdin>:2:1: note: scanning from here
+; CHECK-EMPTY:
+; CHECK: ^
 ; CHECK-EMPTY:
