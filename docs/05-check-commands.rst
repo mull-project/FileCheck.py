@@ -9,9 +9,6 @@ For all of the examples below, please note:
 
 - ``.check`` extension is chosen arbitrarily. FileCheck can work with any file
   names.
-- When ``echo`` is used with the ``-e`` flag, the ``\n`` symbols are
-  treated as newline symbols. We use it to simulate multiline input for
-  FileCheck.
 
 CHECK
 -----
@@ -31,7 +28,7 @@ Valid input results in the exit code ``0`` that indicates success:
 
 .. code-block:: bash
 
-    echo -e "String1\nString2\nString3" | filecheck CHECK.check
+    printf "String1\nString2\nString3" | filecheck CHECK.check
     /Users/Stanislaw/.pyenv/versions/3.5.0/bin/filecheck
 
 Invalid input results in the exit code ``1`` and error message:
@@ -120,14 +117,14 @@ Check file ``CHECK-NEXT.check``:
 
 .. code-block:: bash
 
-    $ echo -e "String1\nString2" | filecheck CHECK-NEXT.check
+    $ printf "String1\nString2" | filecheck CHECK-NEXT.check
     ...filecheck
     $ echo $?
     0
 
 .. code-block:: bash
 
-    $ echo -e "String1\nfoo\nString2" | filecheck CHECK-NEXT.check
+    $ printf "String1\nfoo\nString2" | filecheck CHECK-NEXT.check
     ...filecheck
     CHECK-NEXT.check:2:13: error: CHECK-NEXT: is not on the line after the previous match
     CHECK-NEXT: String2
@@ -159,14 +156,16 @@ In the following example, there is an empty line so the test will pass:
 
 .. code-block:: bash
 
-    echo -e "String1\n\nString2" | filecheck CHECK-EMPTY.check
+    $ printf "String1\n\nString2" | filecheck CHECK-EMPTY.check
     ...filecheck
     $ echo $?
     0
 
 If the empty line is removed, the test will fail:
 
-    echo -e "String1\nString2" | filecheck CHECK-EMPTY.check
+.. code-block:: bash
+
+    $ printf "String1\nString2" | filecheck CHECK-EMPTY.check
     ...filecheck
     ...CHECK-EMPTY.check:2:13: error: CHECK-EMPTY: expected string not found in input
     CHECK-EMPTY:
