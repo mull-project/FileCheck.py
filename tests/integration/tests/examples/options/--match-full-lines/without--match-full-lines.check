@@ -1,0 +1,3 @@
+CHECK: tring1
+CHECK: ring2
+CHECK: String3
