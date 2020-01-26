@@ -1,5 +1,5 @@
 /**
-; RUN: gcc %s -o %S/hello-world && %S/hello-world | filecheck %s
+; RUN: gcc %s -o %S/hello-world-1 && %S/hello-world-1 | filecheck %s
 ; CHECK: Hello world
  */
 
