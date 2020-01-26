@@ -12,7 +12,7 @@ LLVM LIT integration tests:
 2. [Doorstop](https://github.com/doorstop-dev/doorstop/pull/431)
 
 The problem is that you have to build `FileCheck` from LLVM sources
-which is not a trivial task for 1) people who are not aware with the LLVM
+which is not a trivial task for 1) people who are not familiar with the LLVM
 infrastructure and 2) Python-based projects that would prefer to not have
 to build anything from LLVM sources in their CI process.
 
@@ -22,7 +22,7 @@ keep third-party binary artifacts in source code,
 
 ## Documentation
 
-Documentation is hosted on Read the Docs: 
+Documentation is hosted on Read the Docs:
 
 [FileCheck.py documentation](https://filecheck.readthedocs.io/en/latest/index.html).
 
