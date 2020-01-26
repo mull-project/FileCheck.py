@@ -122,7 +122,7 @@ Check file ``CHECK-NEXT.check``:
 
     $ echo -e "String1\nString2" | filecheck CHECK-NEXT.check
     ...filecheck
-    $ echo ?0
+    $ echo $?
     0
 
 .. code-block:: bash
@@ -145,4 +145,34 @@ Check file ``CHECK-NEXT.check``:
 CHECK-EMPTY
 -----------
 
-...
+``CHECK-EMPTY`` command is used to match empty lines.
+
+Consider the following check file:
+
+.. code-block:: text
+
+    CHECK: String1
+    CHECK-EMPTY:
+    CHECK: String2
+
+In the following example, there is an empty line so the test will pass:
+
+.. code-block:: bash
+
+    echo -e "String1\n\nString2" | filecheck CHECK-EMPTY.check
+    ...filecheck
+    $ echo $?
+    0
+
+If the empty line is removed, the test will fail:
+
+    echo -e "String1\nString2" | filecheck CHECK-EMPTY.check
+    ...filecheck
+    ...CHECK-EMPTY.check:2:13: error: CHECK-EMPTY: expected string not found in input
+    CHECK-EMPTY:
+                ^
+    <stdin>:2:1: note: scanning from here
+    String2
+    ^
+    $ echo $?
+    1
