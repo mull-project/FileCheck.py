@@ -26,3 +26,8 @@ Documentation is hosted on Read the Docs:
 
 [FileCheck.py documentation](https://filecheck.readthedocs.io/en/latest/index.html).
 
+## Copyright
+
+Copyright (c) 2020 Stanislav Pankevich s.pankevich@gmail.com. See LICENSE for
+details.
+
