@@ -9,7 +9,7 @@ from collections import namedtuple
 from difflib import SequenceMatcher
 from enum import Enum
 
-__version__ = '0.0.11'
+__version__ = '0.0.12'
 
 
 class FailedCheck:
