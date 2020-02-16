@@ -2,10 +2,37 @@
 
 ## [Unreleased](https://github.com/stanislaw/FileCheck.py/tree/HEAD)
 
-[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.11...HEAD)
+[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.12...HEAD)
 
 **Merged pull requests:**
 
+-  Bump version: 0.0.11 → 0.0.12  [\#98](https://github.com/stanislaw/FileCheck.py/pull/98) ([stanislaw](https://github.com/stanislaw))
+
+## [v0.0.12](https://github.com/stanislaw/FileCheck.py/tree/v0.0.12) (2020-02-16)
+
+[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.11...v0.0.12)
+
+**Closed issues:**
+
+- `assert current\_scan\_base \> 0` [\#96](https://github.com/stanislaw/FileCheck.py/issues/96)
+- Missing LICENSE file? [\#95](https://github.com/stanislaw/FileCheck.py/issues/95)
+- Add documentation  [\#31](https://github.com/stanislaw/FileCheck.py/issues/31)
+
+**Merged pull requests:**
+
+- CHECK-NEXT: fix edge case when on the first line without a match \(fixes \#96\) [\#97](https://github.com/stanislaw/FileCheck.py/pull/97) ([stanislaw](https://github.com/stanislaw))
+- docs: options: initial documentation [\#94](https://github.com/stanislaw/FileCheck.py/pull/94) ([stanislaw](https://github.com/stanislaw))
+- tests: switch to printf everywhere [\#93](https://github.com/stanislaw/FileCheck.py/pull/93) ([stanislaw](https://github.com/stanislaw))
+- docs: switch to printf in all examples [\#92](https://github.com/stanislaw/FileCheck.py/pull/92) ([stanislaw](https://github.com/stanislaw))
+- docs: check commands: CHECK-EMPTY: initial description [\#91](https://github.com/stanislaw/FileCheck.py/pull/91) ([stanislaw](https://github.com/stanislaw))
+- Edge case: Ghost empty string in LLVM while Py seems to be correct [\#88](https://github.com/stanislaw/FileCheck.py/pull/88) ([stanislaw](https://github.com/stanislaw))
+- docs: move examples to be run together with integration tests [\#87](https://github.com/stanislaw/FileCheck.py/pull/87) ([stanislaw](https://github.com/stanislaw))
+- docs: Known issues: path to itself [\#86](https://github.com/stanislaw/FileCheck.py/pull/86) ([stanislaw](https://github.com/stanislaw))
+- docs: Check commands: CHECK-NEXT description [\#85](https://github.com/stanislaw/FileCheck.py/pull/85) ([stanislaw](https://github.com/stanislaw))
+- docs: Check commands: CHECK-NOT description [\#84](https://github.com/stanislaw/FileCheck.py/pull/84) ([stanislaw](https://github.com/stanislaw))
+- docs: Check commands: CHECK description [\#83](https://github.com/stanislaw/FileCheck.py/pull/83) ([stanislaw](https://github.com/stanislaw))
+- CHECK command: improve error reporting by finishing old TODO [\#82](https://github.com/stanislaw/FileCheck.py/pull/82) ([stanislaw](https://github.com/stanislaw))
+- Add CHANGELOG [\#81](https://github.com/stanislaw/FileCheck.py/pull/81) ([stanislaw](https://github.com/stanislaw))
 - docs: Roadmap [\#80](https://github.com/stanislaw/FileCheck.py/pull/80) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.10 → 0.0.11 [\#79](https://github.com/stanislaw/FileCheck.py/pull/79) ([stanislaw](https://github.com/stanislaw))
 
