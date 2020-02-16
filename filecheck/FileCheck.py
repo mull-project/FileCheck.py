@@ -45,7 +45,7 @@ class CheckType(Enum):
     CHECK_EMPTY = 4
 
 
-Check = namedtuple("Check", "check_type match_type expression source_line check_line_idx start_index")
+Check = namedtuple("Check", "check_type match_type check_keyword expression source_line check_line_idx start_index")
 
 
 def debug_print(string):
@@ -234,16 +234,17 @@ def main():
             # CHECK and CHECK-NEXT
             strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " ?"
 
-            check_regex = ".*{}:{}(.*)".format(check_prefix, strict_whitespace_match)
+            check_regex = ".*({}):{}(.*)".format(check_prefix, strict_whitespace_match)
             check_match = re.search(check_regex, line)
             check_type = CheckType.CHECK
             if not check_match:
-                check_regex = ".*{}-NEXT:{}(.*)".format(check_prefix, strict_whitespace_match)
+                check_regex = ".*({}-NEXT):{}(.*)".format(check_prefix, strict_whitespace_match)
                 check_match = re.search(check_regex, line)
                 check_type = CheckType.CHECK_NEXT
 
             if check_match:
-                check_expression = check_match.group(1)
+                check_keyword = check_match.group(1)
+                check_expression = check_match.group(2)
 
                 match_type = MatchType.SUBSTRING
 
@@ -255,20 +256,22 @@ def main():
 
                 check = Check(check_type=check_type,
                               match_type=match_type,
+                              check_keyword=check_keyword,
                               expression=check_expression,
                               source_line=line,
                               check_line_idx=line_idx,
-                              start_index=check_match.start(1))
+                              start_index=check_match.start(2))
 
                 checks.append(check)
                 continue
 
-            check_not_regex = ".*{}-NOT:{}(.*)".format(check_prefix, strict_whitespace_match)
+            check_not_regex = ".*({}-NOT):{}(.*)".format(check_prefix, strict_whitespace_match)
             check_match = re.search(check_not_regex, line)
             if check_match:
                 match_type = MatchType.SUBSTRING
 
-                check_expression = check_match.group(1)
+                check_keyword = check_match.group(1)
+                check_expression = check_match.group(2)
 
                 if re.search(r"\{\{.*\}\}", check_expression):
                     regex_line = escape_non_regex_parts(check_expression)
@@ -278,19 +281,23 @@ def main():
 
                 check = Check(check_type=CheckType.CHECK_NOT,
                               match_type=match_type,
+                              check_keyword=check_keyword,
                               expression=check_expression,
                               source_line=line,
                               check_line_idx=line_idx,
-                              start_index=check_match.start(1))
+                              start_index=check_match.start(2))
 
                 checks.append(check)
                 continue
 
-            check_empty_regex = ".*{}-EMPTY:".format(check_prefix)
+            check_empty_regex = ".*({}-EMPTY):".format(check_prefix)
             check_match = re.search(check_empty_regex, line)
             if check_match:
+                check_keyword = check_match.group(1)
+
                 check = Check(check_type=CheckType.CHECK_EMPTY,
                               match_type=MatchType.SUBSTRING,
+                              check_keyword=check_keyword,
                               expression=None,
                               source_line=line,
                               check_line_idx=line_idx,
@@ -602,29 +609,38 @@ def main():
 
                 exit(1)
             else:
-                assert current_scan_base > 0
-                previous_matched_line = input_lines[current_scan_base - 1].rstrip()
+                if current_scan_base > 0:
+                    print("{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match"
+                          .format(check_file,
+                                  current_check.check_line_idx + 1,
+                                  current_check.start_index + 1))
+                    print(current_check.source_line.rstrip())
+                    print("^".rjust(current_check.start_index + 1))
 
-                print("{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match"
-                      .format(check_file,
-                              current_check.check_line_idx + 1,
-                              current_check.start_index + 1))
-                print(current_check.source_line.rstrip())
-                print("^".rjust(current_check.start_index + 1))
+                    matching_line = input_lines[matching_line_idx].rstrip()
+                    print("<stdin>:{}:1: note: 'next' match was here".format(matching_line_idx + 1))
+                    print(matching_line)
+                    print("^")
 
-                matching_line = input_lines[matching_line_idx].rstrip()
-                print("<stdin>:{}:1: note: 'next' match was here".format(matching_line_idx + 1))
-                print(matching_line)
-                print("^")
+                    previous_matched_line = input_lines[current_scan_base - 1].rstrip()
+                    print("<stdin>:{}:{}: note: previous match ended here".format(current_scan_base, len(previous_matched_line) + 1))
+                    print(previous_matched_line)
+                    print("^".rjust(len(previous_matched_line) + 1))
+                    print("<stdin>:{}:{}: note: non-matching line after previous match is here".format(current_scan_base + 1, 1))
+                    print(last_read_line)
+                    print("^")
 
-                print("<stdin>:{}:{}: note: previous match ended here".format(current_scan_base, len(previous_matched_line) + 1))
-                print(previous_matched_line)
-                print("^".rjust(len(previous_matched_line) + 1))
-                print("<stdin>:{}:{}: note: non-matching line after previous match is here".format(current_scan_base + 1, 1))
-                print(last_read_line)
-                print("^")
+                    exit(1)
+                else:
+                    check_expression_idx = current_check.source_line.find(current_check.check_keyword)
+                    print("{}:{}:{}: error: found 'CHECK-NEXT' without previous 'CHECK: line"
+                          .format(check_file,
+                                  current_check.check_line_idx + 1,
+                                  check_expression_idx + 1))
+                    print(current_check.source_line.rstrip())
+                    print("^".rjust(check_expression_idx + 1))
 
-                exit(1)
+                    exit(2)
 
         raise NotImplementedError()
 
