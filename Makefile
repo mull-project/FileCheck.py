@@ -30,7 +30,7 @@ test-lit-py: ## Run tests against FileCheck.py.
 test-lit-real: test-lit-real-8 test-lit-real-9 ## Run tests against FileCheck C++.
 
 FILECHECK_REAL_8_EXEC=$(PWD)/tests/integration/tools/FileCheck/FileCheck-8.0.1
-test-lit-real-8: ## Run tests against FileCheck
+test-lit-real-8: ## Run tests against LLVM FileCheck 8.
 	@echo "--- Running integration tests against LLVM FileCheck 8.0.1 ---"
 	cd tests/integration && make clean
 
@@ -42,7 +42,7 @@ test-lit-real-8: ## Run tests against FileCheck
 		-vv $(PWD)/tests/integration
 
 FILECHECK_REAL_9_EXEC=$(PWD)/tests/integration/tools/FileCheck/FileCheck-9.0.1
-test-lit-real-9: ## Run tests against FileCheck C++.
+test-lit-real-9: ## Run tests against LLVM FileCheck 9.
 	@echo "--- Running integration tests against LLVM FileCheck 9.0.1 ---"
 	cd tests/integration && make clean
 
