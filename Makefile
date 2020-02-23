@@ -27,14 +27,28 @@ test-lit-py: ## Run tests against FileCheck.py.
 		lit \
 		-vv $(PWD)/tests/integration
 
-FILECHECK_REAL_EXEC=$(PWD)/tests/integration/tools/FileCheck/FileCheck
-test-lit-real: ## Run tests against FileCheck C++.
-	@echo "--- Running integration tests against FileCheck C++ ---"
+test-lit-real: test-lit-real-8 test-lit-real-9 ## Run tests against FileCheck C++.
+
+FILECHECK_REAL_8_EXEC=$(PWD)/tests/integration/tools/FileCheck/FileCheck-8.0.1
+test-lit-real-8: ## Run tests against FileCheck
+	@echo "--- Running integration tests against LLVM FileCheck 8.0.1 ---"
 	cd tests/integration && make clean
 
 	CURRENT_DIR=$(PWD) \
 		REAL_ONLY=1 \
-		FILECHECK_EXEC=$(FILECHECK_REAL_EXEC) \
+		FILECHECK_EXEC=$(FILECHECK_REAL_8_EXEC) \
+		PATH=$(PWD)/tests/integration/tools/FileCheck:$(PWD)/tests/integration/tools:$$PATH \
+		lit \
+		-vv $(PWD)/tests/integration
+
+FILECHECK_REAL_9_EXEC=$(PWD)/tests/integration/tools/FileCheck/FileCheck-9.0.1
+test-lit-real-9: ## Run tests against FileCheck C++.
+	@echo "--- Running integration tests against LLVM FileCheck 9.0.1 ---"
+	cd tests/integration && make clean
+
+	CURRENT_DIR=$(PWD) \
+		REAL_ONLY=1 \
+		FILECHECK_EXEC=$(FILECHECK_REAL_9_EXEC) \
 		PATH=$(PWD)/tests/integration/tools/FileCheck:$(PWD)/tests/integration/tools:$$PATH \
 		lit \
 		-vv $(PWD)/tests/integration
