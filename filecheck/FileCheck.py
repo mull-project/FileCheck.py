@@ -361,8 +361,8 @@ def main():
         print("FileCheck command line: {}".format(check_file))
         exit(2)
 
+    current_not_checks = []
     try:
-        current_not_checks = []
         failed_check = None
 
         while True:
@@ -454,10 +454,18 @@ def main():
         try:
             while True:
                 line_idx, line = next(stdin_input_iter)
-                if check_line(line, current_check, args.match_full_lines) == \
-                        CheckResult.CHECK_NOT_MATCH:
-                    current_check_line_idx = line_idx
-                    break
+
+                for not_check in current_not_checks:
+                    if check_line(line, not_check, args.match_full_lines) == \
+                            CheckResult.CHECK_NOT_MATCH:
+                        current_check_line_idx = line_idx
+                        failed_check = FailedCheck(not_check, line_idx)
+                        raise CheckFailedException(failed_check)
+
+        except CheckFailedException as e:
+            current_check = e.failed_check.check
+            current_check_line_idx = e.failed_check.line_idx
+
         except StopIteration:
             exit(0)
 
