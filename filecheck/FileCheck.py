@@ -415,6 +415,9 @@ def main():
                         raise CheckFailedException(failed_check)
 
                 elif check_result == CheckResult.CHECK_NOT_WITHOUT_MATCH:
+                    if failed_check:
+                        raise CheckFailedException(failed_check)
+
                     try:
                         current_not_checks.append(current_check)
                         current_check = next(check_iterator)
