@@ -2,10 +2,29 @@
 
 ## [Unreleased](https://github.com/stanislaw/FileCheck.py/tree/HEAD)
 
-[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.12...HEAD)
+[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.13...HEAD)
 
 **Merged pull requests:**
 
+- Bump version: 0.0.12 → 0.0.13 [\#105](https://github.com/stanislaw/FileCheck.py/pull/105) ([stanislaw](https://github.com/stanislaw))
+
+## [v0.0.13](https://github.com/stanislaw/FileCheck.py/tree/v0.0.13) (2020-03-25)
+
+[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.12...v0.0.13)
+
+**Fixed bugs:**
+
+- Possible bug: multiple CHECK\_NOT strings get shadowed by each other [\#103](https://github.com/stanislaw/FileCheck.py/issues/103)
+
+**Closed issues:**
+
+- Test against FileCheck from LLVM 8, 9 and 10. [\#100](https://github.com/stanislaw/FileCheck.py/issues/100)
+
+**Merged pull requests:**
+
+-  CHECK-NOT: Fix edge case when CHECK\_NOT strings get shadowed by each  [\#104](https://github.com/stanislaw/FileCheck.py/pull/104) ([stanislaw](https://github.com/stanislaw))
+- tests/integration: add FileCheck 9.0.1 Linux and macOS [\#101](https://github.com/stanislaw/FileCheck.py/pull/101) ([stanislaw](https://github.com/stanislaw))
+- Update CHANGELOG [\#99](https://github.com/stanislaw/FileCheck.py/pull/99) ([stanislaw](https://github.com/stanislaw))
 -  Bump version: 0.0.11 → 0.0.12  [\#98](https://github.com/stanislaw/FileCheck.py/pull/98) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.12](https://github.com/stanislaw/FileCheck.py/tree/v0.0.12) (2020-02-16)
