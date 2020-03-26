@@ -66,7 +66,7 @@ def clean(c):
             \\)
             -not -path "**Expected**"
             -not -path "**Input**"
-        """)
+    """)
 
     find_result = c.run("{}".format(find_command))
     find_result_stdout = find_result.stdout.strip()
@@ -75,5 +75,17 @@ def clean(c):
         """echo {find_result} | xargs rm -rfv""".format(find_result=find_result_stdout)
     )
 
-    print(echo_command)
     c.run("{}".format(echo_command))
+
+
+# https://github.com/github-changelog-generator/github-changelog-generator
+# gem install github_changelog_generator
+@task
+def changelog(c, github_token):
+    command = formatted_command("""
+        CHANGELOG_GITHUB_TOKEN={github_token}
+        github_changelog_generator
+        --user stanislaw
+        --project FileCheck.py
+    """).format(github_token=github_token)
+    c.run("{}".format(command))
