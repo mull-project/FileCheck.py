@@ -1,3 +1,4 @@
 #!/bin/bash
 
-make test-lit
+invoke test
+
