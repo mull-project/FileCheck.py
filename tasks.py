@@ -50,3 +50,30 @@ def test(c):
     run_lit_tests(c, get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC), True)
     run_lit_tests(c, get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC), True)
     run_lit_tests(c, get_filecheck_py_path(), False)
+
+@task
+def clean(c):
+    find_command = formatted_command("""
+        find
+            .
+            -type f \\(
+                -name '*.script'
+            \\)
+            -or -type d \\(
+                -name '*.dSYM' -or
+                -name 'Sandbox' -or
+                -name 'Output'
+            \\)
+            -not -path "**Expected**"
+            -not -path "**Input**"
+        """)
+
+    find_result = c.run("{}".format(find_command))
+    find_result_stdout = find_result.stdout.strip()
+
+    echo_command = formatted_command(
+        """echo {find_result} | xargs rm -rfv""".format(find_result=find_result_stdout)
+    )
+
+    print(echo_command)
+    c.run("{}".format(echo_command))
