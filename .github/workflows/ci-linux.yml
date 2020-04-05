@@ -1,4 +1,4 @@
-name: "FileCheck.py on Ubuntu"
+name: "FileCheck.py on Linux"
 
 on: [pull_request]
 
