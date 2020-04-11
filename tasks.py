@@ -38,7 +38,6 @@ def run_lit_tests(c, filecheck_exec, llvm_only):
     command = formatted_command("""
         REAL_ONLY={llvm_only_value} \
         FILECHECK_EXEC={filecheck_exec}
-        PATH={cwd}/tests/integration/tools/FileCheck:{cwd}/tests/integration/tools:$PATH
         lit 
         -vv 
         {cwd}/tests/integration
