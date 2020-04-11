@@ -31,8 +31,11 @@ def run_lit_tests(c, filecheck_exec, llvm_only):
 
     cwd = os.getcwd()
 
+    # For debugging:
+    # --debug
+    # --show-all
+    # --filter 02-weird
     command = formatted_command("""
-        CURRENT_DIR={cwd}
         REAL_ONLY={llvm_only_value} \
         FILECHECK_EXEC={filecheck_exec}
         PATH={cwd}/tests/integration/tools/FileCheck:{cwd}/tests/integration/tools:$PATH
