@@ -32,12 +32,10 @@ def run_lit_tests(c, filecheck_exec, llvm_only):
     cwd = os.getcwd()
 
     command = formatted_command("""
-        CURRENT_DIR={cwd}
-        REAL_ONLY={llvm_only_value} \
-        FILECHECK_EXEC={filecheck_exec}
-        PATH={cwd}/tests/integration/tools/FileCheck:{cwd}/tests/integration/tools:$PATH
-        lit 
-        -vv 
+        lit
+        --param REAL_ONLY={llvm_only_value}
+        --param FILECHECK_EXEC={filecheck_exec}
+        -v
         {cwd}/tests/integration
     """).format(cwd=cwd, filecheck_exec=filecheck_exec, llvm_only_value=llvm_only_value)
 
