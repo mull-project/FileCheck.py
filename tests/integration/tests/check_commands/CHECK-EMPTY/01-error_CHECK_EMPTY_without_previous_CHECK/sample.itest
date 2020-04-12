@@ -1,5 +1,5 @@
 ; RUN: %cat "%S/filecheck.input" | %expect_exit 2 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --match-full-lines
-; CHECK: {{^.*}}FileCheck{{(\.py)?$}}
+
 ; CHECK: {{.*}}filecheck.check:1:3: error: found 'CHECK-EMPTY' without previous 'CHECK: line{{$}}
 ; CHECK: {{^}}; CHECK-EMPTY:{{$}}
 ; CHECK: {{^}}  ^

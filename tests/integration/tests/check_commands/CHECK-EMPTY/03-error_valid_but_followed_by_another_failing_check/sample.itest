@@ -1,4 +1,5 @@
 ; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+
 ; CHECK:{{.*}}filecheck.check:3:10: error: CHECK: expected string not found in input{{$}}
 ; CHECK:; CHECK: string2
 ; CHECK:         ^
