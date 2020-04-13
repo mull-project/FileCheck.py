@@ -1,6 +1,6 @@
-; RUN: cat "%S/filecheck.input" | %FILECHECK_EXEC "%S/filecheck.check" --check-prefix STRING1 | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
-; RUN: cat "%S/filecheck.input" | %FILECHECK_EXEC "%S/filecheck.check" --check-prefix STRING2 | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
-; RUN: cat "%S/filecheck.input" | %FILECHECK_EXEC "%S/filecheck.check" --check-prefix STRING3 | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %cat "%S/filecheck.input" | %FILECHECK_EXEC "%S/filecheck.check" --check-prefix STRING1 | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %cat "%S/filecheck.input" | %FILECHECK_EXEC "%S/filecheck.check" --check-prefix STRING2 | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %cat "%S/filecheck.input" | %FILECHECK_EXEC "%S/filecheck.check" --check-prefix STRING3 | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
 
 ; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
 ; CHECK-EMPTY:
