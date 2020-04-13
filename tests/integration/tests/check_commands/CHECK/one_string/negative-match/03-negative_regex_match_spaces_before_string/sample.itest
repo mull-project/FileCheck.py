@@ -1,6 +1,5 @@
 ; RUN: %cat "%S/filecheck.input" | (%FILECHECK_EXEC "%S/filecheck.check" 2>&1; test $? = 1) | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
-; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
-; CHECK-NEXT:{{.*}}filecheck.check:1:10: error: CHECK: expected string not found in input{{$}}
+; CHECK:{{.*}}filecheck.check:1:10: error: CHECK: expected string not found in input{{$}}
 ; CHECK-NEXT:{{^; CHECK: .....hello.....$}}
 ; CHECK-NEXT:{{^         \^$}}
 ; TODO: It is weird that FileCheck C++ eats whitespaces and therefore does not
