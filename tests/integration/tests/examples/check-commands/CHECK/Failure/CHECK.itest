@@ -1,4 +1,4 @@
-; RUN: printf "String1" | (%FILECHECK_EXEC %S/CHECK.check 2>&1; test $? = 1;) | %FILECHECK_EXEC %s
+; RUN: printf "String1" | (%FILECHECK_EXEC "%S/CHECK.check" 2>&1; test $? = 1;) | %FILECHECK_EXEC "%s"
 ; CHECK: {{^.*}}FileCheck{{(\.py)?$}}
 ; CHECK: {{.*}}CHECK.check:2:8: error: CHECK: expected string not found in input
 ; CHECK: CHECK: String2

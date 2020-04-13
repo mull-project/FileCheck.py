@@ -1,5 +1,5 @@
-; RUN: printf "String1 String2 String3" | %FILECHECK_EXEC %S/without--strict-whitespace.check | %FILECHECK_EXEC %s
-; RUN: printf "String1  String2          String3" | %FILECHECK_EXEC %S/without--strict-whitespace.check | %FILECHECK_EXEC %s
-; RUN: printf "   String1\tString2\t\t\tString3 " | %FILECHECK_EXEC %S/without--strict-whitespace.check | %FILECHECK_EXEC %s
+; RUN: printf "String1 String2 String3" | %FILECHECK_EXEC %S/without--strict-whitespace.check | %FILECHECK_EXEC "%s"
+; RUN: printf "String1  String2          String3" | %FILECHECK_EXEC %S/without--strict-whitespace.check | %FILECHECK_EXEC "%s"
+; RUN: printf "   String1\tString2\t\t\tString3 " | %FILECHECK_EXEC %S/without--strict-whitespace.check | %FILECHECK_EXEC "%s"
 ; CHECK: {{^.*}}FileCheck{{(\.py)?$}}
 ; CHECK-EMPTY:

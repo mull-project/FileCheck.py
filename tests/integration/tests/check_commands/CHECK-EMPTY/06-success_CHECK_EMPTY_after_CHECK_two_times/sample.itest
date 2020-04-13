@@ -1,3 +1,3 @@
-; RUN: cat "%S/filecheck.input" | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 0) | %FILECHECK_TESTER_EXEC %s --match-full-lines
+; RUN: cat "%S/filecheck.input" | (%FILECHECK_EXEC "%S/filecheck.check" 2>&1; test $? = 0) | %FILECHECK_TESTER_EXEC %s --match-full-lines
 ; CHECK: {{^.*}}FileCheck{{(\.py)?$}}
 ; CHECK-EMPTY:
