@@ -1,1 +1,1 @@
-; RUN: printf "String1\nString2" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC %S/CHECK-NEXT.check
+; RUN: printf "String1\nString2" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/CHECK-NEXT.check"

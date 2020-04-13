@@ -1,1 +1,1 @@
-; RUN: printf "String4" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC %S/CHECK-NOT.check
+; RUN: printf "String4" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/CHECK-NOT.check"
