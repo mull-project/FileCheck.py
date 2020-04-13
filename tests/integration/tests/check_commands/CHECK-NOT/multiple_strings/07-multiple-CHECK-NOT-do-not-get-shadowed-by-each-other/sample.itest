@@ -1,4 +1,5 @@
-; RUN: %cat "%S/filecheck.input" | (%FILECHECK_EXEC "%S/filecheck.check" 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+
 ; CHECK:{{^.*}}filecheck.check:1:13: error: CHECK-NOT: excluded string found in input
 ; CHECK:; CHECK-NOT:warning
 ; CHECK:            ^

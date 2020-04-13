@@ -1,1 +1,1 @@
-; RUN: cat "%S/filecheck.input" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines --strict-whitespace
+; RUN: %cat "%S/filecheck.input" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines --strict-whitespace
