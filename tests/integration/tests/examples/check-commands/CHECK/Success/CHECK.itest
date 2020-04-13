@@ -1,3 +1,1 @@
-; RUN: printf "String1\nString2\nString3" | %FILECHECK_EXEC "%S/CHECK.check" | %FILECHECK_EXEC "%s"
-; CHECK: {{^.*}}FileCheck{{(\.py)?$}}
-; CHECK-EMPTY:
+; RUN: printf "String1\nString2\nString3" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC %S/CHECK.check

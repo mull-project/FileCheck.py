@@ -1,3 +1,1 @@
-; RUN: printf "\n" | %FILECHECK_EXEC "%S/filecheck.check" 2>&1 | %FILECHECK_TESTER_EXEC "%s"
-; CHECK: {{.*}}FileCheck
-; CHECK-EMPTY:
+; RUN: printf "\n" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" 2>&1

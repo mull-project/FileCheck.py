@@ -1,5 +1,0 @@
-#!/bin/bash
-
-file_check_path=`echo $(cd $(dirname "$0") && pwd -P)`
-
-$file_check_path/FileCheck-9.0.1 "$@"
