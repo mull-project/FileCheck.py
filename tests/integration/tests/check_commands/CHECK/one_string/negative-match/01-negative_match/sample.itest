@@ -1,4 +1,4 @@
-; RUN: cat %S/filecheck.input | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
+; RUN: cat "%S/filecheck.input" | (%FILECHECK_EXEC %S/filecheck.check 2>&1; test $? = 1;) | %FILECHECK_TESTER_EXEC %s --strict-whitespace --match-full-lines
 ; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
 ; CHECK:{{.*}}filecheck.check:1:10: error: CHECK: expected string not found in input{{$}}
 ; CHECK:{{^}}; CHECK: foo{{$}}
