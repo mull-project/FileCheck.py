@@ -1,6 +1,6 @@
 ; RUN: %cat "%S/filecheck.input" | (%FILECHECK_EXEC "%S/filecheck.check" 2>&1; test $? == 1;) | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
-; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
-; CHECK-NEXT:{{^.*}}filecheck.check:1:14: error: CHECK-NOT: excluded string found in input{{$}}
+
+; CHECK:{{^.*}}filecheck.check:1:14: error: CHECK-NOT: excluded string found in input{{$}}
 ; CHECK-NEXT:{{^; CHECK-NOT: hello world$}}
 ; CHECK-NEXT:{{^             \^$}}
 ; CHECK-NEXT:<stdin>:1:1: note: found here
