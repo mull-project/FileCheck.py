@@ -35,11 +35,7 @@ for line in data:
 
 stdout, stderr = process.communicate()
 
-output_lines = stdout.decode('utf-8').split('\n')
-# The last '\n' never belongs to the output, it is produced by decode-split.
-if len(output_lines) > 0:
-    del output_lines[-1]
-
+output_lines = stdout.decode('utf-8').splitlines()
 for word in output_lines:
     print(word)
 
