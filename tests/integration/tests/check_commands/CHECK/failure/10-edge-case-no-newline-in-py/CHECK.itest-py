@@ -1,5 +1,4 @@
 ; RUN: printf "String1\n" | (%FILECHECK_EXEC %S/CHECK.check 2>&1; test $? = 1;) | %FILECHECK_EXEC %s --strict-whitespace --match-full-lines
-; CHECK:{{^.*}}FileCheck{{(\.py)?$}}
 // TODO: Something wrong with the greediness here:
 ; CHECK***:{{^.*}}CHECK.check:2:8: error: CHECK***: expected string not found in input
 ; CHECK:{{^.*}}

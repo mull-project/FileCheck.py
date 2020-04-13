@@ -173,13 +173,6 @@ def check_line(line, current_check, match_full_lines):
 
 
 def main():
-    # FileCheck always prints its first argument.
-    filecheck_path = sys.argv[0]
-    if os.path.exists(filecheck_path):
-        filecheck_path = os.path.abspath(filecheck_path)
-
-    print(filecheck_path)
-
     if len(sys.argv) == 1:
         print("<check-file> not specified")
         exit(2)

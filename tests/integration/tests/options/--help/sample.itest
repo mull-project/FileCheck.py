@@ -1,4 +1,4 @@
-; RUN: (%FILECHECK_EXEC --help 2>&1; test $? = 0) | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %expect_exit 0 %FILECHECK_EXEC --help | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
 
 ; CHECK:{{^USAGE: [Ff]ile[Cc]heck.* \[options\] <check-file>$}}
 ; CHECK-EMPTY:
