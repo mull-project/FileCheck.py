@@ -1,2 +1,2 @@
-; RUN: printf "hello" | %FILECHECK_EXEC %S/filecheck.check | %FILECHECK_TESTER_EXEC %s --match-full-lines
+; RUN: printf "hello" | %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC %s --match-full-lines
 ; CHECK: {{^.*}}FileCheck{{(\.py)?$}}
