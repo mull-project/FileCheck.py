@@ -2,7 +2,9 @@
 
 Attempt to reimplement LLVM's FileCheck using Python.
 
-![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20macOS/badge.svg) ![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20Linux/badge.svg)
+![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20macOS/badge.svg)
+![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20Linux/badge.svg)
+![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20Windows/badge.svg)
 
 ## Background
 
