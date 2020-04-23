@@ -1,0 +1,9 @@
+; RUN: echo "hello" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines
+
+; RUN: echo " hello" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines
+
+; RUN: echo "  hello" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines
+
+; RUN: echo "hello " | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines
+
+; RUN: echo "hello  " | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines

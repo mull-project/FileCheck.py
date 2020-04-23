@@ -1,10 +1,9 @@
 ; RUN: printf "String1" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK.check" | %FILECHECK_EXEC "%s" --strict-whitespace --match-full-lines
 
 // TODO: Something wrong with the greediness here:
-; CHECK***:{{^.*}}CHECK.check:2:8: error: CHECK***: expected string not found in input
-; CHECK:{{^.*}}
+; CHECK:{{^.*}}CHECK.check:2:8: error: {{CHECK}}: expected string not found in input
 // TODO: And here:
-; CHECK:{{.*}}String2
+; CHECK:{{^CHECK}}: String2
 ; CHECK:       ^
 ; CHECK:<stdin>:1:8: note: scanning from here
 ; CHECK:String1
