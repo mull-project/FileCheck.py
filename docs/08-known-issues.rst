@@ -1,14 +1,6 @@
 Known issues
 ============
 
-FileCheck always prints a full path to itself
----------------------------------------------
-
-LLVM FileCheck always prints its own path to the output so the first line is
-always the path. This always happens regardless of a test outcome: success or
-failure. FileCheck.py follows LLVM FileCheck and does the same, even though
-there seems to be no reason to do that every time.
-
 Unintuitive behavior of CHECK-NOT
 ---------------------------------
 
