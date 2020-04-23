@@ -225,7 +225,7 @@ def main():
                 line = canonicalize_whitespace(line)
 
             # CHECK and CHECK-NEXT
-            strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " ?"
+            strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " *"
 
             check_regex = ".*({}):{}(.*)".format(check_prefix, strict_whitespace_match)
             check_match = re.search(check_regex, line)
@@ -238,6 +238,8 @@ def main():
             if check_match:
                 check_keyword = check_match.group(1)
                 check_expression = check_match.group(2)
+                if not (args.strict_whitespace and args.match_full_lines):
+                    check_expression = check_expression.strip(' ')
 
                 match_type = MatchType.SUBSTRING
 
@@ -265,6 +267,8 @@ def main():
 
                 check_keyword = check_match.group(1)
                 check_expression = check_match.group(2)
+                if not (args.strict_whitespace and args.match_full_lines):
+                    check_expression = check_expression.strip(' ')
 
                 if re.search(r"\{\{.*\}\}", check_expression):
                     regex_line = escape_non_regex_parts(check_expression)
@@ -362,6 +366,8 @@ def main():
             line = line.rstrip()
             if not args.strict_whitespace:
                 line = canonicalize_whitespace(line)
+                if args.match_full_lines:
+                    line = line.strip(' ')
 
             while True:
                 if not failed_check:
