@@ -1,11 +1,45 @@
 # Changelog
 
-## [Unreleased](https://github.com/stanislaw/FileCheck.py/tree/HEAD)
+## [v0.0.14](https://github.com/stanislaw/FileCheck.py/tree/v0.0.14) (2020-04-23)
 
-[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.13...HEAD)
+[Full Changelog](https://github.com/stanislaw/FileCheck.py/compare/v0.0.13...v0.0.14)
+
+**Implemented enhancements:**
+
+- CI setup [\#34](https://github.com/stanislaw/FileCheck.py/issues/34)
+
+**Closed issues:**
+
+- Weird behavior with a leading space character [\#131](https://github.com/stanislaw/FileCheck.py/issues/131)
+- CI: set up Actions on Windows [\#112](https://github.com/stanislaw/FileCheck.py/issues/112)
+- Switch from Makefile to Invoke [\#102](https://github.com/stanislaw/FileCheck.py/issues/102)
 
 **Merged pull requests:**
 
+- Fix --match-full-lines: strip leading and trailing whitespace unless --strict-whitespace [\#132](https://github.com/stanislaw/FileCheck.py/pull/132) ([stanislaw](https://github.com/stanislaw))
+- README: add Windows badge [\#130](https://github.com/stanislaw/FileCheck.py/pull/130) ([stanislaw](https://github.com/stanislaw))
+- lit.cfg: detect shell to fix running on Windows locally [\#129](https://github.com/stanislaw/FileCheck.py/pull/129) ([stanislaw](https://github.com/stanislaw))
+- tests: fix remaining test ?= lines \(part 2\) [\#128](https://github.com/stanislaw/FileCheck.py/pull/128) ([stanislaw](https://github.com/stanislaw))
+-  tests: fix remaining test ?= lines  [\#127](https://github.com/stanislaw/FileCheck.py/pull/127) ([stanislaw](https://github.com/stanislaw))
+- Edge case test: LLVM vs py: use lit.local.cfg [\#126](https://github.com/stanislaw/FileCheck.py/pull/126) ([stanislaw](https://github.com/stanislaw))
+- tests: remove obsolete first line check [\#125](https://github.com/stanislaw/FileCheck.py/pull/125) ([stanislaw](https://github.com/stanislaw))
+- Rename to work on Windows: cat -\> %cat [\#124](https://github.com/stanislaw/FileCheck.py/pull/124) ([stanislaw](https://github.com/stanislaw))
+- Rename to safer paths: %FILECHECK\_TESTER\_EXEC "%s" [\#123](https://github.com/stanislaw/FileCheck.py/pull/123) ([stanislaw](https://github.com/stanislaw))
+- Rename to safer paths: %FILECHECK\_EXEC "%s" and similar [\#122](https://github.com/stanislaw/FileCheck.py/pull/122) ([stanislaw](https://github.com/stanislaw))
+- Rename to safer paths: %S/filecheck.input -\> "%S/filecheck.input" [\#121](https://github.com/stanislaw/FileCheck.py/pull/121) ([stanislaw](https://github.com/stanislaw))
+- tasks and lit.cfg: adapt for running on Windows [\#120](https://github.com/stanislaw/FileCheck.py/pull/120) ([stanislaw](https://github.com/stanislaw))
+-  FileCheck 8.0.1, windows version built from LLVM  [\#119](https://github.com/stanislaw/FileCheck.py/pull/119) ([stanislaw](https://github.com/stanislaw))
+- tests: fix output of expect\_exit.py [\#118](https://github.com/stanislaw/FileCheck.py/pull/118) ([stanislaw](https://github.com/stanislaw))
+- tests: expect\_exit.py tool to replace "test $?" [\#117](https://github.com/stanislaw/FileCheck.py/pull/117) ([stanislaw](https://github.com/stanislaw))
+-  lit: introduce %cat to abstract the difference cat vs type  [\#116](https://github.com/stanislaw/FileCheck.py/pull/116) ([stanislaw](https://github.com/stanislaw))
+- FileCheck 9.0.1, windows version built from LLVM [\#115](https://github.com/stanislaw/FileCheck.py/pull/115) ([stanislaw](https://github.com/stanislaw))
+-  tasks: switch to passing parameters to lit with "--param"  [\#114](https://github.com/stanislaw/FileCheck.py/pull/114) ([stanislaw](https://github.com/stanislaw))
+- CI: GitHub Actions on Windows setup [\#113](https://github.com/stanislaw/FileCheck.py/pull/113) ([stanislaw](https://github.com/stanislaw))
+- README: add CI badge [\#110](https://github.com/stanislaw/FileCheck.py/pull/110) ([stanislaw](https://github.com/stanislaw))
+- CI setup with GitHub Actions [\#109](https://github.com/stanislaw/FileCheck.py/pull/109) ([stanislaw](https://github.com/stanislaw))
+- Poetry: set Python to 3.5, update bump2version [\#108](https://github.com/stanislaw/FileCheck.py/pull/108) ([stanislaw](https://github.com/stanislaw))
+- Switch from Makefile to Invoke \(closes \#102\) [\#107](https://github.com/stanislaw/FileCheck.py/pull/107) ([stanislaw](https://github.com/stanislaw))
+- Update CHANGELOG [\#106](https://github.com/stanislaw/FileCheck.py/pull/106) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.12 → 0.0.13 [\#105](https://github.com/stanislaw/FileCheck.py/pull/105) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.13](https://github.com/stanislaw/FileCheck.py/tree/v0.0.13) (2020-03-25)
@@ -111,10 +145,10 @@
 
 **Merged pull requests:**
 
-- CHECK-NOT: edge case: failing CHECK has higher precedence than failing CHECK-NOT [\#64](https://github.com/stanislaw/FileCheck.py/pull/64) ([stanislaw](https://github.com/stanislaw))
 - CHECK-EMPTY: edge case when it matches the end of input but there are more checks to fail [\#62](https://github.com/stanislaw/FileCheck.py/pull/62) ([stanislaw](https://github.com/stanislaw))
 - --version: add more details about filecheck [\#61](https://github.com/stanislaw/FileCheck.py/pull/61) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.4 → 0.0.5 [\#60](https://github.com/stanislaw/FileCheck.py/pull/60) ([stanislaw](https://github.com/stanislaw))
+- CHECK-EMPTY: consistent behavior when followed by normal CHECKS [\#58](https://github.com/stanislaw/FileCheck.py/pull/58) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.5](https://github.com/stanislaw/FileCheck.py/tree/v0.0.5) (2019-12-13)
 
@@ -126,13 +160,14 @@
 
 **Merged pull requests:**
 
+- CHECK-NOT: edge case: failing CHECK has higher precedence than failing CHECK-NOT [\#64](https://github.com/stanislaw/FileCheck.py/pull/64) ([stanislaw](https://github.com/stanislaw))
 - Fix calculation of the current\_scan\_base [\#59](https://github.com/stanislaw/FileCheck.py/pull/59) ([stanislaw](https://github.com/stanislaw))
-- CHECK-EMPTY: consistent behavior when followed by normal CHECKS [\#58](https://github.com/stanislaw/FileCheck.py/pull/58) ([stanislaw](https://github.com/stanislaw))
 -  Refactoring: extract checks to a separate function  [\#57](https://github.com/stanislaw/FileCheck.py/pull/57) ([stanislaw](https://github.com/stanislaw))
 - CHECK-EMPTY: negative match [\#56](https://github.com/stanislaw/FileCheck.py/pull/56) ([stanislaw](https://github.com/stanislaw))
 - CHECK-NEXT: negative regex match [\#55](https://github.com/stanislaw/FileCheck.py/pull/55) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.3 → 0.0.4 [\#53](https://github.com/stanislaw/FileCheck.py/pull/53) ([stanislaw](https://github.com/stanislaw))
 - Refactoring: remove obsolete code [\#51](https://github.com/stanislaw/FileCheck.py/pull/51) ([stanislaw](https://github.com/stanislaw))
+- Everything what's needed to publish a pip package [\#45](https://github.com/stanislaw/FileCheck.py/pull/45) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.4](https://github.com/stanislaw/FileCheck.py/tree/v0.0.4) (2019-12-08)
 
@@ -165,7 +200,6 @@
 **Merged pull requests:**
 
 - --help command: remove artifacts introduced by testing [\#47](https://github.com/stanislaw/FileCheck.py/pull/47) ([stanislaw](https://github.com/stanislaw))
-- Everything what's needed to publish a pip package [\#45](https://github.com/stanislaw/FileCheck.py/pull/45) ([stanislaw](https://github.com/stanislaw))
 - Help command: enough to get going [\#44](https://github.com/stanislaw/FileCheck.py/pull/44) ([stanislaw](https://github.com/stanislaw))
 - Fix some typos [\#43](https://github.com/stanislaw/FileCheck.py/pull/43) ([AlexDenisov](https://github.com/AlexDenisov))
 - Add Poetry [\#42](https://github.com/stanislaw/FileCheck.py/pull/42) ([stanislaw](https://github.com/stanislaw))
