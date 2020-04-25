@@ -36,17 +36,20 @@ process = subprocess.Popen(args,
 
 stdout, _ = process.communicate(input=sys.stdin.buffer.read())
 
-if len(stdout) > 0 and expect_no_content:
-    print("error: expect_exit: expected no content but received: {}".format(stdout))
-    exit(1)
+unexpected_exit_code = process.returncode != expected_exit_code
+if unexpected_exit_code:
+    print("error: expect_exit: expected exit code: {}, actual: {}"
+          .format(expected_exit_code, process.returncode))
+
+unexpected_content = expect_no_content and len(stdout) > 0
+if unexpected_content:
+    print("error: expect_exit: expected no content but received:")
 
 output_lines = stdout.decode('utf-8').splitlines()
 for word in output_lines:
     print(word)
 
-if process.returncode == expected_exit_code:
-    exit(0)
-else:
-    print("error: expect_exit: expected exit code {} but received: {}"
-          .format(expected_exit_code, process.returncode))
+if unexpected_content or unexpected_content:
     exit(1)
+
+exit(0)
