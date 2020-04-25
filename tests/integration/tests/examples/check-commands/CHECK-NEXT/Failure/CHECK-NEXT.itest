@@ -1,4 +1,4 @@
-; RUN: printf "String1\nfoo\nString2" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-NEXT.check" | %FILECHECK_EXEC "%s"
+; RUN: %printf "String1\nfoo\nString2" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-NEXT.check" | %FILECHECK_EXEC "%s"
 
 ; CHECK: {{.*}}CHECK-NEXT.check:2:13: error: CHECK-NEXT: is not on the line after the previous match
 ; CHECK: CHECK-NEXT: String2
