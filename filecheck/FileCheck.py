@@ -18,9 +18,21 @@ class FailedCheck:
         self.line_idx = line_idx
 
 
+class FailedImplicitCheckContext:
+    def __init__(self, check, line, line_idx):
+        self.check = check
+        self.line = line
+        self.line_idx = line_idx
+
+
 class CheckFailedException(BaseException):
     def __init__(self, failed_check):
         self.failed_check = failed_check
+
+
+class ImplicitCheckNotFailedException(BaseException):
+    def __init__(self, failed_check_context):
+        self.failed_check_context = failed_check_context
 
 
 class CheckNOTIsLastException(BaseException):
@@ -46,6 +58,7 @@ class CheckType(Enum):
 
 
 Check = namedtuple("Check", "check_type match_type check_keyword expression source_line check_line_idx start_index")
+ImplicitCheck = namedtuple("ImplicitCheck", "original_check check")
 
 
 def debug_print(string):
@@ -172,6 +185,15 @@ def check_line(line, current_check, match_full_lines):
     return CheckResult.PASS
 
 
+def implicit_check_line(check_not_check, strict_mode, line):
+    if strict_mode:
+        if check_not_check.original_check in line:
+            return True
+    elif check_not_check.check in line:
+        return True
+    return False
+
+
 def main():
     if len(sys.argv) == 1:
         print("<check-file> not specified")
@@ -205,10 +227,25 @@ def main():
     parser.add_argument('--strict-whitespace', action='store_true', help='TODO')
     parser.add_argument('--match-full-lines', action='store_true', help='TODO')
     parser.add_argument('--check-prefix', action='store', help='TODO')
+    parser.add_argument('--implicit-check-not', action='append', help='TODO')
 
     args = parser.parse_args()
 
+    strict_mode = args.match_full_lines and args.strict_whitespace
+
     check_prefix = args.check_prefix if args.check_prefix else "CHECK"
+    implicit_check_not_checks = []
+
+    if args.implicit_check_not:
+        for implicit_check_not_arg in args.implicit_check_not:
+            # LLVM FileCheck does rstrip() here for some reason that
+            # does not seem reasonable. We still prefer to be compatible.
+            stripped_check = implicit_check_not_arg.rstrip()
+
+            implicit_check_not = ImplicitCheck(
+                original_check=implicit_check_not_arg, check=stripped_check
+            )
+            implicit_check_not_checks.append(implicit_check_not)
 
     if not re.search('^[A-Za-z][A-Za-z0-9-_]+$', check_prefix):
         sys.stdout.flush()
@@ -361,9 +398,13 @@ def main():
     current_not_checks = []
     try:
         failed_check = None
+        failed_implicit_check = None
 
         while True:
             line = line.rstrip()
+
+            unstripped_line = line
+
             if not args.strict_whitespace:
                 line = canonicalize_whitespace(line)
                 if args.match_full_lines:
@@ -377,6 +418,15 @@ def main():
                                                   args.match_full_lines)
                         if check_result == CheckResult.CHECK_NOT_MATCH:
                             failed_check = FailedCheck(current_not_check, line_idx)
+                            break
+
+                if not failed_implicit_check:
+                    for check_not_check in implicit_check_not_checks:
+                        if implicit_check_line(check_not_check, strict_mode, unstripped_line):
+                            failed_implicit_check = FailedImplicitCheckContext(
+                                check_not_check, unstripped_line, line_idx
+                            )
+                            break
 
                 check_result = check_line(line, current_check, args.match_full_lines)
 
@@ -385,6 +435,9 @@ def main():
                     raise CheckFailedException(failed_check)
 
                 elif check_result == CheckResult.PASS:
+                    if failed_implicit_check:
+                        raise ImplicitCheckNotFailedException(failed_implicit_check)
+
                     if failed_check:
                         raise CheckFailedException(failed_check)
 
@@ -394,6 +447,17 @@ def main():
                     try:
                         current_check = next(check_iterator)
                     except StopIteration:
+                        if len(implicit_check_not_checks) == 0:
+                            exit(0)
+
+                        for line_idx, line in stdin_input_iter:
+                            for check_not_check in implicit_check_not_checks:
+                                if implicit_check_line(check_not_check, strict_mode, line):
+                                    failed_implicit_check = FailedImplicitCheckContext(
+                                        check_not_check, line, line_idx
+                                    )
+                                    raise ImplicitCheckNotFailedException(failed_implicit_check)
+
                         exit(0)
 
                     try:
@@ -474,6 +538,26 @@ def main():
     except CheckFailedException as e:
         current_check = e.failed_check.check
         current_check_line_idx = e.failed_check.line_idx
+
+    except ImplicitCheckNotFailedException as e:
+        context = e.failed_check_context
+        failed_check = context.check
+        failed_line_num = context.line_idx + 1
+
+        failed_column_idx = context.line.find(failed_check.check)
+        assert failed_column_idx != -1
+
+        failed_column_num = failed_column_idx + 1
+
+        print("command line:1:22: error: CHECK-NOT: excluded string found in input")
+        print("-implicit-check-not='{}'".format(failed_check.original_check))
+        print("                     ^")
+        print("<stdin>:{}:{}: note: found here".format(failed_line_num, failed_column_num))
+        print(context.line)
+        print("^"
+              .rjust(failed_column_idx + 1, ' ')
+              .ljust(len(failed_check.check) + failed_column_idx, '~'))
+        exit(1)
 
     # CHECK-EMPTY is special: if there is no output anymore and this check is
     # the 1) current and 2) the last one we want to declare success.

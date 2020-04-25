@@ -1,0 +1,2 @@
+; CHECK-NOT: error
+; CHECK: string 1

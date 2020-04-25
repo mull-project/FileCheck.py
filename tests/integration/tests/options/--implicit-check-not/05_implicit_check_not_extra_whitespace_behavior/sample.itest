@@ -1,0 +1,21 @@
+; RUN: %printf "error\nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error "
+; RUN: %printf "error\nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --strict-whitespace
+; RUN: %printf "error\nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --match-full-lines
+; RUN: %printf "error\nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --strict-whitespace --match-full-lines
+
+; RUN: %printf "error \nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error "
+; RUN: %printf "error \nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --strict-whitespace
+; RUN: %printf "error \nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --match-full-lines
+; RUN: %printf "error \nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --strict-whitespace --match-full-lines
+
+; RUN: %printf " error\nFoo" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %printf " error\nFoo" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --strict-whitespace | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %printf " error\nFoo" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --match-full-lines | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %printf " error\nFoo" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not " error " --strict-whitespace --match-full-lines
+
+; CHECK:command line:1:22: error: CHECK-NOT: excluded string found in input
+; CHECK:-implicit-check-not=' error '
+; CHECK:                     ^
+; CHECK:<stdin>:1:1: note: found here
+; CHECK: error
+; CHECK:^~~~~~

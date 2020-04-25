@@ -1,0 +1,18 @@
+; RUN: %printf "someerrorsome\nFoo" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "error" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix CHECK-BEFORE
+
+; CHECK-BEFORE:command line:1:22: error: CHECK-NOT: excluded string found in input
+; CHECK-BEFORE:-implicit-check-not='error'
+; CHECK-BEFORE:                     ^
+; CHECK-BEFORE:<stdin>:1:5: note: found here
+; CHECK-BEFORE:someerrorsome
+; CHECK-BEFORE:    ^~~~~
+
+; RUN: %printf "Foo\nsomeerrorsome" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "error" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix CHECK-AFTER
+
+; CHECK-AFTER:command line:1:22: error: CHECK-NOT: excluded string found in input
+; CHECK-AFTER:-implicit-check-not='error'
+; CHECK-AFTER:                     ^
+; CHECK-AFTER:<stdin>:2:5: note: found here
+; CHECK-AFTER:someerrorsome
+; CHECK-AFTER:    ^~~~~
+

@@ -49,7 +49,7 @@ output_lines = stdout.decode('utf-8').splitlines()
 for word in output_lines:
     print(word)
 
-if unexpected_content or unexpected_content:
+if unexpected_exit_code or unexpected_content:
     exit(1)
 
 exit(0)
