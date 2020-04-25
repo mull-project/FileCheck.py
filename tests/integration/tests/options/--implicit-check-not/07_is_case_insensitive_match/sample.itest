@@ -1,0 +1,2 @@
+; RUN: %printf "Error\nHello" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "error"
+; RUN: %printf "ERROR\nHello" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "error"
