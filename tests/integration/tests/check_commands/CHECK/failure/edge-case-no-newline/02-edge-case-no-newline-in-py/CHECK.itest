@@ -1,4 +1,4 @@
-; RUN: printf "String1\n" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK.check" | %FILECHECK_EXEC "%s" --strict-whitespace --match-full-lines
+; RUN: %printf "String1\n" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK.check" | %FILECHECK_EXEC "%s" --strict-whitespace --match-full-lines
 
 // TODO: Something wrong with the greediness here:
 ; CHECK***:{{^.*}}CHECK.check:2:8: error: CHECK***: expected string not found in input
