@@ -1,4 +1,4 @@
-; RUN: printf "" | %expect_exit 2 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --match-full-lines
+; RUN: %printf "" | %expect_exit 2 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --match-full-lines
 
 ; CHECK: error: no check strings found with prefix 'CHECK:'
 ; CHECK-EMPTY

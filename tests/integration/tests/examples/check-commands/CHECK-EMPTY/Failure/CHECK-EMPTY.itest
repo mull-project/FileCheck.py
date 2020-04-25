@@ -1,4 +1,4 @@
-; RUN: printf "String1\nString2" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-EMPTY.check" | %FILECHECK_EXEC "%s"
+; RUN: %printf "String1\nString2" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-EMPTY.check" | %FILECHECK_EXEC "%s"
 
 ; CHECK: {{^.*}}CHECK-EMPTY.check:2:13: error: CHECK-EMPTY: expected string not found in input
 ; CHECK: CHECK-EMPTY:
