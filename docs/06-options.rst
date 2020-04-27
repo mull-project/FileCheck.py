@@ -1,8 +1,8 @@
 Options
 =======
 
---strict-whitespace
--------------------
+strict-whitespace
+-----------------
 
 When the ``--strict-whitespace``  option is not provided, FileCheck ignores
 differences between spaces and tabs. Additionally multiple spaces are ignored
@@ -27,8 +27,8 @@ will pass on any of the following inputs:
 
 Adding ``--strict-whitespace`` disables this behavior.
 
---match-full-lines
-------------------
+match-full-lines
+----------------
 
 When the ``--match-full-lines``  option is not provided, FileCheck does not
 match full lines.
@@ -76,8 +76,8 @@ Notice absence of spaces between ``CHECK:`` and the lines.
     $ echo $?
     0
 
---check-prefix
---------------
+check-prefix
+------------
 
 The ``--check-prefix`` option allows changing a default match keyword `CHECK`
 to an arbitrary keyword. This is useful when you want to test different behavior
@@ -93,8 +93,8 @@ in the same file:
 One usual case is testing of how a program behaves when it is run with or
 without a specific option.
 
---implicit-check-not
---------------------
+implicit-check-not
+------------------
 
 The ``--implicit-check-not`` option adds implicit `CHECK-NOT` check that works
 on every input line.
@@ -102,16 +102,16 @@ on every input line.
 FileCheck.py follows LLVM FileCheck in the following implementation details:
 
 - The implicit checks are substring-matched i.e. their are ``in`` checks, not
-``==`` checks.
+  ``==`` checks.
 
 - The implicit checks are case sensitive, so ``error`` check will not match
-``ERROR`` in the input.
+  ``ERROR`` in the input.
 
 - The implicit check has lower priority than the positive `CHECK*` checks,
-but it has higher priority than negative `CHECK-NOT` checks.
+  but it has higher priority than negative `CHECK-NOT` checks.
 
 - To provide multiple implicit checks, duplicate the argument
-``--implicit-check-not <your check>`` multiple times.
+  ``--implicit-check-not <your check>`` multiple times.
 
 Example
 ~~~~~~~
