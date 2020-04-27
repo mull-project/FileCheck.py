@@ -103,10 +103,13 @@ FileCheck.py follows LLVM FileCheck in the following implementation details:
 
 - The implicit checks are substring-matched i.e. their are ``in`` checks, not
 ``==`` checks.
+
 - The implicit checks are case sensitive, so ``error`` check will not match
 ``ERROR`` in the input.
+
 - The implicit check has lower priority than the positive `CHECK*` checks,
 but it has higher priority than negative `CHECK-NOT` checks.
+
 - To provide multiple implicit checks, duplicate the argument
 ``--implicit-check-not <your check>`` multiple times.
 
