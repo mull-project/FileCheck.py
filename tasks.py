@@ -18,19 +18,6 @@ def get_os_filename_string():
     assert 0, "error: FileCheck.py could not detect OS"
 
 
-def get_filecheck_py_exec():
-    cwd = os.getcwd()
-    return 'python \\"{cwd}/filecheck/FileCheck.py\\"'.format(cwd=cwd)
-
-
-def get_filecheck_tester_exec():
-    cwd = os.getcwd()
-    os_string = get_os_filename_string()
-
-    template = '\\"{cwd}/tests/integration/tools/FileCheck/FileCheck-9.0.1-{os_string}\\"'
-    return template.format(cwd=cwd, os_string=os_string)
-
-
 def get_filecheck_llvm_path(filecheck_exec):
     cwd = os.getcwd()
     os_string = get_os_filename_string()
@@ -39,6 +26,11 @@ def get_filecheck_llvm_path(filecheck_exec):
     return template.format(
         cwd=cwd, filecheck_exec=filecheck_exec, os_string=os_string
     )
+
+
+def get_filecheck_py_exec():
+    cwd = os.getcwd()
+    return 'python \\"{cwd}/filecheck/FileCheck.py\\"'.format(cwd=cwd)
 
 
 def formatted_command(string):
@@ -53,7 +45,7 @@ def run_lit_tests(c, filecheck_exec, llvm_only):
     cwd = os.getcwd()
 
     llvm_only_value = "1" if llvm_only else ""
-    filecheck_tester_exec = get_filecheck_tester_exec()
+    filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
     command = formatted_command("""
         lit
