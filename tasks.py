@@ -37,7 +37,7 @@ def formatted_command(string):
     return re.sub('\\s+', ' ', string).strip()
 
 
-def run_lit_tests(c, filecheck_exec, llvm_only):
+def run_lit_tests(c, filecheck_exec, filecheck_tester_exec, llvm_only):
     assert c
     assert filecheck_exec
     assert llvm_only is not None
@@ -45,7 +45,6 @@ def run_lit_tests(c, filecheck_exec, llvm_only):
     cwd = os.getcwd()
 
     llvm_only_value = "1" if llvm_only else ""
-    filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
     command = formatted_command("""
         lit
@@ -64,10 +63,36 @@ def run_lit_tests(c, filecheck_exec, llvm_only):
 
 
 @task
+def test_filecheck_llvm(c):
+    filecheck_llvm_8_exec = get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC)
+    filecheck_llvm_9_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
+    filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
+
+    run_lit_tests(c, filecheck_llvm_8_exec, filecheck_tester_exec, True)
+    run_lit_tests(c, filecheck_llvm_9_exec, filecheck_tester_exec, True)
+
+
+@task
+def test_filecheck_py_using_file_check_llvm_tester(c):
+    filecheck_exec = get_filecheck_py_exec()
+    filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
+
+    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, False)
+
+
+@task
+def test_filecheck_py_using_filecheck_py_tester(c):
+    filecheck_exec = get_filecheck_py_exec()
+    filecheck_tester_exec = filecheck_exec
+
+    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, False)
+
+
+@task
 def test(c):
-    run_lit_tests(c, get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC), True)
-    run_lit_tests(c, get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC), True)
-    run_lit_tests(c, get_filecheck_py_exec(), False)
+    test_filecheck_llvm(c)
+    test_filecheck_py_using_file_check_llvm_tester(c)
+
 
 @task
 def clean(c):
