@@ -195,31 +195,47 @@ def implicit_check_line(check_not_check, strict_mode, line):
 
 
 def main():
+    args = None
+    input_lines = None
+
+    # TODO: Unify exit_handler() handling.
+    def exit_handler(code):
+        # Here we diverge from LLVM FileCheck by printing input lines without
+        # any additional formatting and hints.
+        # Eventually it would be great to implement the same behavior.
+        # https://llvm.org/docs/CommandGuide/FileCheck.html#cmdoption-filecheck-dump-input
+        if code != 0 and input_lines and args and args.dump_input:
+            print('')
+            print('Full input was:')
+            for input_line in input_lines:
+                print(input_line.rstrip())
+        exit(code)
+
     if len(sys.argv) == 1:
         print("<check-file> not specified")
-        exit(2)
+        exit_handler(2)
 
     for arg in sys.argv:
         if arg == '--help':
             print_help()
-            exit(0)
+            exit_handler(0)
 
     for arg in sys.argv:
         if arg == '--version':
             print_version()
-            exit(0)
+            exit_handler(0)
 
     check_file = sys.argv[1]
     if not os.path.isfile(check_file):
         sys.stdout.flush()
         err = "Could not open check file '{}': No such file or directory".format(check_file)
         print(err)
-        exit(2)
+        exit_handler(2)
 
     if os.path.getsize(check_file) == 0:
         sys.stdout.flush()
         print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
-        exit(2)
+        exit_handler(2)
 
     parser = argparse.ArgumentParser()
 
@@ -228,6 +244,7 @@ def main():
     parser.add_argument('--match-full-lines', action='store_true', help='TODO')
     parser.add_argument('--check-prefix', action='store', help='TODO')
     parser.add_argument('--implicit-check-not', action='append', help='TODO')
+    parser.add_argument('--dump-input', action='store', choices=['fail'], help='TODO')
 
     args = parser.parse_args()
 
@@ -251,7 +268,7 @@ def main():
         sys.stdout.flush()
         error_message = "Supplied check-prefix is invalid! Prefixes must be unique and start with a letter and contain only alphanumeric characters, hyphens and underscores"
         print(error_message, file=sys.stderr)
-        exit(2)
+        exit_handler(2)
 
     checks = []
     with open(check_file) as f:
@@ -341,7 +358,7 @@ def main():
                     print("{}:{}:{}: error: found 'CHECK-EMPTY' without previous 'CHECK: line".format(check_file, 1, 3))
                     print(line)
                     print("  ^")
-                    exit(2)
+                    exit_handler(2)
 
                 checks.append(check)
                 continue
@@ -360,7 +377,7 @@ def main():
         error_message = "error: no check strings found with prefix '{}:'".format(check_prefix)
         print(error_message, file=sys.stderr)
         sys.stdout.flush()
-        exit(2)
+        exit_handler(2)
 
     current_scan_base = 0
     # Keeping track of a current scan column is a simplified feature which is
@@ -393,7 +410,7 @@ def main():
     except StopIteration:
         print("CHECK: FileCheck error: '-' is empty.")
         print("FileCheck command line: {}".format(check_file))
-        exit(2)
+        exit_handler(2)
 
     current_not_checks = []
     try:
@@ -448,7 +465,7 @@ def main():
                         current_check = next(check_iterator)
                     except StopIteration:
                         if len(implicit_check_not_checks) == 0:
-                            exit(0)
+                            exit_handler(0)
 
                         for line_idx, line in stdin_input_iter:
                             for check_not_check in implicit_check_not_checks:
@@ -458,7 +475,7 @@ def main():
                                     )
                                     raise ImplicitCheckNotFailedException(failed_implicit_check)
 
-                        exit(0)
+                        exit_handler(0)
 
                     try:
                         line_idx, line = next(stdin_input_iter)
@@ -509,7 +526,7 @@ def main():
                     break
             else:
                 # No checks which are still actual have been found. Declare success.
-                exit(0)
+                exit_handler(0)
 
             current_check = still_actual_check
             current_check_line_idx = line_idx
@@ -533,7 +550,7 @@ def main():
             current_check_line_idx = e.failed_check.line_idx
 
         except StopIteration:
-            exit(0)
+            exit_handler(0)
 
     except CheckFailedException as e:
         current_check = e.failed_check.check
@@ -557,7 +574,7 @@ def main():
         print("^"
               .rjust(failed_column_idx + 1, ' ')
               .ljust(len(failed_check.check) + failed_column_idx, '~'))
-        exit(1)
+        exit_handler(1)
 
     # CHECK-EMPTY is special: if there is no output anymore and this check is
     # the 1) current and 2) the last one we want to declare success.
@@ -571,7 +588,7 @@ def main():
             current_scan_base += 1
             current_scan_col = 0
         except StopIteration:
-            exit(0)
+            exit_handler(0)
 
     # Error reporting part. By now we know that we have failed and we just want
     # to report a check that has failed.
@@ -588,7 +605,7 @@ def main():
         print(last_read_line)
         print("^")
 
-        exit(1)
+        exit_handler(1)
 
     if current_check.check_type == CheckType.CHECK:
         assert current_scan_base < len(input_lines)
@@ -644,7 +661,7 @@ def main():
                     print(candidate_line)
                     print("^".rjust(caret_pos, ' '))
 
-            exit(1)
+            exit_handler(1)
 
     if current_check.check_type == CheckType.CHECK_NOT:
         if (current_check.match_type == MatchType.SUBSTRING or
@@ -675,7 +692,7 @@ def main():
             else:
                 print("^".ljust(len(last_read_line), '~'))
 
-            exit(1)
+            exit_handler(1)
 
         assert 0, "Not implemented"
 
@@ -701,7 +718,7 @@ def main():
                 print(last_read_line)
                 print("^")
 
-                exit(1)
+                exit_handler(1)
             else:
                 if current_scan_base > 0:
                     print("{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match"
@@ -724,7 +741,7 @@ def main():
                     print(last_read_line)
                     print("^")
 
-                    exit(1)
+                    exit_handler(1)
                 else:
                     check_expression_idx = current_check.source_line.find(current_check.check_keyword)
                     print("{}:{}:{}: error: found 'CHECK-NEXT' without previous 'CHECK: line"
@@ -734,7 +751,7 @@ def main():
                     print(current_check.source_line.rstrip())
                     print("^".rjust(check_expression_idx + 1))
 
-                    exit(2)
+                    exit_handler(2)
 
         raise NotImplementedError()
 
