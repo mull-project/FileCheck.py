@@ -1,0 +1,4 @@
+; CHECK: string 1
+; OTHER-CHECK: string 2
+; ANOTHER-CHECK: string 3
+; YET_ANOTHER-CHECK: string 4
