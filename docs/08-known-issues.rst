@@ -22,17 +22,17 @@ Check file:
 
 .. code-block:: text
 
-   ; CHECK-NOT:String1
-   ; CHECK:String2
+   CHECK-NOT:String1
+   CHECK:String2
 
 Result:
 
 .. code-block:: text
 
    /Users/Stanislaw/.pyenv/shims/filecheck
-   filecheck.check:2:9: error: CHECK: expected string not found in input
-   ; CHECK:String2
-           ^
+   filecheck.check:2:7: error: CHECK: expected string not found in input
+   CHECK:String2
+         ^
    <stdin>:1:1: note: scanning from here
    String1
    ^

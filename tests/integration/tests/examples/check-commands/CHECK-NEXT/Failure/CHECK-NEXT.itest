@@ -1,15 +1,15 @@
-; RUN: %printf "String1\nfoo\nString2" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-NEXT.check" | %FILECHECK_EXEC "%s"
+RUN: %printf "String1\nfoo\nString2" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-NEXT.check" | %FILECHECK_EXEC "%s"
 
-; CHECK: {{.*}}CHECK-NEXT.check:2:13: error: CHECK-NEXT: is not on the line after the previous match
-; CHECK: CHECK-NEXT: String2
-; CHECK:             ^
-; CHECK: <stdin>:3:1: note: 'next' match was here
-; CHECK: String2
-; CHECK: ^
-; CHECK: <stdin>:1:8: note: previous match ended here
-; CHECK: String1
-; CHECK:        ^
-; CHECK: <stdin>:2:1: note: non-matching line after previous match is here
-; CHECK: foo
-; CHECK: ^
-; CHECK-EMPTY:
+CHECK: {{.*}}CHECK-NEXT.check:2:13: error: CHECK-NEXT: is not on the line after the previous match
+CHECK: CHECK-NEXT: String2
+CHECK:             ^
+CHECK: <stdin>:3:1: note: 'next' match was here
+CHECK: String2
+CHECK: ^
+CHECK: <stdin>:1:8: note: previous match ended here
+CHECK: String1
+CHECK:        ^
+CHECK: <stdin>:2:1: note: non-matching line after previous match is here
+CHECK: foo
+CHECK: ^
+CHECK-EMPTY:

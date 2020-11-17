@@ -1,8 +1,8 @@
-; RUN: printf "String3" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-NOT.check" | %FILECHECK_EXEC "%s"
-; CHECK: {{.*}}CHECK-NOT.check:3:12: error: CHECK-NOT: excluded string found in input
-; CHECK: CHECK-NOT: String3
-; CHECK:            ^
-; CHECK: <stdin>:1:1: note: found here
-; CHECK: String3
-; CHECK: ^~~~~~~
-; CHECK-EMPTY:
+RUN: printf "String3" | %expect_exit 1 %FILECHECK_EXEC "%S/CHECK-NOT.check" | %FILECHECK_EXEC "%s"
+CHECK: {{.*}}CHECK-NOT.check:3:12: error: CHECK-NOT: excluded string found in input
+CHECK: CHECK-NOT: String3
+CHECK:            ^
+CHECK: <stdin>:1:1: note: found here
+CHECK: String3
+CHECK: ^~~~~~~
+CHECK-EMPTY:
