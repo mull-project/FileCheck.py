@@ -138,6 +138,10 @@ class CheckResult(Enum):
     CHECK_NOT_WITHOUT_MATCH = 5
 
 
+# Allow check prefixes only at the beginnings of lines or after non-word characters.
+before_prefix = "^(.*?[^\w-])?"
+
+
 def check_line(line, current_check, match_full_lines):
     if current_check.check_type == CheckType.CHECK_EMPTY:
         if line != '':
@@ -281,11 +285,11 @@ def main():
             # CHECK and CHECK-NEXT
             strict_whitespace_match = "" if args.strict_whitespace and args.match_full_lines else " *"
 
-            check_regex = "^(.*?[^\w-])?({}):{}(.*)".format(check_prefix, strict_whitespace_match)
+            check_regex = "{}({}):{}(.*)".format(before_prefix, check_prefix, strict_whitespace_match)
             check_match = re.search(check_regex, line)
             check_type = CheckType.CHECK
             if not check_match:
-                check_regex = "^(.*?[^\w-])?({}-NEXT):{}(.*)".format(check_prefix, strict_whitespace_match)
+                check_regex = "{}({}-NEXT):{}(.*)".format(before_prefix, check_prefix, strict_whitespace_match)
                 check_match = re.search(check_regex, line)
                 check_type = CheckType.CHECK_NEXT
 
@@ -314,7 +318,7 @@ def main():
                 checks.append(check)
                 continue
 
-            check_not_regex = "^(.*?[^\w-])?({}-NOT):{}(.*)".format(check_prefix, strict_whitespace_match)
+            check_not_regex = "{}({}-NOT):{}(.*)".format(before_prefix, check_prefix, strict_whitespace_match)
             check_match = re.search(check_not_regex, line)
             if check_match:
                 match_type = MatchType.SUBSTRING
@@ -341,7 +345,7 @@ def main():
                 checks.append(check)
                 continue
 
-            check_empty_regex = "^(.*?[^\w-])?({}-EMPTY):".format(check_prefix)
+            check_empty_regex = "{}({}-EMPTY):".format(before_prefix, check_prefix)
             check_match = re.search(check_empty_regex, line)
             if check_match:
                 check_keyword = check_match.group(2)
