@@ -28,7 +28,7 @@ jobs:
 
     - name: Add Poetry to PATH
       run: |
-        echo "$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
+        echo "$PATH:$HOME/.poetry/bin" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |
