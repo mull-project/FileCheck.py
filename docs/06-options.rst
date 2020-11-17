@@ -85,10 +85,10 @@ in the same file:
 
 .. code-block:: text
 
-    ; RUN: printf "String1" | %FILECHECK_EXEC %s --check-prefix STRING1
-    ; RUN: printf "String2" | %FILECHECK_EXEC %s --check-prefix STRING2
-    ; STRING1: String1
-    ; STRING2: String2
+    RUN: printf "String1" | %FILECHECK_EXEC %s --check-prefix STRING1
+    RUN: printf "String2" | %FILECHECK_EXEC %s --check-prefix STRING2
+    STRING1: String1
+    STRING2: String2
 
 One usual case is testing of how a program behaves when it is run with or
 without a specific option.

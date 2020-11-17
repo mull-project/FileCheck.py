@@ -31,7 +31,7 @@ Create new file ``hello-world.check`` with the following contents:
 
 .. code-block:: text
 
-   ; CHECK: Hello world
+   CHECK: Hello world
 
 Now we can provide a valid input to ``filecheck`` which will match it against
 the check file:
@@ -52,9 +52,9 @@ If we provide an invalid output we will see an error message:
 
    $ echo "What is FileCheck" | filecheck hello-world.check
    /usr/local/bin/filecheck
-   examples/hello-world.check:1:10: error: CHECK: expected string not found in input
-   ; CHECK: Hello world
-            ^
+   examples/hello-world.check:1:8: error: CHECK: expected string not found in input
+   CHECK: Hello world
+          ^
    <stdin>:1:1: note: scanning from here
    What is FileCheck
    ^
@@ -72,7 +72,7 @@ Create a new file ``hello-world-regex.check`` with the following contents:
 
 .. code-block:: text
 
-   ; CHECK: {{^Hello world$}}
+   CHECK: {{^Hello world$}}
 
 Let's run it with a valid input:
 
@@ -89,9 +89,9 @@ With invalid input:
 
    $ echo "Hello world Hello world" | filecheck examples/hello-world-regex.check
    /usr/local/bin/filecheck
-   examples/hello-world-regex.check:1:10: error: CHECK: expected string not found in input
-   ; CHECK: {{^Hello world$}}
-            ^
+   examples/hello-world-regex.check:1:8: error: CHECK: expected string not found in input
+   CHECK: {{^Hello world$}}
+          ^
    <stdin>:1:1: note: scanning from here
    Hello world Hello world
    ^

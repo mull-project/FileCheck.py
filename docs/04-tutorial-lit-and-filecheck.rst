@@ -61,8 +61,8 @@ Test file ``01-pass.c``:
 .. code-block:: c
 
     /**
-    ; RUN: clang %s -o %S/hello-world && %S/hello-world | filecheck %s
-    ; CHECK: Hello world
+    RUN: clang %s -o %S/hello-world && %S/hello-world | filecheck %s
+    CHECK: Hello world
      */
 
     #include <stdio.h>
@@ -94,8 +94,8 @@ Test file ``02-fail.c``:
 .. code-block:: c
 
     /**
-    ; RUN: clang %s -o %S/hello-world && %S/hello-world | filecheck %s
-    ; CHECK: Wrong line
+    RUN: clang %s -o %S/hello-world && %S/hello-world | filecheck %s
+    CHECK: Wrong line
      */
 
     #include <stdio.h>
@@ -137,9 +137,9 @@ Produces more output:
     -- Testing: 1 tests, single process --
     FAIL: <unnamed> :: 02-fail.c (1 of 1)
     ******************** TEST '<unnamed> :: 02-fail.c' FAILED ********************
-    02-fail.c:3:10: error: CHECK: expected string not found in input
-    ; CHECK: Wrong line
-             ^
+    02-fail.c:3:8: error: CHECK: expected string not found in input
+    CHECK: Wrong line
+           ^
     <stdin>:1:1: note: scanning from here
     Hello world
     ...
