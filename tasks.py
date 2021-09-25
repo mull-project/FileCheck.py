@@ -128,7 +128,7 @@ def changelog(c, github_token):
     command = formatted_command("""
         CHANGELOG_GITHUB_TOKEN={github_token}
         github_changelog_generator
-        --user stanislaw
+        --user mull-project
         --project FileCheck.py
     """).format(github_token=github_token)
     c.run("{}".format(command))
