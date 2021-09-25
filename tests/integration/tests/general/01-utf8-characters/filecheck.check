@@ -1,0 +1,3 @@
+CHECK: # © A line with UTF-8 produces
+CHECK: # UnicodeDecodeError: 'ascii' codec can't decode byte
+CHECK: # if not properly handled

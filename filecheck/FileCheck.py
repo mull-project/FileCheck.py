@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import io
 import os
 import re
 import sys
@@ -275,7 +276,7 @@ def main():
         exit_handler(2)
 
     checks = []
-    with open(check_file) as f:
+    with open(check_file, encoding="utf-8") as f:
         for line_idx, line in enumerate(f):
             line = line.rstrip()
 
@@ -411,7 +412,11 @@ def main():
     # TODO: Performance implications?
     # "Getting exit code 141 when reading from stdin with a Python script with “set -o pipefail” set"
     # https://stackoverflow.com/questions/59436858/getting-exit-code-141-when-reading-from-stdin-with-a-python-script-with-set-o/59436997?noredirect=1#comment105058533_59436997
-    input_lines = sys.stdin.readlines()
+    # Also: Forcing the stdin to be UTF-8
+    # Python 3: How to specify stdin encoding
+    # https://stackoverflow.com/a/16549381/598057
+    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+    input_lines = input_stream.readlines()
     stdin_input_iter = enumerate(input_lines)
 
     try:
