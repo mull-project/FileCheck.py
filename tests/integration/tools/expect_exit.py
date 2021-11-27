@@ -1,6 +1,10 @@
 import subprocess
 import sys
 
+# Force UTF-8 to be sent to stdout.
+# https://stackoverflow.com/a/3597849/598057
+sys.stdout = open(1, 'w', encoding='utf-8', closefd=False)
+
 if len(sys.argv) <= 2:
     print("error: expect_exit: expect arguments to be provided")
     exit(1)
