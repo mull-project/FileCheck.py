@@ -1,0 +1,11 @@
+RUN: %cat "%S/sample.input" | \
+RUN:    %expect_exit 1 %FILECHECK_EXEC "%S/sample.check" --dump-input=fail | \
+RUN:      %FILECHECK_TESTER_EXEC "%s" \
+RUN:        --strict-whitespace \
+RUN:        --match-full-lines
+
+CHECK:{{.*}}/sample.check:1:8: error: CHECK: expected string not found in input
+CHECK:{{.*}}CHECK: Match line that does not exist in input.
+CHECK:{{.*}}<stdin>:1:1: note: scanning from here
+CHECK:{{.*}}# © A line with UTF-8 produces
+CHECK:{{.*}}# vadsэавфыаЭХÜÜÄ

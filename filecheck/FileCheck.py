@@ -200,6 +200,10 @@ def implicit_check_line(check_not_check, strict_mode, line):
 
 
 def main():
+    # Force UTF-8 to be sent to stdout.
+    # https://stackoverflow.com/a/3597849/598057
+    sys.stdout = open(1, 'w', encoding='utf-8', closefd=False)
+
     args = None
     input_lines = None
 
