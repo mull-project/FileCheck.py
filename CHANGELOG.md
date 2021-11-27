@@ -2,10 +2,24 @@
 
 ## [Unreleased](https://github.com/mull-project/FileCheck.py/tree/HEAD)
 
-[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/v0.0.19...HEAD)
+[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/v0.0.20...HEAD)
 
 **Merged pull requests:**
 
+- Bump version: 0.0.19 → 0.0.20 [\#164](https://github.com/mull-project/FileCheck.py/pull/164) ([stanislaw](https://github.com/stanislaw))
+
+## [v0.0.20](https://github.com/mull-project/FileCheck.py/tree/v0.0.20) (2021-11-27)
+
+[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/v0.0.19...v0.0.20)
+
+**Closed issues:**
+
+- Outputs are not treated as UTF-8 [\#162](https://github.com/mull-project/FileCheck.py/issues/162)
+
+**Merged pull requests:**
+
+- Force stdout to always encode UTF8 [\#163](https://github.com/mull-project/FileCheck.py/pull/163) ([stanislaw](https://github.com/stanislaw))
+- Regenerate CHANGELOG [\#161](https://github.com/mull-project/FileCheck.py/pull/161) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.18 → 0.0.19 [\#160](https://github.com/mull-project/FileCheck.py/pull/160) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.19](https://github.com/mull-project/FileCheck.py/tree/v0.0.19) (2021-09-25)
@@ -132,7 +146,7 @@
 
 **Closed issues:**
 
-- `assert current_scan_base > 0` [\#96](https://github.com/mull-project/FileCheck.py/issues/96)
+- `assert current\_scan\_base \> 0` [\#96](https://github.com/mull-project/FileCheck.py/issues/96)
 - Missing LICENSE file? [\#95](https://github.com/mull-project/FileCheck.py/issues/95)
 - Add documentation  [\#31](https://github.com/mull-project/FileCheck.py/issues/31)
 
@@ -246,6 +260,23 @@
 - Fix scanning for the best intended match  [\#50](https://github.com/mull-project/FileCheck.py/pull/50) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.2 → 0.0.3  [\#49](https://github.com/mull-project/FileCheck.py/pull/49) ([stanislaw](https://github.com/stanislaw))
 - --version option  [\#48](https://github.com/mull-project/FileCheck.py/pull/48) ([stanislaw](https://github.com/stanislaw))
+
+## [v0.0.3](https://github.com/mull-project/FileCheck.py/tree/v0.0.3) (2019-12-05)
+
+[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/ce965cb5571be21d0c38f6f64c6a85cc9720b620...v0.0.3)
+
+**Implemented enhancements:**
+
+- Feature: --check-prefix option [\#21](https://github.com/mull-project/FileCheck.py/issues/21)
+- Feature: --strict-whitespace option [\#4](https://github.com/mull-project/FileCheck.py/issues/4)
+
+**Closed issues:**
+
+- Provide help command [\#41](https://github.com/mull-project/FileCheck.py/issues/41)
+- Feature: "note: possible intended match here". [\#10](https://github.com/mull-project/FileCheck.py/issues/10)
+
+**Merged pull requests:**
+
 - --help command: remove artifacts introduced by testing [\#47](https://github.com/mull-project/FileCheck.py/pull/47) ([stanislaw](https://github.com/stanislaw))
 - Everything what's needed to publish a pip package [\#45](https://github.com/mull-project/FileCheck.py/pull/45) ([stanislaw](https://github.com/stanislaw))
 - Help command: enough to get going [\#44](https://github.com/mull-project/FileCheck.py/pull/44) ([stanislaw](https://github.com/stanislaw))
@@ -281,20 +312,6 @@
 - CHECK-NOT command: more tests [\#3](https://github.com/mull-project/FileCheck.py/pull/3) ([stanislaw](https://github.com/stanislaw))
 - Fix test: CHECK/one\_string/01-negative\_match [\#2](https://github.com/mull-project/FileCheck.py/pull/2) ([stanislaw](https://github.com/stanislaw))
 - Feature: CHECK-NOT/one\_string/01-negative\_match [\#1](https://github.com/mull-project/FileCheck.py/pull/1) ([stanislaw](https://github.com/stanislaw))
-
-## [v0.0.3](https://github.com/mull-project/FileCheck.py/tree/v0.0.3) (2019-12-05)
-
-[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/41176a9c5044d5c76dc0c0655f15f8ecebcb8bb3...v0.0.3)
-
-**Implemented enhancements:**
-
-- Feature: --check-prefix option [\#21](https://github.com/mull-project/FileCheck.py/issues/21)
-- Feature: --strict-whitespace option [\#4](https://github.com/mull-project/FileCheck.py/issues/4)
-
-**Closed issues:**
-
-- Provide help command [\#41](https://github.com/mull-project/FileCheck.py/issues/41)
-- Feature: "note: possible intended match here". [\#10](https://github.com/mull-project/FileCheck.py/issues/10)
 
 
 
