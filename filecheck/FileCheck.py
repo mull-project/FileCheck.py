@@ -317,6 +317,18 @@ def main():
                         if check_expression[-1] != "$":
                             check_expression = check_expression + "$"
 
+                # Replace line number expressions, e.g. `[[# @LINE + 3 ]]`
+                line_var_match = re.search(
+                    r"\[\[# +@LINE *([+-])? *([0-9]+)? *\]\]", check_expression)
+                while line_var_match is not None:
+                    offset = int(line_var_match.group(2) or 0)
+                    if line_var_match.group(1) == "-":
+                        offset = -offset
+                    check_expression = re.sub(
+                        r"\[\[# +@LINE *([+-])? *([0-9]+)? *\]\]", str(line_idx + offset + 1), check_expression)
+                    line_var_match = re.search(
+                        r"\[\[# +@LINE *([+-])? *([0-9]+)? *\]\]", check_expression)
+
                 check = Check(check_type=check_type,
                               match_type=match_type,
                               check_keyword=check_keyword,
