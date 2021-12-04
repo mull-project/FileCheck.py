@@ -127,6 +127,20 @@ def clean(c):
     c.run("{}".format(echo_command))
 
 
+@task
+def docs_sphinx(c, open=False):
+    command = formatted_command("""
+        cd docs && make html SPHINXOPTS="-W --keep-going -n"
+    """)
+    c.run(command)
+    if open:
+        c.run(
+            formatted_command("""
+                open docs/_build/html/index.html
+            """)
+        )
+
+
 # https://github.com/github-changelog-generator/github-changelog-generator
 # gem install github_changelog_generator
 @task

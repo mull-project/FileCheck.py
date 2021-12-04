@@ -10,8 +10,9 @@ Welcome to FileCheck.py's documentation!
    04-tutorial-lit-and-filecheck
    05-check-commands
    06-options
-   07-roadmap
-   08-known-issues
+   07-extra-features
+   08-roadmap
+   09-known-issues
 
 .. Indices and tables
    ==================
