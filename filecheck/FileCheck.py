@@ -758,8 +758,7 @@ def main():
             last_read_line = input_lines[current_scan_base].rstrip()
 
         if (
-            current_check.match_type == MatchType.SUBSTRING
-            or current_check.match_type == MatchType.REGEX
+            current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX)
         ):
             print(
                 f"{check_file}:"
@@ -815,8 +814,7 @@ def main():
 
     if current_check.check_type == CheckType.CHECK_NOT:
         if (
-            current_check.match_type == MatchType.SUBSTRING
-            or current_check.match_type == MatchType.REGEX
+            current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX)
         ):
             assert current_check_line_idx is not None
             last_read_line = input_lines[current_check_line_idx].rstrip()
@@ -854,8 +852,7 @@ def main():
         last_read_line = input_lines[current_scan_base].rstrip()
 
         if (
-            current_check.match_type == MatchType.SUBSTRING
-            or current_check.match_type == MatchType.REGEX
+            current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX)
         ):
             matching_line_idx = -1
             for line_idx, line in enumerate(input_lines[current_scan_base:]):
