@@ -10,7 +10,7 @@ from collections import namedtuple
 from difflib import SequenceMatcher
 from enum import Enum
 
-__version__ = '0.0.20'
+__version__ = "0.0.20"
 
 
 class FailedCheck:
@@ -58,7 +58,10 @@ class CheckType(Enum):
     CHECK_EMPTY = 4
 
 
-Check = namedtuple("Check", "check_type match_type check_keyword expression source_line check_line_idx start_index")
+Check = namedtuple(
+    "Check",
+    "check_type match_type check_keyword expression source_line check_line_idx start_index",
+)
 ImplicitCheck = namedtuple("ImplicitCheck", "original_check check")
 
 LINE_NUMBER_REGEX = r"\[\[# +@LINE *([+-])? *([0-9]+)? *\]\]"
@@ -82,10 +85,16 @@ def print_help():
 
     print("General options:")
     print("")
-    print("  --match-full-lines             - Require all positive matches to cover an entire input line.")
-    print("                                   Allows leading and trailing whitespace if --strict-whitespace")
+    print(
+        "  --match-full-lines             - Require all positive matches to cover an entire input line."
+    )
+    print(
+        "                                   Allows leading and trailing whitespace if --strict-whitespace"
+    )
     print("                                   is not also passed.")
-    print("  --strict-whitespace            - Do not treat all horizontal whitespace as equivalent")
+    print(
+        "  --strict-whitespace            - Do not treat all horizontal whitespace as equivalent"
+    )
     print("")
 
     print("Generic options:")
@@ -94,22 +103,26 @@ def print_help():
 
 
 def print_version():
-    print("filecheck: Python port of LLVM's FileCheck, flexible pattern matching file verifier")
+    print(
+        "filecheck: Python port of LLVM's FileCheck, flexible pattern matching file verifier"
+    )
     print("https://github.com/stanislaw/FileCheck.py")
     print("Version: {}".format(__version__))
 
 
 def escape_non_regex_or_skip(match_obj):
-    non_regex = match_obj.group('non_regex')
+    non_regex = match_obj.group("non_regex")
     if non_regex:
         return re.escape(non_regex)
     return match_obj.group()
 
 
 def escape_non_regex_parts(check_expression):
-    regex_line = re.sub(r"((?P<non_regex>[^\{{2}]+)|(?P<regex>\{\{(.*?)\}\}))",
-                        escape_non_regex_or_skip,
-                        check_expression)
+    regex_line = re.sub(
+        r"((?P<non_regex>[^\{{2}]+)|(?P<regex>\{\{(.*?)\}\}))",
+        escape_non_regex_or_skip,
+        check_expression,
+    )
 
     return regex_line
 
@@ -119,7 +132,7 @@ def escape_non_regex_parts(check_expression):
 # The --strict-whitespace argument disables this behavior.
 # https://llvm.org/docs/CommandGuide/FileCheck.html#cmdoption-filecheck-strict-whitespace
 def canonicalize_whitespace(input):
-    output = re.sub("\\s+", ' ', input)
+    output = re.sub("\\s+", " ", input)
     return output
 
 
@@ -147,7 +160,7 @@ before_prefix = "^(.*?[^\w-])?"
 
 def check_line(line, current_check, match_full_lines):
     if current_check.check_type == CheckType.CHECK_EMPTY:
-        if line != '':
+        if line != "":
             return CheckResult.FAIL_FATAL
 
     elif current_check.check_type == CheckType.CHECK:
@@ -204,7 +217,7 @@ def implicit_check_line(check_not_check, strict_mode, line):
 def main():
     # Force UTF-8 to be sent to stdout.
     # https://stackoverflow.com/a/3597849/598057
-    sys.stdout = open(1, 'w', encoding='utf-8', closefd=False)
+    sys.stdout = open(1, "w", encoding="utf-8", closefd=False)
 
     args = None
     input_lines = None
@@ -216,8 +229,8 @@ def main():
         # Eventually it would be great to implement the same behavior.
         # https://llvm.org/docs/CommandGuide/FileCheck.html#cmdoption-filecheck-dump-input
         if code != 0 and input_lines and args and args.dump_input:
-            print('')
-            print('Full input was:')
+            print("")
+            print("Full input was:")
             for input_line in input_lines:
                 print(input_line.rstrip())
         exit(code)
@@ -227,35 +240,44 @@ def main():
         exit_handler(2)
 
     for arg in sys.argv:
-        if arg == '--help':
+        if arg == "--help":
             print_help()
             exit_handler(0)
 
     for arg in sys.argv:
-        if arg == '--version':
+        if arg == "--version":
             print_version()
             exit_handler(0)
 
     check_file = sys.argv[1]
     if not os.path.isfile(check_file):
         sys.stdout.flush()
-        err = "Could not open check file '{}': No such file or directory".format(check_file)
+        err = (
+            "Could not open check file '{}': No such file or directory".format(
+                check_file
+            )
+        )
         print(err)
         exit_handler(2)
 
     if os.path.getsize(check_file) == 0:
         sys.stdout.flush()
-        print("error: no check strings found with prefix 'CHECK:'", file=sys.stderr)
+        print(
+            "error: no check strings found with prefix 'CHECK:'",
+            file=sys.stderr,
+        )
         exit_handler(2)
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('check_file_arg', type=str, help='TODO')
-    parser.add_argument('--strict-whitespace', action='store_true', help='TODO')
-    parser.add_argument('--match-full-lines', action='store_true', help='TODO')
-    parser.add_argument('--check-prefix', action='store', help='TODO')
-    parser.add_argument('--implicit-check-not', action='append', help='TODO')
-    parser.add_argument('--dump-input', action='store', choices=['fail'], help='TODO')
+    parser.add_argument("check_file_arg", type=str, help="TODO")
+    parser.add_argument("--strict-whitespace", action="store_true", help="TODO")
+    parser.add_argument("--match-full-lines", action="store_true", help="TODO")
+    parser.add_argument("--check-prefix", action="store", help="TODO")
+    parser.add_argument("--implicit-check-not", action="append", help="TODO")
+    parser.add_argument(
+        "--dump-input", action="store", choices=["fail"], help="TODO"
+    )
 
     args = parser.parse_args()
 
@@ -275,7 +297,7 @@ def main():
             )
             implicit_check_not_checks.append(implicit_check_not)
 
-    if not re.search('^[A-Za-z][A-Za-z0-9-_]+$', check_prefix):
+    if not re.search("^[A-Za-z][A-Za-z0-9-_]+$", check_prefix):
         sys.stdout.flush()
         error_message = "Supplied check-prefix is invalid! Prefixes must be unique and start with a letter and contain only alphanumeric characters, hyphens and underscores"
         print(error_message, file=sys.stderr)
@@ -292,11 +314,15 @@ def main():
             # CHECK and CHECK-NEXT
             strict_whitespace_match = "" if strict_mode else " *"
 
-            check_regex = "{}({}):{}(.*)".format(before_prefix, check_prefix, strict_whitespace_match)
+            check_regex = "{}({}):{}(.*)".format(
+                before_prefix, check_prefix, strict_whitespace_match
+            )
             check_match = re.search(check_regex, line)
             check_type = CheckType.CHECK
             if not check_match:
-                check_regex = "{}({}-NEXT):{}(.*)".format(before_prefix, check_prefix, strict_whitespace_match)
+                check_regex = "{}({}-NEXT):{}(.*)".format(
+                    before_prefix, check_prefix, strict_whitespace_match
+                )
                 check_match = re.search(check_regex, line)
                 check_type = CheckType.CHECK_NEXT
 
@@ -304,7 +330,7 @@ def main():
                 check_keyword = check_match.group(2)
                 check_expression = check_match.group(3)
                 if not strict_mode:
-                    check_expression = check_expression.strip(' ')
+                    check_expression = check_expression.strip(" ")
 
                 match_type = MatchType.SUBSTRING
 
@@ -326,22 +352,31 @@ def main():
                     if line_var_match.group(1) == "-":
                         offset = -offset
                     check_expression = re.sub(
-                        LINE_NUMBER_REGEX, str(line_idx + offset + 1), check_expression, 1)
+                        LINE_NUMBER_REGEX,
+                        str(line_idx + offset + 1),
+                        check_expression,
+                        1,
+                    )
                     line_var_match = re.search(
-                        LINE_NUMBER_REGEX, check_expression)
+                        LINE_NUMBER_REGEX, check_expression
+                    )
 
-                check = Check(check_type=check_type,
-                              match_type=match_type,
-                              check_keyword=check_keyword,
-                              expression=check_expression,
-                              source_line=line,
-                              check_line_idx=line_idx,
-                              start_index=check_match.start(3))
+                check = Check(
+                    check_type=check_type,
+                    match_type=match_type,
+                    check_keyword=check_keyword,
+                    expression=check_expression,
+                    source_line=line,
+                    check_line_idx=line_idx,
+                    start_index=check_match.start(3),
+                )
 
                 checks.append(check)
                 continue
 
-            check_not_regex = "{}({}-NOT):{}(.*)".format(before_prefix, check_prefix, strict_whitespace_match)
+            check_not_regex = "{}({}-NOT):{}(.*)".format(
+                before_prefix, check_prefix, strict_whitespace_match
+            )
             check_match = re.search(check_not_regex, line)
             if check_match:
                 match_type = MatchType.SUBSTRING
@@ -349,7 +384,7 @@ def main():
                 check_keyword = check_match.group(2)
                 check_expression = check_match.group(3)
                 if not strict_mode:
-                    check_expression = check_expression.strip(' ')
+                    check_expression = check_expression.strip(" ")
 
                 if re.search(r"\{\{.*\}\}", check_expression):
                     regex_line = escape_non_regex_parts(check_expression)
@@ -357,32 +392,42 @@ def main():
                     match_type = MatchType.REGEX
                     check_expression = regex_line
 
-                check = Check(check_type=CheckType.CHECK_NOT,
-                              match_type=match_type,
-                              check_keyword=check_keyword,
-                              expression=check_expression,
-                              source_line=line,
-                              check_line_idx=line_idx,
-                              start_index=check_match.start(3))
+                check = Check(
+                    check_type=CheckType.CHECK_NOT,
+                    match_type=match_type,
+                    check_keyword=check_keyword,
+                    expression=check_expression,
+                    source_line=line,
+                    check_line_idx=line_idx,
+                    start_index=check_match.start(3),
+                )
 
                 checks.append(check)
                 continue
 
-            check_empty_regex = "{}({}-EMPTY):".format(before_prefix, check_prefix)
+            check_empty_regex = "{}({}-EMPTY):".format(
+                before_prefix, check_prefix
+            )
             check_match = re.search(check_empty_regex, line)
             if check_match:
                 check_keyword = check_match.group(2)
 
-                check = Check(check_type=CheckType.CHECK_EMPTY,
-                              match_type=MatchType.SUBSTRING,
-                              check_keyword=check_keyword,
-                              expression=None,
-                              source_line=line,
-                              check_line_idx=line_idx,
-                              start_index=-1)
+                check = Check(
+                    check_type=CheckType.CHECK_EMPTY,
+                    match_type=MatchType.SUBSTRING,
+                    check_keyword=check_keyword,
+                    expression=None,
+                    source_line=line,
+                    check_line_idx=line_idx,
+                    start_index=-1,
+                )
 
                 if len(checks) == 0:
-                    print("{}:{}:{}: error: found 'CHECK-EMPTY' without previous 'CHECK: line".format(check_file, 1, 3))
+                    print(
+                        "{}:{}:{}: error: found 'CHECK-EMPTY' without previous 'CHECK: line".format(
+                            check_file, 1, 3
+                        )
+                    )
                     print(line)
                     print("  ^")
                     exit_handler(2)
@@ -401,7 +446,11 @@ def main():
     try:
         current_check = next(check_iterator)
     except StopIteration:
-        error_message = "error: no check strings found with prefix '{}:'".format(check_prefix)
+        error_message = (
+            "error: no check strings found with prefix '{}:'".format(
+                check_prefix
+            )
+        )
         print(error_message, file=sys.stderr)
         sys.stdout.flush()
         exit_handler(2)
@@ -432,7 +481,7 @@ def main():
     # Also: Forcing the stdin to be UTF-8
     # Python 3: How to specify stdin encoding
     # https://stackoverflow.com/a/16549381/598057
-    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8")
     input_lines = input_stream.readlines()
     stdin_input_iter = enumerate(input_lines)
 
@@ -456,27 +505,33 @@ def main():
             if not args.strict_whitespace:
                 line = canonicalize_whitespace(line)
                 if args.match_full_lines:
-                    line = line.strip(' ')
+                    line = line.strip(" ")
 
             while True:
                 if not failed_check:
                     for current_not_check in current_not_checks:
-                        check_result = check_line(line,
-                                                  current_not_check,
-                                                  args.match_full_lines)
+                        check_result = check_line(
+                            line, current_not_check, args.match_full_lines
+                        )
                         if check_result == CheckResult.CHECK_NOT_MATCH:
-                            failed_check = FailedCheck(current_not_check, line_idx)
+                            failed_check = FailedCheck(
+                                current_not_check, line_idx
+                            )
                             break
 
                 if not failed_implicit_check:
                     for check_not_check in implicit_check_not_checks:
-                        if implicit_check_line(check_not_check, strict_mode, unstripped_line):
+                        if implicit_check_line(
+                            check_not_check, strict_mode, unstripped_line
+                        ):
                             failed_implicit_check = FailedImplicitCheckContext(
                                 check_not_check, unstripped_line, line_idx
                             )
                             break
 
-                check_result = check_line(line, current_check, args.match_full_lines)
+                check_result = check_line(
+                    line, current_check, args.match_full_lines
+                )
 
                 if check_result == CheckResult.FAIL_FATAL:
                     failed_check = FailedCheck(current_check, line_idx)
@@ -484,7 +539,9 @@ def main():
 
                 elif check_result == CheckResult.PASS:
                     if failed_implicit_check:
-                        raise ImplicitCheckNotFailedException(failed_implicit_check)
+                        raise ImplicitCheckNotFailedException(
+                            failed_implicit_check
+                        )
 
                     if failed_check:
                         raise CheckFailedException(failed_check)
@@ -500,11 +557,17 @@ def main():
 
                         for line_idx, line in stdin_input_iter:
                             for check_not_check in implicit_check_not_checks:
-                                if implicit_check_line(check_not_check, strict_mode, line):
-                                    failed_implicit_check = FailedImplicitCheckContext(
-                                        check_not_check, line, line_idx
+                                if implicit_check_line(
+                                    check_not_check, strict_mode, line
+                                ):
+                                    failed_implicit_check = (
+                                        FailedImplicitCheckContext(
+                                            check_not_check, line, line_idx
+                                        )
                                     )
-                                    raise ImplicitCheckNotFailedException(failed_implicit_check)
+                                    raise ImplicitCheckNotFailedException(
+                                        failed_implicit_check
+                                    )
 
                         exit_handler(0)
 
@@ -570,8 +633,10 @@ def main():
                 line_idx, line = next(stdin_input_iter)
 
                 for not_check in current_not_checks:
-                    if check_line(line, not_check, args.match_full_lines) == \
-                            CheckResult.CHECK_NOT_MATCH:
+                    if (
+                        check_line(line, not_check, args.match_full_lines)
+                        == CheckResult.CHECK_NOT_MATCH
+                    ):
                         current_check_line_idx = line_idx
                         failed_check = FailedCheck(not_check, line_idx)
                         raise CheckFailedException(failed_check)
@@ -597,22 +662,32 @@ def main():
 
         failed_column_num = failed_column_idx + 1
 
-        print("command line:1:22: error: CHECK-NOT: excluded string found in input")
+        print(
+            "command line:1:22: error: CHECK-NOT: excluded string found in input"
+        )
         print("-implicit-check-not='{}'".format(failed_check.original_check))
         print("                     ^")
-        print("<stdin>:{}:{}: note: found here".format(failed_line_num, failed_column_num))
+        print(
+            "<stdin>:{}:{}: note: found here".format(
+                failed_line_num, failed_column_num
+            )
+        )
         print(context.line)
-        print("^"
-              .rjust(failed_column_idx + 1, ' ')
-              .ljust(len(failed_check.check) + failed_column_idx, '~'))
+        print(
+            "^".rjust(failed_column_idx + 1, " ").ljust(
+                len(failed_check.check) + failed_column_idx, "~"
+            )
+        )
         exit_handler(1)
 
     # CHECK-EMPTY is special: if there is no output anymore and this check is
     # the 1) current and 2) the last one we want to declare success.
     # Otherwise we switch to a next check, make it current and go to do error
     # reporting below.
-    if current_check.check_type == CheckType.CHECK_EMPTY and \
-            check_result == CheckResult.PASS:
+    if (
+        current_check.check_type == CheckType.CHECK_EMPTY
+        and check_result == CheckResult.PASS
+    ):
         try:
             current_check = next(check_iterator)
             input_lines.append("")
@@ -626,13 +701,20 @@ def main():
 
     if current_check.check_type == CheckType.CHECK_EMPTY:
         last_read_line = input_lines[current_scan_base].rstrip()
-        print("{}:{}:{}: error: CHECK-EMPTY: expected string not found in input"
-              .format(check_file,
-                      current_check.check_line_idx + 1,
-                      len(current_check.source_line) + 1))
+        print(
+            "{}:{}:{}: error: CHECK-EMPTY: expected string not found in input".format(
+                check_file,
+                current_check.check_line_idx + 1,
+                len(current_check.source_line) + 1,
+            )
+        )
         print("{}".format(current_check.source_line))
         print("^".rjust(len(current_check.source_line) + 1))
-        print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
+        print(
+            "<stdin>:{}:{}: note: scanning from here".format(
+                current_scan_base + 1, 1
+            )
+        )
         print(last_read_line)
         print("^")
 
@@ -644,23 +726,32 @@ def main():
         # FileCheck prefers to show non-empty lines when printing
         # "Scanning from here" so we are skipping through empty lines if any.
         last_read_line = input_lines[current_scan_base].rstrip()
-        while last_read_line == "" and current_scan_base < (len(input_lines) - 1):
+        while last_read_line == "" and current_scan_base < (
+            len(input_lines) - 1
+        ):
             current_scan_base += 1
             last_read_line = input_lines[current_scan_base].rstrip()
 
-        if current_check.match_type == MatchType.SUBSTRING or \
-                current_check.match_type == MatchType.REGEX:
-            print("{}:{}:{}: error: {}: expected string not found in input"
-                  .format(check_file,
-                          current_check.check_line_idx + 1,
-                          current_check.start_index + 1,
-                          check_prefix))
+        if (
+            current_check.match_type == MatchType.SUBSTRING
+            or current_check.match_type == MatchType.REGEX
+        ):
+            print(
+                "{}:{}:{}: error: {}: expected string not found in input".format(
+                    check_file,
+                    current_check.check_line_idx + 1,
+                    current_check.start_index + 1,
+                    check_prefix,
+                )
+            )
 
             print(current_check.source_line.rstrip())
             print("^".rjust(current_check.start_index + 1))
 
-            print("<stdin>:{}:{}: note: scanning from here".format(
-                current_scan_base + 1, current_scan_col + 1)
+            print(
+                "<stdin>:{}:{}: note: scanning from here".format(
+                    current_scan_base + 1, current_scan_col + 1
+                )
             )
             print(last_read_line)
             print("^".rjust(current_scan_col + 1))
@@ -674,13 +765,16 @@ def main():
             if current_scan_col != 0:
                 current_scan_base += 1
 
-            if current_check.match_type == MatchType.SUBSTRING or \
-                    (current_check.match_type == MatchType.REGEX and
-                     current_scan_base < (len(input_lines) - 1)):
+            if current_check.match_type == MatchType.SUBSTRING or (
+                current_check.match_type == MatchType.REGEX
+                and current_scan_base < (len(input_lines) - 1)
+            ):
                 candidate_line = None
                 candidate_line_idx = None
                 current_best_ratio = 0
-                for read_line_idx, read_line in enumerate(input_lines[current_scan_base:]):
+                for read_line_idx, read_line in enumerate(
+                    input_lines[current_scan_base:]
+                ):
                     similar_ratio = similar(read_line, current_check.expression)
                     if current_best_ratio < similar_ratio:
                         candidate_line = read_line.rstrip()
@@ -688,29 +782,42 @@ def main():
                         current_best_ratio = similar_ratio
                 if candidate_line:
                     caret_pos = len(candidate_line) // 2 + 1
-                    print("<stdin>:{}:{}: note: possible intended match here".format(candidate_line_idx + 1, caret_pos))
+                    print(
+                        "<stdin>:{}:{}: note: possible intended match here".format(
+                            candidate_line_idx + 1, caret_pos
+                        )
+                    )
                     print(candidate_line)
-                    print("^".rjust(caret_pos, ' '))
+                    print("^".rjust(caret_pos, " "))
 
             exit_handler(1)
 
     if current_check.check_type == CheckType.CHECK_NOT:
-        if (current_check.match_type == MatchType.SUBSTRING or
-                current_check.match_type == MatchType.REGEX):
+        if (
+            current_check.match_type == MatchType.SUBSTRING
+            or current_check.match_type == MatchType.REGEX
+        ):
             assert current_check_line_idx != None
             last_read_line = input_lines[current_check_line_idx].rstrip()
 
             if not args.strict_whitespace:
-                last_read_line = re.sub("\\s+", ' ', last_read_line).strip()
+                last_read_line = re.sub("\\s+", " ", last_read_line).strip()
 
-            print("{}:{}:{}: error: CHECK-NOT: excluded string found in input"
-                  .format(check_file,
-                          current_check.check_line_idx + 1,
-                          current_check.start_index + 1))
+            print(
+                "{}:{}:{}: error: CHECK-NOT: excluded string found in input".format(
+                    check_file,
+                    current_check.check_line_idx + 1,
+                    current_check.start_index + 1,
+                )
+            )
 
             print(current_check.source_line.rstrip())
             print("^".rjust(current_check.start_index + 1))
-            print("<stdin>:{}:{}: note: found here".format(current_check_line_idx + 1, 1))
+            print(
+                "<stdin>:{}:{}: note: found here".format(
+                    current_check_line_idx + 1, 1
+                )
+            )
             print(last_read_line)
 
             if current_check.match_type == MatchType.SUBSTRING:
@@ -718,10 +825,10 @@ def main():
                 assert match_pos != -1
 
                 # TODO: check on lines which start with spaces
-                highlight_line = "^".rjust(match_pos, ' ')
-                print(highlight_line.ljust(len(current_check.expression), '~'))
+                highlight_line = "^".rjust(match_pos, " ")
+                print(highlight_line.ljust(len(current_check.expression), "~"))
             else:
-                print("^".ljust(len(last_read_line), '~'))
+                print("^".ljust(len(last_read_line), "~"))
 
             exit_handler(1)
 
@@ -730,55 +837,86 @@ def main():
     if current_check.check_type == CheckType.CHECK_NEXT:
         last_read_line = input_lines[current_scan_base].rstrip()
 
-        if current_check.match_type == MatchType.SUBSTRING or \
-                current_check.match_type == MatchType.REGEX:
+        if (
+            current_check.match_type == MatchType.SUBSTRING
+            or current_check.match_type == MatchType.REGEX
+        ):
             matching_line_idx = -1
             for line_idx, line in enumerate(input_lines[current_scan_base:]):
                 if current_check.expression in line:
                     matching_line_idx = current_scan_base + line_idx
 
             if matching_line_idx == -1:
-                print("{}:{}:{}: error: CHECK-NEXT: expected string not found in input"
-                      .format(check_file,
-                              current_check.check_line_idx + 1,
-                              current_check.start_index + 1))
+                print(
+                    "{}:{}:{}: error: CHECK-NEXT: expected string not found in input".format(
+                        check_file,
+                        current_check.check_line_idx + 1,
+                        current_check.start_index + 1,
+                    )
+                )
 
                 print(current_check.source_line.rstrip())
                 print("^".rjust(current_check.start_index + 1))
-                print("<stdin>:{}:{}: note: scanning from here".format(current_scan_base + 1, 1))
+                print(
+                    "<stdin>:{}:{}: note: scanning from here".format(
+                        current_scan_base + 1, 1
+                    )
+                )
                 print(last_read_line)
                 print("^")
 
                 exit_handler(1)
             else:
                 if current_scan_base > 0:
-                    print("{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match"
-                          .format(check_file,
-                                  current_check.check_line_idx + 1,
-                                  current_check.start_index + 1))
+                    print(
+                        "{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match".format(
+                            check_file,
+                            current_check.check_line_idx + 1,
+                            current_check.start_index + 1,
+                        )
+                    )
                     print(current_check.source_line.rstrip())
                     print("^".rjust(current_check.start_index + 1))
 
                     matching_line = input_lines[matching_line_idx].rstrip()
-                    print("<stdin>:{}:1: note: 'next' match was here".format(matching_line_idx + 1))
+                    print(
+                        "<stdin>:{}:1: note: 'next' match was here".format(
+                            matching_line_idx + 1
+                        )
+                    )
                     print(matching_line)
                     print("^")
 
-                    previous_matched_line = input_lines[current_scan_base - 1].rstrip()
-                    print("<stdin>:{}:{}: note: previous match ended here".format(current_scan_base, len(previous_matched_line) + 1))
+                    previous_matched_line = input_lines[
+                        current_scan_base - 1
+                    ].rstrip()
+                    print(
+                        "<stdin>:{}:{}: note: previous match ended here".format(
+                            current_scan_base, len(previous_matched_line) + 1
+                        )
+                    )
                     print(previous_matched_line)
                     print("^".rjust(len(previous_matched_line) + 1))
-                    print("<stdin>:{}:{}: note: non-matching line after previous match is here".format(current_scan_base + 1, 1))
+                    print(
+                        "<stdin>:{}:{}: note: non-matching line after previous match is here".format(
+                            current_scan_base + 1, 1
+                        )
+                    )
                     print(last_read_line)
                     print("^")
 
                     exit_handler(1)
                 else:
-                    check_expression_idx = current_check.source_line.find(current_check.check_keyword)
-                    print("{}:{}:{}: error: found 'CHECK-NEXT' without previous 'CHECK: line"
-                          .format(check_file,
-                                  current_check.check_line_idx + 1,
-                                  check_expression_idx + 1))
+                    check_expression_idx = current_check.source_line.find(
+                        current_check.check_keyword
+                    )
+                    print(
+                        "{}:{}:{}: error: found 'CHECK-NEXT' without previous 'CHECK: line".format(
+                            check_file,
+                            current_check.check_line_idx + 1,
+                            check_expression_idx + 1,
+                        )
+                    )
                     print(current_check.source_line.rstrip())
                     print("^".rjust(check_expression_idx + 1))
 

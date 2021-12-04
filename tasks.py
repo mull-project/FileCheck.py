@@ -6,8 +6,8 @@ from typing import Optional
 import invoke
 from invoke import task
 
-FILECHECK_LLVM_8_EXEC = 'FileCheck-8.0.1'
-FILECHECK_LLVM_9_EXEC = 'FileCheck-9.0.1'
+FILECHECK_LLVM_8_EXEC = "FileCheck-8.0.1"
+FILECHECK_LLVM_9_EXEC = "FileCheck-9.0.1"
 
 
 def one_line_command(string):
@@ -21,11 +21,11 @@ def run_invoke_cmd(context, cmd) -> invoke.runners.Result:
 
 
 def get_os_filename_string():
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         return "Windows"
-    if platform.system() == 'Darwin':
+    if platform.system() == "Darwin":
         return "macOS"
-    if platform.system() == 'Linux':
+    if platform.system() == "Linux":
         return "Linux"
     assert 0, "error: FileCheck.py could not detect OS"
 
@@ -57,7 +57,8 @@ def run_lit_tests(
     llvm_only_value = "1" if llvm_only else ""
     focus_or_none = f"--filter {focus}" if focus else ""
 
-    command = one_line_command("""
+    command = one_line_command(
+        """
         lit
         --param REAL_ONLY={llvm_only_value}
         --param FILECHECK_EXEC="{filecheck_exec}"
@@ -65,13 +66,37 @@ def run_lit_tests(
         -v
         {focus_or_none}
         {cwd}/tests/integration
-    """).format(cwd=cwd,
-                filecheck_exec=filecheck_exec,
-                filecheck_tester_exec=filecheck_tester_exec,
-                focus_or_none=focus_or_none,
-                llvm_only_value=llvm_only_value)
+    """
+    ).format(
+        cwd=cwd,
+        filecheck_exec=filecheck_exec,
+        filecheck_tester_exec=filecheck_tester_exec,
+        focus_or_none=focus_or_none,
+        llvm_only_value=llvm_only_value,
+    )
 
     run_invoke_cmd(c, command)
+
+
+@task
+def lint_black_diff(context):
+    command = one_line_command(
+        """
+        black . --color 2>&1
+        """
+    )
+    result = run_invoke_cmd(context, command)
+
+    # black always exits with 0, so we handle the output.
+    if "reformatted" in result.stdout:
+        print("invoke: black found issues")
+        result.exited = 1
+        raise invoke.exceptions.UnexpectedExit(result)
+
+
+@task(lint_black_diff)
+def lint(_):
+    pass
 
 
 @task
@@ -100,7 +125,7 @@ def test_filecheck_py_using_filecheck_py_tester(c, focus=None):
     run_lit_tests(c, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
-@task
+@task(lint)
 def test(c, focus=None):
     test_filecheck_llvm(c, focus)
     test_filecheck_py_using_file_check_llvm_tester(c, focus)
@@ -108,7 +133,8 @@ def test(c, focus=None):
 
 @task
 def clean(c):
-    find_command = one_line_command("""
+    find_command = one_line_command(
+        """
         find
             .
             -type f \\(
@@ -122,27 +148,38 @@ def clean(c):
             \\)
             -not -path "**Expected**"
             -not -path "**Input**"
-    """)
+    """
+    )
 
     find_result = run_invoke_cmd(c, find_command)
     find_result_stdout = find_result.stdout.strip()
 
     echo_command = one_line_command(
-        """echo {find_result} | xargs rm -rfv""".format(find_result=find_result_stdout)
+        """echo {find_result} | xargs rm -rfv""".format(
+            find_result=find_result_stdout
+        )
     )
     run_invoke_cmd(c, echo_command)
 
 
 @task
 def docs_sphinx(c, open=False):
-    run_invoke_cmd(c, one_line_command("""
+    run_invoke_cmd(
+        c,
+        one_line_command(
+            """
         cd docs && make html SPHINXOPTS="-W --keep-going -n"
-    """))
+    """
+        ),
+    )
     if open:
         run_invoke_cmd(
-            c, one_line_command("""
+            c,
+            one_line_command(
+                """
                 open docs/_build/html/index.html
-            """)
+            """
+            ),
         )
 
 
@@ -150,10 +187,12 @@ def docs_sphinx(c, open=False):
 # gem install github_changelog_generator
 @task
 def changelog(c, github_token):
-    command = one_line_command("""
+    command = one_line_command(
+        """
         CHANGELOG_GITHUB_TOKEN={github_token}
         github_changelog_generator
         --user mull-project
         --project FileCheck.py
-    """).format(github_token=github_token)
+    """
+    ).format(github_token=github_token)
     run_invoke_cmd(c, command)
