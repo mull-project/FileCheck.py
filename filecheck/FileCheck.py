@@ -6,7 +6,6 @@ import os
 import re
 import sys
 
-from collections import namedtuple
 from difflib import SequenceMatcher
 from enum import Enum
 
@@ -58,26 +57,49 @@ class CheckType(Enum):
     CHECK_EMPTY = 4
 
 
-Check = namedtuple(
-    "Check",
-    (
-        "check_type "
-        "match_type "
-        "check_keyword "
-        "expression "
-        "source_line "
-        "check_line_idx "
-        "start_index"
-    ),
-)
-ImplicitCheck = namedtuple("ImplicitCheck", "original_check check")
+class Check:
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        check_type: CheckType,
+        match_type: MatchType,
+        check_keyword: str,
+        expression: str,
+        source_line: str,
+        check_line_idx: int,
+        start_index: int,
+    ):
+        self.check_type = check_type
+        self.match_type = match_type
+        self.check_keyword = check_keyword
+        self.expression = expression
+        self.source_line = source_line
+        self.check_line_idx = check_line_idx
+        self.start_index = start_index
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return (
+            "Check("
+            f"check_type: {self.check_type}, "
+            f"match_type: {self.match_type}, "
+            f"check_keyword: {self.check_keyword}, "
+            f"expression: {self.expression}, "
+            f"source_line: {self.source_line}, "
+            f"check_line_idx: {self.check_line_idx}, "
+            f"start_index: {self.start_index}"
+            ")"
+        )
+
+
+class ImplicitCheck:
+    def __init__(self, original_check: str, check: str):
+        self.original_check = original_check
+        self.check = check
+
 
 LINE_NUMBER_REGEX = r"\[\[# +@LINE *([+-])? *([0-9]+)? *\]\]"
-
-
-def debug_print(string):
-    # print(string)
-    pass
 
 
 def similar(a, b):
@@ -146,16 +168,6 @@ def escape_non_regex_parts(check_expression):
 def canonicalize_whitespace(input):
     output = re.sub("\\s+", " ", input)
     return output
-
-
-def dump_check(check):
-    debug_print("check dump")
-    debug_print("\tcheck_type: {}".format(check.check_type))
-    debug_print("\tmatch_type: {}".format(check.match_type))
-    debug_print("\texpression: {}".format(check.expression))
-    debug_print("\tsource_line: {}".format(check.source_line))
-    debug_print("\tcheck_line_idx: {}".format(check.check_line_idx))
-    debug_print("\tstart_index: {}".format(check.start_index))
 
 
 class CheckResult(Enum):
