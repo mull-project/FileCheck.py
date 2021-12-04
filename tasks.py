@@ -130,7 +130,7 @@ def lint_pylint(context):
         raise exc
 
 
-@task(lint_black_diff)
+@task(lint_black_diff, lint_flake8)
 def lint(_):
     pass
 
