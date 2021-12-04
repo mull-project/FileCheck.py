@@ -40,7 +40,7 @@ def get_filecheck_llvm_path(filecheck_exec):
 
 def get_filecheck_py_exec():
     cwd = os.getcwd()
-    return f'python \\"{cwd}/filecheck/FileCheck.py\\"'
+    return f'python \\"{cwd}/filecheck/filecheck.py\\"'
 
 
 def run_lit_tests(
@@ -106,13 +106,6 @@ def lint_pylint(context):
         """
         pylint
           --rcfile=.pylint.ini
-          --disable=all
-          --fail-under=10.0
-          --enable=E1101,R0201,R0902,R0913,R1701,R1705,R1710,R1714,R1719,R1725,C0103,C0209,C0303,C0411,C1801,W0703,W0231,W0235,W0612,W0613,W0640,W0707,W1514
-          filecheck/ tasks.py
-        &&
-        pylint
-          --rcfile=.pylint.ini
           --disable=c-extension-no-member
           --exit-zero
           filecheck/ tasks.py
@@ -126,7 +119,7 @@ def lint_pylint(context):
         raise exc
 
 
-@task(lint_black_diff, lint_flake8)
+@task(lint_black_diff, lint_flake8, lint_pylint)
 def lint(_):
     pass
 
