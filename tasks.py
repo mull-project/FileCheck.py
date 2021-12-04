@@ -1,6 +1,7 @@
 import os
 import platform
 import re
+from typing import Optional
 
 from invoke import task
 
@@ -37,7 +38,9 @@ def formatted_command(string):
     return re.sub('\\s+', ' ', string).strip()
 
 
-def run_lit_tests(c, filecheck_exec, filecheck_tester_exec, llvm_only):
+def run_lit_tests(
+    c, filecheck_exec, filecheck_tester_exec, focus: Optional[str], llvm_only
+):
     assert c
     assert filecheck_exec
     assert llvm_only is not None
@@ -45,6 +48,7 @@ def run_lit_tests(c, filecheck_exec, filecheck_tester_exec, llvm_only):
     cwd = os.getcwd()
 
     llvm_only_value = "1" if llvm_only else ""
+    focus_or_none = f"--filter {focus}" if focus else ""
 
     command = formatted_command("""
         lit
@@ -52,10 +56,12 @@ def run_lit_tests(c, filecheck_exec, filecheck_tester_exec, llvm_only):
         --param FILECHECK_EXEC="{filecheck_exec}"
         --param FILECHECK_TESTER_EXEC="{filecheck_tester_exec}"
         -v
+        {focus_or_none}
         {cwd}/tests/integration
     """).format(cwd=cwd,
                 filecheck_exec=filecheck_exec,
                 filecheck_tester_exec=filecheck_tester_exec,
+                focus_or_none=focus_or_none,
                 llvm_only_value=llvm_only_value)
 
     print(command)
@@ -63,35 +69,35 @@ def run_lit_tests(c, filecheck_exec, filecheck_tester_exec, llvm_only):
 
 
 @task
-def test_filecheck_llvm(c):
+def test_filecheck_llvm(c, focus=None):
     filecheck_llvm_8_exec = get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC)
     filecheck_llvm_9_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
     filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
     # run_lit_tests(c, filecheck_llvm_8_exec, filecheck_tester_exec, True)
-    run_lit_tests(c, filecheck_llvm_9_exec, filecheck_tester_exec, True)
+    run_lit_tests(c, filecheck_llvm_9_exec, filecheck_tester_exec, focus, True)
 
 
 @task
-def test_filecheck_py_using_file_check_llvm_tester(c):
+def test_filecheck_py_using_file_check_llvm_tester(c, focus=None):
     filecheck_exec = get_filecheck_py_exec()
     filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
-    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, False)
+    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
 @task
-def test_filecheck_py_using_filecheck_py_tester(c):
+def test_filecheck_py_using_filecheck_py_tester(c, focus=None):
     filecheck_exec = get_filecheck_py_exec()
     filecheck_tester_exec = filecheck_exec
 
-    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, False)
+    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
 @task
-def test(c):
-    test_filecheck_llvm(c)
-    test_filecheck_py_using_file_check_llvm_tester(c)
+def test(c, focus=None):
+    test_filecheck_llvm(c, focus)
+    test_filecheck_py_using_file_check_llvm_tester(c, focus)
 
 
 @task

@@ -1,2 +1,2 @@
-RUN: echo "Hello world" | filecheck %s
+RUN: echo "Hello world" | %FILECHECK_EXEC %s
 CHECK: Hello world
