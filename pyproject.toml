@@ -16,7 +16,7 @@ lit = "^0.9"
 pylint = "2.12.2"
 
 [tool.poetry.scripts]
-filecheck = "filecheck.FileCheck:main"
+filecheck = "filecheck.filecheck:main"
 
 [build-system]
 requires = ["poetry>=0.12"]

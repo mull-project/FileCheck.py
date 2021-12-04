@@ -29,11 +29,13 @@ class FailedImplicitCheckContext:
 
 class CheckFailedException(BaseException):
     def __init__(self, failed_check):
+        super().__init__()
         self.failed_check = failed_check
 
 
 class ImplicitCheckNotFailedException(BaseException):
     def __init__(self, failed_check_context):
+        super().__init__()
         self.failed_check_context = failed_check_context
 
 
@@ -42,8 +44,7 @@ class CheckNOTIsLastException(BaseException):
 
 
 class InputFinishedException(BaseException):
-    def __init__(self):
-        pass
+    pass
 
 
 class MatchType(Enum):
@@ -104,8 +105,8 @@ class ImplicitCheck:
 LINE_NUMBER_REGEX = r"\[\[# +@LINE *([+-])? *([0-9]+)? *\]\]"
 
 
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
+def similar(lhs, rhs):
+    return SequenceMatcher(None, lhs, rhs).ratio()
 
 
 def print_help():
@@ -167,9 +168,8 @@ def escape_non_regex_parts(check_expression):
 # tabs) which causes it to ignore these differences (a space will match a tab).
 # The --strict-whitespace argument disables this behavior.
 # https://llvm.org/docs/CommandGuide/FileCheck.html#cmdoption-filecheck-strict-whitespace
-def canonicalize_whitespace(input):
-    output = re.sub("\\s+", " ", input)
-    return output
+def canonicalize_whitespace(input_string):
+    return re.sub("\\s+", " ", input_string)
 
 
 class CheckResult(Enum):
@@ -182,10 +182,12 @@ class CheckResult(Enum):
 
 # Allow check prefixes only at the beginnings of lines or
 # after non-word characters.
-before_prefix = "^(.*?[^\\w-])?"
+BEFORE_PREFIX = "^(.*?[^\\w-])?"
 
 
-def check_line(line, current_check, match_full_lines):
+def check_line(
+    line, current_check, match_full_lines
+):  # pylint: disable=too-many-return-statements
     if current_check.check_type == CheckType.CHECK_EMPTY:
         if line != "":
             return CheckResult.FAIL_FATAL
@@ -220,14 +222,12 @@ def check_line(line, current_check, match_full_lines):
         if current_check.match_type == MatchType.SUBSTRING:
             if current_check.expression in line:
                 return CheckResult.CHECK_NOT_MATCH
-            else:
-                return CheckResult.CHECK_NOT_WITHOUT_MATCH
+            return CheckResult.CHECK_NOT_WITHOUT_MATCH
 
-        elif current_check.match_type == MatchType.REGEX:
+        if current_check.match_type == MatchType.REGEX:
             if re.search(current_check.expression, line):
                 return CheckResult.CHECK_NOT_MATCH
-            else:
-                return CheckResult.CHECK_NOT_WITHOUT_MATCH
+            return CheckResult.CHECK_NOT_WITHOUT_MATCH
 
     return CheckResult.PASS
 
@@ -244,7 +244,9 @@ def implicit_check_line(check_not_check, strict_mode, line):
 def main():
     # Force UTF-8 to be sent to stdout.
     # https://stackoverflow.com/a/3597849/598057
-    sys.stdout = open(1, "w", encoding="utf-8", closefd=False)
+    sys.stdout = open(
+        1, "w", encoding="utf-8", closefd=False
+    )  # pylint: disable=consider-using-with
 
     args = None
     input_lines = None
@@ -345,14 +347,14 @@ def main():
             strict_whitespace_match = "" if strict_mode else " *"
 
             check_regex = (
-                f"{before_prefix}({check_prefix}):{strict_whitespace_match}(.*)"
+                f"{BEFORE_PREFIX}({check_prefix}):{strict_whitespace_match}(.*)"
             )
 
             check_match = re.search(check_regex, line)
             check_type = CheckType.CHECK
             if not check_match:
                 check_regex = (
-                    f"{before_prefix}({check_prefix}-NEXT):"
+                    f"{BEFORE_PREFIX}({check_prefix}-NEXT):"
                     f"{strict_whitespace_match}(.*)"
                 )
                 check_match = re.search(check_regex, line)
@@ -407,7 +409,7 @@ def main():
                 continue
 
             check_not_regex = (
-                f"{before_prefix}({check_prefix}-NOT):"
+                f"{BEFORE_PREFIX}({check_prefix}-NOT):"
                 f"{strict_whitespace_match}(.*)"
             )
             check_match = re.search(check_not_regex, line)
@@ -438,7 +440,7 @@ def main():
                 checks.append(check)
                 continue
 
-            check_empty_regex = f"{before_prefix}({check_prefix}-EMPTY):"
+            check_empty_regex = f"{BEFORE_PREFIX}({check_prefix}-EMPTY):"
             check_match = re.search(check_empty_regex, line)
             if check_match:
                 check_keyword = check_match.group(2)
@@ -567,7 +569,7 @@ def main():
                     failed_check = FailedCheck(current_check, line_idx)
                     raise CheckFailedException(failed_check)
 
-                elif check_result == CheckResult.PASS:
+                if check_result == CheckResult.PASS:
                     if failed_implicit_check:
                         raise ImplicitCheckNotFailedException(
                             failed_implicit_check
