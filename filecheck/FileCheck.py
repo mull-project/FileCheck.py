@@ -597,7 +597,7 @@ def main():
                                     )
                                     raise ImplicitCheckNotFailedException(
                                         failed_implicit_check
-                                    )
+                                    ) from None
 
                         exit_handler(0)
 
@@ -607,7 +607,7 @@ def main():
                         current_scan_col = 0
                         break
                     except StopIteration:
-                        raise InputFinishedException
+                        raise InputFinishedException from None
 
                 elif check_result == CheckResult.CHECK_NOT_MATCH:
                     failed_check = FailedCheck(current_check, line_idx)
@@ -616,7 +616,7 @@ def main():
                         current_check = next(check_iterator)
                         continue
                     except StopIteration:
-                        raise CheckFailedException(failed_check)
+                        raise CheckFailedException(failed_check) from None
 
                 elif check_result == CheckResult.CHECK_NOT_WITHOUT_MATCH:
                     if failed_check:
@@ -627,7 +627,7 @@ def main():
                         current_check = next(check_iterator)
                         continue
                     except StopIteration:
-                        raise CheckNOTIsLastException
+                        raise CheckNOTIsLastException from None
 
                 elif check_result == CheckResult.FAIL_SKIP_LINE:
                     try:
@@ -635,7 +635,7 @@ def main():
                         break
                     except StopIteration:
                         failed_check = FailedCheck(current_check, line_idx)
-                        raise CheckFailedException(failed_check)
+                        raise CheckFailedException(failed_check) from None
 
                 assert 0, "Should not reach here"
     except InputFinishedException:
@@ -670,21 +670,21 @@ def main():
                     ):
                         current_check_line_idx = line_idx
                         failed_check = FailedCheck(not_check, line_idx)
-                        raise CheckFailedException(failed_check)
+                        raise CheckFailedException(failed_check) from None
 
-        except CheckFailedException as e:
-            current_check = e.failed_check.check
-            current_check_line_idx = e.failed_check.line_idx
+        except CheckFailedException as check_failed_exception:
+            current_check = check_failed_exception.failed_check.check
+            current_check_line_idx = check_failed_exception.failed_check.line_idx
 
         except StopIteration:
             exit_handler(0)
 
-    except CheckFailedException as e:
-        current_check = e.failed_check.check
-        current_check_line_idx = e.failed_check.line_idx
+    except CheckFailedException as check_failed_exception:
+        current_check = check_failed_exception.failed_check.check
+        current_check_line_idx = check_failed_exception.failed_check.line_idx
 
-    except ImplicitCheckNotFailedException as e:
-        context = e.failed_check_context
+    except ImplicitCheckNotFailedException as implicit_check_not_exception:
+        context = implicit_check_not_exception.failed_check_context
         failed_check = context.check
         failed_line_num = context.line_idx + 1
 
