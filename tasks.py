@@ -3,10 +3,21 @@ import platform
 import re
 from typing import Optional
 
+import invoke
 from invoke import task
 
 FILECHECK_LLVM_8_EXEC = 'FileCheck-8.0.1'
 FILECHECK_LLVM_9_EXEC = 'FileCheck-9.0.1'
+
+
+def one_line_command(string):
+    return re.sub("\\s+", " ", string).strip()
+
+
+def run_invoke_cmd(context, cmd) -> invoke.runners.Result:
+    return context.run(
+        cmd, env=None, hide=False, warn=False, pty=False, echo=True
+    )
 
 
 def get_os_filename_string():
@@ -34,10 +45,6 @@ def get_filecheck_py_exec():
     return 'python \\"{cwd}/filecheck/FileCheck.py\\"'.format(cwd=cwd)
 
 
-def formatted_command(string):
-    return re.sub('\\s+', ' ', string).strip()
-
-
 def run_lit_tests(
     c, filecheck_exec, filecheck_tester_exec, focus: Optional[str], llvm_only
 ):
@@ -50,7 +57,7 @@ def run_lit_tests(
     llvm_only_value = "1" if llvm_only else ""
     focus_or_none = f"--filter {focus}" if focus else ""
 
-    command = formatted_command("""
+    command = one_line_command("""
         lit
         --param REAL_ONLY={llvm_only_value}
         --param FILECHECK_EXEC="{filecheck_exec}"
@@ -64,13 +71,12 @@ def run_lit_tests(
                 focus_or_none=focus_or_none,
                 llvm_only_value=llvm_only_value)
 
-    print(command)
-    c.run("{}".format(command))
+    run_invoke_cmd(c, command)
 
 
 @task
 def test_filecheck_llvm(c, focus=None):
-    filecheck_llvm_8_exec = get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC)
+    # filecheck_llvm_8_exec = get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC)
     filecheck_llvm_9_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
     filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
@@ -102,7 +108,7 @@ def test(c, focus=None):
 
 @task
 def clean(c):
-    find_command = formatted_command("""
+    find_command = one_line_command("""
         find
             .
             -type f \\(
@@ -111,31 +117,30 @@ def clean(c):
             -or -type d \\(
                 -name '*.dSYM' -or
                 -name 'Sandbox' -or
-                -name 'Output'
+                -name 'Output' -or
+                -name 'output'
             \\)
             -not -path "**Expected**"
             -not -path "**Input**"
     """)
 
-    find_result = c.run("{}".format(find_command))
+    find_result = run_invoke_cmd(c, find_command)
     find_result_stdout = find_result.stdout.strip()
 
-    echo_command = formatted_command(
+    echo_command = one_line_command(
         """echo {find_result} | xargs rm -rfv""".format(find_result=find_result_stdout)
     )
-
-    c.run("{}".format(echo_command))
+    run_invoke_cmd(c, echo_command)
 
 
 @task
 def docs_sphinx(c, open=False):
-    command = formatted_command("""
+    run_invoke_cmd(c, one_line_command("""
         cd docs && make html SPHINXOPTS="-W --keep-going -n"
-    """)
-    c.run(command)
+    """))
     if open:
-        c.run(
-            formatted_command("""
+        run_invoke_cmd(
+            c, one_line_command("""
                 open docs/_build/html/index.html
             """)
         )
@@ -145,10 +150,10 @@ def docs_sphinx(c, open=False):
 # gem install github_changelog_generator
 @task
 def changelog(c, github_token):
-    command = formatted_command("""
+    command = one_line_command("""
         CHANGELOG_GITHUB_TOKEN={github_token}
         github_changelog_generator
         --user mull-project
         --project FileCheck.py
     """).format(github_token=github_token)
-    c.run("{}".format(command))
+    run_invoke_cmd(c, command)
