@@ -94,6 +94,42 @@ def lint_black_diff(context):
         raise invoke.exceptions.UnexpectedExit(result)
 
 
+@task
+def lint_flake8(context):
+    command = one_line_command(
+        """
+        flake8 filecheck/ --statistics --max-line-length 80 --show-source
+        """
+    )
+    run_invoke_cmd(context, command)
+
+
+@task
+def lint_pylint(context):
+    command = one_line_command(
+        """
+        pylint
+          --rcfile=.pylint.ini
+          --disable=all
+          --fail-under=10.0
+          --enable=E1101,R0201,R0902,R0913,R1701,R1705,R1710,R1714,R1719,R1725,C0103,C0209,C0303,C0411,C1801,W0703,W0231,W0235,W0612,W0613,W0640,W0707,W1514
+          filecheck/ tasks.py
+        &&
+        pylint
+          --rcfile=.pylint.ini
+          --disable=c-extension-no-member
+          --exit-zero
+          filecheck/ tasks.py
+        """  # pylint: disable=line-too-long
+    )
+    try:
+        run_invoke_cmd(context, command)
+    except invoke.exceptions.UnexpectedExit as exc:
+        # pylink doesn't show an error message when exit code != 0, so we do.
+        print(f"invoke: pylint exited with error code {exc.result.exited}")
+        raise exc
+
+
 @task(lint_black_diff)
 def lint(_):
     pass
