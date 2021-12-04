@@ -11,6 +11,8 @@ from enum import Enum
 
 __version__ = "0.0.20"
 
+from typing import Optional
+
 
 class FailedCheck:
     def __init__(self, check, line_idx):
@@ -63,7 +65,7 @@ class Check:
         check_type: CheckType,
         match_type: MatchType,
         check_keyword: str,
-        expression: str,
+        expression: Optional[str],
         source_line: str,
         check_line_idx: int,
         start_index: int,
@@ -141,7 +143,7 @@ def print_version():
         "flexible pattern matching file verifier"
     )
     print("https://github.com/mull-project/FileCheck.py")
-    print("Version: {}".format(__version__))
+    print(f"Version: {__version__}")
 
 
 def escape_non_regex_or_skip(match_obj):
@@ -258,7 +260,7 @@ def main():
             print("Full input was:")
             for input_line in input_lines:
                 print(input_line.rstrip())
-        exit(code)
+        sys.exit(code)
 
     if len(sys.argv) == 1:
         print("<check-file> not specified")
@@ -278,9 +280,8 @@ def main():
     if not os.path.isfile(check_file):
         sys.stdout.flush()
         err = (
-            "Could not open check file '{}': No such file or directory".format(
-                check_file
-            )
+            f"Could not open check file '{check_file}': "
+            f"No such file or directory"
         )
         print(err)
         exit_handler(2)
@@ -343,14 +344,16 @@ def main():
             # CHECK and CHECK-NEXT
             strict_whitespace_match = "" if strict_mode else " *"
 
-            check_regex = "{}({}):{}(.*)".format(
-                before_prefix, check_prefix, strict_whitespace_match
+            check_regex = (
+                f"{before_prefix}({check_prefix}):{strict_whitespace_match}(.*)"
             )
+
             check_match = re.search(check_regex, line)
             check_type = CheckType.CHECK
             if not check_match:
-                check_regex = "{}({}-NEXT):{}(.*)".format(
-                    before_prefix, check_prefix, strict_whitespace_match
+                check_regex = (
+                    f"{before_prefix}({check_prefix}-NEXT):"
+                    f"{strict_whitespace_match}(.*)"
                 )
                 check_match = re.search(check_regex, line)
                 check_type = CheckType.CHECK_NEXT
@@ -403,8 +406,9 @@ def main():
                 checks.append(check)
                 continue
 
-            check_not_regex = "{}({}-NOT):{}(.*)".format(
-                before_prefix, check_prefix, strict_whitespace_match
+            check_not_regex = (
+                f"{before_prefix}({check_prefix}-NOT):"
+                f"{strict_whitespace_match}(.*)"
             )
             check_match = re.search(check_not_regex, line)
             if check_match:
@@ -434,9 +438,7 @@ def main():
                 checks.append(check)
                 continue
 
-            check_empty_regex = "{}({}-EMPTY):".format(
-                before_prefix, check_prefix
-            )
+            check_empty_regex = f"{before_prefix}({check_prefix}-EMPTY):"
             check_match = re.search(check_empty_regex, line)
             if check_match:
                 check_keyword = check_match.group(2)
@@ -452,9 +454,10 @@ def main():
                 )
 
                 if len(checks) == 0:
+                    # TODO: 1 and 3?
                     print(
-                        "{}:{}:{}: error: found 'CHECK-EMPTY' without "
-                        "previous 'CHECK: line".format(check_file, 1, 3)
+                        f"{check_file}:{1}:{3}: error: "
+                        f"found 'CHECK-EMPTY' without previous 'CHECK: line"
                     )
                     print(line)
                     print("  ^")
@@ -475,9 +478,7 @@ def main():
         current_check = next(check_iterator)
     except StopIteration:
         error_message = (
-            "error: no check strings found with prefix '{}:'".format(
-                check_prefix
-            )
+            f"error: no check strings found with prefix '{check_prefix}:'"
         )
         print(error_message, file=sys.stderr)
         sys.stdout.flush()
@@ -518,7 +519,7 @@ def main():
         line_idx, line = next(stdin_input_iter)
     except StopIteration:
         print("CHECK: FileCheck error: '-' is empty.")
-        print("FileCheck command line: {}".format(check_file))
+        print(f"FileCheck command line: {check_file}")
         exit_handler(2)
 
     current_not_checks = []
@@ -696,12 +697,10 @@ def main():
             "command line:1:22: error: CHECK-NOT: excluded string found "
             "in input"
         )
-        print("-implicit-check-not='{}'".format(failed_check.original_check))
+        print(f"-implicit-check-not='{failed_check.original_check}'")
         print("                     ^")
         print(
-            "<stdin>:{}:{}: note: found here".format(
-                failed_line_num, failed_column_num
-            )
+            f"<stdin>:{failed_line_num}:{failed_column_num}: note: found here"
         )
         print(context.line)
         print(
@@ -733,20 +732,14 @@ def main():
     if current_check.check_type == CheckType.CHECK_EMPTY:
         last_read_line = input_lines[current_scan_base].rstrip()
         print(
-            "{}:{}:{}: error: CHECK-EMPTY: expected string not found "
-            "in input".format(
-                check_file,
-                current_check.check_line_idx + 1,
-                len(current_check.source_line) + 1,
-            )
+            f"{check_file}:"
+            f"{current_check.check_line_idx + 1}:"
+            f"{len(current_check.source_line) + 1}: "
+            "error: CHECK-EMPTY: expected string not found in input"
         )
-        print("{}".format(current_check.source_line))
+        print(current_check.source_line)
         print("^".rjust(len(current_check.source_line) + 1))
-        print(
-            "<stdin>:{}:{}: note: scanning from here".format(
-                current_scan_base + 1, 1
-            )
-        )
+        print(f"<stdin>:{current_scan_base + 1}:{1}: note: scanning from here")
         print(last_read_line)
         print("^")
 
@@ -769,22 +762,18 @@ def main():
             or current_check.match_type == MatchType.REGEX
         ):
             print(
-                "{}:{}:{}: error: {}: expected string not found "
-                "in input".format(
-                    check_file,
-                    current_check.check_line_idx + 1,
-                    current_check.start_index + 1,
-                    check_prefix,
-                )
+                f"{check_file}:"
+                f"{current_check.check_line_idx + 1}:"
+                f"{current_check.start_index + 1}: "
+                f"error: {check_prefix}: expected string not found in input"
             )
 
             print(current_check.source_line.rstrip())
             print("^".rjust(current_check.start_index + 1))
 
             print(
-                "<stdin>:{}:{}: note: scanning from here".format(
-                    current_scan_base + 1, current_scan_col + 1
-                )
+                f"<stdin>:{current_scan_base + 1}:{current_scan_col + 1}: "
+                f"note: scanning from here"
             )
             print(last_read_line)
             print("^".rjust(current_scan_col + 1))
@@ -816,8 +805,8 @@ def main():
                 if candidate_line:
                     caret_pos = len(candidate_line) // 2 + 1
                     print(
-                        "<stdin>:{}:{}: note: possible intended "
-                        "match here".format(candidate_line_idx + 1, caret_pos)
+                        f"<stdin>:{candidate_line_idx + 1}:{caret_pos}: "
+                        f"note: possible intended match here"
                     )
                     print(candidate_line)
                     print("^".rjust(caret_pos, " "))
@@ -836,21 +825,15 @@ def main():
                 last_read_line = re.sub("\\s+", " ", last_read_line).strip()
 
             print(
-                "{}:{}:{}: error: CHECK-NOT: excluded string "
-                "found in input".format(
-                    check_file,
-                    current_check.check_line_idx + 1,
-                    current_check.start_index + 1,
-                )
+                f"{check_file}:"
+                f"{current_check.check_line_idx + 1}:"
+                f"{current_check.start_index + 1}: "
+                f"error: CHECK-NOT: excluded string found in input"
             )
 
             print(current_check.source_line.rstrip())
             print("^".rjust(current_check.start_index + 1))
-            print(
-                "<stdin>:{}:{}: note: found here".format(
-                    current_check_line_idx + 1, 1
-                )
-            )
+            print(f"<stdin>:{current_check_line_idx + 1}:{1}: note: found here")
             print(last_read_line)
 
             if current_check.match_type == MatchType.SUBSTRING:
@@ -881,20 +864,17 @@ def main():
 
             if matching_line_idx == -1:
                 print(
-                    "{}:{}:{}: error: CHECK-NEXT: expected string not found in "
-                    "input".format(
-                        check_file,
-                        current_check.check_line_idx + 1,
-                        current_check.start_index + 1,
-                    )
+                    f"{check_file}:"
+                    f"{current_check.check_line_idx + 1}:"
+                    f"{current_check.start_index + 1}: "
+                    f"error: CHECK-NEXT: expected string not found in input"
                 )
 
                 print(current_check.source_line.rstrip())
                 print("^".rjust(current_check.start_index + 1))
                 print(
-                    "<stdin>:{}:{}: note: scanning from here".format(
-                        current_scan_base + 1, 1
-                    )
+                    f"<stdin>:{current_scan_base + 1}:{1}: "
+                    "note: scanning from here"
                 )
                 print(last_read_line)
                 print("^")
@@ -903,21 +883,19 @@ def main():
             else:
                 if current_scan_base > 0:
                     print(
-                        "{}:{}:{}: error: CHECK-NEXT: is not on the line after "
-                        "the previous match".format(
-                            check_file,
-                            current_check.check_line_idx + 1,
-                            current_check.start_index + 1,
-                        )
+                        f"{check_file}:"
+                        f"{current_check.check_line_idx + 1}:"
+                        f"{current_check.start_index + 1}: "
+                        "error: CHECK-NEXT: is not on the line after "
+                        "the previous match"
                     )
                     print(current_check.source_line.rstrip())
                     print("^".rjust(current_check.start_index + 1))
 
                     matching_line = input_lines[matching_line_idx].rstrip()
                     print(
-                        "<stdin>:{}:1: note: 'next' match was here".format(
-                            matching_line_idx + 1
-                        )
+                        f"<stdin>:{matching_line_idx + 1}:1: "
+                        "note: 'next' match was here"
                     )
                     print(matching_line)
                     print("^")
@@ -926,17 +904,15 @@ def main():
                         current_scan_base - 1
                     ].rstrip()
                     print(
-                        "<stdin>:{}:{}: note: previous match ended here".format(
-                            current_scan_base, len(previous_matched_line) + 1
-                        )
+                        f"<stdin>:{current_scan_base}:"
+                        f"{len(previous_matched_line) + 1}: "
+                        f"note: previous match ended here"
                     )
                     print(previous_matched_line)
                     print("^".rjust(len(previous_matched_line) + 1))
                     print(
-                        "<stdin>:{}:{}: note: non-matching line after "
-                        "previous match is here".format(
-                            current_scan_base + 1, 1
-                        )
+                        f"<stdin>:{current_scan_base + 1}:{1}: "
+                        f"note: non-matching line after previous match is here"
                     )
                     print(last_read_line)
                     print("^")
@@ -947,12 +923,11 @@ def main():
                         current_check.check_keyword
                     )
                     print(
-                        "{}:{}:{}: error: found 'CHECK-NEXT' "
-                        "without previous 'CHECK: line".format(
-                            check_file,
-                            current_check.check_line_idx + 1,
-                            check_expression_idx + 1,
-                        )
+                        f"{check_file}:"
+                        f"{current_check.check_line_idx + 1}:"
+                        f"{check_expression_idx + 1}: "
+                        f"error: found 'CHECK-NEXT' without "
+                        f"previous 'CHECK: line"
                     )
                     print(current_check.source_line.rstrip())
                     print("^".rjust(check_expression_idx + 1))
