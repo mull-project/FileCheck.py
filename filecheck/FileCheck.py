@@ -276,17 +276,17 @@ def main():
             print_version()
             exit_handler(0)
 
-    check_file = sys.argv[1]
-    if not os.path.isfile(check_file):
+    check_file_path = sys.argv[1]
+    if not os.path.isfile(check_file_path):
         sys.stdout.flush()
         err = (
-            f"Could not open check file '{check_file}': "
+            f"Could not open check file '{check_file_path}': "
             f"No such file or directory"
         )
         print(err)
         exit_handler(2)
 
-    if os.path.getsize(check_file) == 0:
+    if os.path.getsize(check_file_path) == 0:
         sys.stdout.flush()
         print(
             "error: no check strings found with prefix 'CHECK:'",
@@ -334,8 +334,8 @@ def main():
         exit_handler(2)
 
     checks = []
-    with open(check_file, encoding="utf-8") as f:
-        for line_idx, line in enumerate(f):
+    with open(check_file_path, encoding="utf-8") as check_file:
+        for line_idx, line in enumerate(check_file):
             line = line.rstrip()
 
             if not args.strict_whitespace:
@@ -456,7 +456,7 @@ def main():
                 if len(checks) == 0:
                     # TODO: 1 and 3?
                     print(
-                        f"{check_file}:{1}:{3}: error: "
+                        f"{check_file_path}:{1}:{3}: error: "
                         f"found 'CHECK-EMPTY' without previous 'CHECK: line"
                     )
                     print(line)
@@ -519,7 +519,7 @@ def main():
         line_idx, line = next(stdin_input_iter)
     except StopIteration:
         print("CHECK: FileCheck error: '-' is empty.")
-        print(f"FileCheck command line: {check_file}")
+        print(f"FileCheck command line: {check_file_path}")
         exit_handler(2)
 
     current_not_checks = []
@@ -674,7 +674,9 @@ def main():
 
         except CheckFailedException as check_failed_exception:
             current_check = check_failed_exception.failed_check.check
-            current_check_line_idx = check_failed_exception.failed_check.line_idx
+            current_check_line_idx = (
+                check_failed_exception.failed_check.line_idx
+            )
 
         except StopIteration:
             exit_handler(0)
@@ -732,7 +734,7 @@ def main():
     if current_check.check_type == CheckType.CHECK_EMPTY:
         last_read_line = input_lines[current_scan_base].rstrip()
         print(
-            f"{check_file}:"
+            f"{check_file_path}:"
             f"{current_check.check_line_idx + 1}:"
             f"{len(current_check.source_line) + 1}: "
             "error: CHECK-EMPTY: expected string not found in input"
@@ -757,11 +759,9 @@ def main():
             current_scan_base += 1
             last_read_line = input_lines[current_scan_base].rstrip()
 
-        if (
-            current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX)
-        ):
+        if current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX):
             print(
-                f"{check_file}:"
+                f"{check_file_path}:"
                 f"{current_check.check_line_idx + 1}:"
                 f"{current_check.start_index + 1}: "
                 f"error: {check_prefix}: expected string not found in input"
@@ -813,9 +813,7 @@ def main():
             exit_handler(1)
 
     if current_check.check_type == CheckType.CHECK_NOT:
-        if (
-            current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX)
-        ):
+        if current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX):
             assert current_check_line_idx is not None
             last_read_line = input_lines[current_check_line_idx].rstrip()
 
@@ -823,7 +821,7 @@ def main():
                 last_read_line = re.sub("\\s+", " ", last_read_line).strip()
 
             print(
-                f"{check_file}:"
+                f"{check_file_path}:"
                 f"{current_check.check_line_idx + 1}:"
                 f"{current_check.start_index + 1}: "
                 f"error: CHECK-NOT: excluded string found in input"
@@ -851,9 +849,7 @@ def main():
     if current_check.check_type == CheckType.CHECK_NEXT:
         last_read_line = input_lines[current_scan_base].rstrip()
 
-        if (
-            current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX)
-        ):
+        if current_check.match_type in (MatchType.SUBSTRING, MatchType.REGEX):
             matching_line_idx = -1
             for line_idx, line in enumerate(input_lines[current_scan_base:]):
                 if current_check.expression in line:
@@ -861,7 +857,7 @@ def main():
 
             if matching_line_idx == -1:
                 print(
-                    f"{check_file}:"
+                    f"{check_file_path}:"
                     f"{current_check.check_line_idx + 1}:"
                     f"{current_check.start_index + 1}: "
                     f"error: CHECK-NEXT: expected string not found in input"
@@ -880,7 +876,7 @@ def main():
             else:
                 if current_scan_base > 0:
                     print(
-                        f"{check_file}:"
+                        f"{check_file_path}:"
                         f"{current_check.check_line_idx + 1}:"
                         f"{current_check.start_index + 1}: "
                         "error: CHECK-NEXT: is not on the line after "
@@ -920,7 +916,7 @@ def main():
                         current_check.check_keyword
                     )
                     print(
-                        f"{check_file}:"
+                        f"{check_file_path}:"
                         f"{current_check.check_line_idx + 1}:"
                         f"{check_expression_idx + 1}: "
                         f"error: found 'CHECK-NEXT' without "
