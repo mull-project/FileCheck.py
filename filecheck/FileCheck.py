@@ -140,7 +140,7 @@ def print_version():
         "filecheck: Python port of LLVM's FileCheck, "
         "flexible pattern matching file verifier"
     )
-    print("https://github.com/stanislaw/FileCheck.py")
+    print("https://github.com/mull-project/FileCheck.py")
     print("Version: {}".format(__version__))
 
 
