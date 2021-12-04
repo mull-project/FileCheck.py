@@ -68,7 +68,7 @@ def test_filecheck_llvm(c):
     filecheck_llvm_9_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
     filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
-    run_lit_tests(c, filecheck_llvm_8_exec, filecheck_tester_exec, True)
+    # run_lit_tests(c, filecheck_llvm_8_exec, filecheck_tester_exec, True)
     run_lit_tests(c, filecheck_llvm_9_exec, filecheck_tester_exec, True)
 
 

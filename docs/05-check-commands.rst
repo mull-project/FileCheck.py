@@ -175,3 +175,13 @@ If the empty line is removed, the test will fail:
     ^
     $ echo $?
     1
+
+Line number expression
+======================
+
+It is often useful to check for a specific line number in your regular
+expression, relative to its location in the file. Hard-coding that number can
+make the test fragile -- rearranging, adding, or deleting lines requires
+changing the expression. To solve this, FileCheck supports a variable for the
+current line number, `[[# @LINE ]]`, as well as simple offsets from this
+variable, e.g. `[[# @LINE + 4 ]]` or `[[# @LINE - 2 ]]`.

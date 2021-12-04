@@ -1,0 +1,1 @@
+CHECK: this line is to be matched with number [[# @LINE + 1 ]]

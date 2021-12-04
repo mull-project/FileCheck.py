@@ -1,0 +1,1 @@
+CHECK: this line is to be matched with two numbers: [[# @LINE + 1 ]] and [[# @LINE + 2 ]]
