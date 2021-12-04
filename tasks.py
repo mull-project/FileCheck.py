@@ -75,6 +75,27 @@ def run_lit_tests(
 
 
 @task
+def lint_black_diff(context):
+    command = one_line_command(
+        """
+        black . --color 2>&1
+        """
+    )
+    result = run_invoke_cmd(context, command)
+
+    # black always exits with 0, so we handle the output.
+    if "reformatted" in result.stdout:
+        print("invoke: black found issues")
+        result.exited = 1
+        raise invoke.exceptions.UnexpectedExit(result)
+
+
+@task(lint_black_diff)
+def lint(_):
+    pass
+
+
+@task
 def test_filecheck_llvm(c, focus=None):
     # filecheck_llvm_8_exec = get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC)
     filecheck_llvm_9_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
@@ -100,7 +121,7 @@ def test_filecheck_py_using_filecheck_py_tester(c, focus=None):
     run_lit_tests(c, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
-@task
+@task(lint)
 def test(c, focus=None):
     test_filecheck_llvm(c, focus)
     test_filecheck_py_using_file_check_llvm_tester(c, focus)
