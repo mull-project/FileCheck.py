@@ -60,7 +60,15 @@ class CheckType(Enum):
 
 Check = namedtuple(
     "Check",
-    "check_type match_type check_keyword expression source_line check_line_idx start_index",
+    (
+        "check_type "
+        "match_type "
+        "check_keyword "
+        "expression "
+        "source_line "
+        "check_line_idx "
+        "start_index"
+    ),
 )
 ImplicitCheck = namedtuple("ImplicitCheck", "original_check check")
 
@@ -86,14 +94,17 @@ def print_help():
     print("General options:")
     print("")
     print(
-        "  --match-full-lines             - Require all positive matches to cover an entire input line."
+        "  --match-full-lines             - Require all positive matches to "
+        "cover an entire input line."
     )
     print(
-        "                                   Allows leading and trailing whitespace if --strict-whitespace"
+        "                                   Allows leading and trailing "
+        "whitespace if --strict-whitespace"
     )
     print("                                   is not also passed.")
     print(
-        "  --strict-whitespace            - Do not treat all horizontal whitespace as equivalent"
+        "  --strict-whitespace            - Do not treat all horizontal "
+        "whitespace as equivalent"
     )
     print("")
 
@@ -104,7 +115,8 @@ def print_help():
 
 def print_version():
     print(
-        "filecheck: Python port of LLVM's FileCheck, flexible pattern matching file verifier"
+        "filecheck: Python port of LLVM's FileCheck, "
+        "flexible pattern matching file verifier"
     )
     print("https://github.com/stanislaw/FileCheck.py")
     print("Version: {}".format(__version__))
@@ -154,8 +166,9 @@ class CheckResult(Enum):
     CHECK_NOT_WITHOUT_MATCH = 5
 
 
-# Allow check prefixes only at the beginnings of lines or after non-word characters.
-before_prefix = "^(.*?[^\w-])?"
+# Allow check prefixes only at the beginnings of lines or
+# after non-word characters.
+before_prefix = "^(.*?[^\\w-])?"
 
 
 def check_line(line, current_check, match_full_lines):
@@ -299,7 +312,11 @@ def main():
 
     if not re.search("^[A-Za-z][A-Za-z0-9-_]+$", check_prefix):
         sys.stdout.flush()
-        error_message = "Supplied check-prefix is invalid! Prefixes must be unique and start with a letter and contain only alphanumeric characters, hyphens and underscores"
+        error_message = (
+            "Supplied check-prefix is invalid! Prefixes must be unique and "
+            "start with a letter and contain only alphanumeric characters, "
+            "hyphens and underscores"
+        )
         print(error_message, file=sys.stderr)
         exit_handler(2)
 
@@ -424,9 +441,8 @@ def main():
 
                 if len(checks) == 0:
                     print(
-                        "{}:{}:{}: error: found 'CHECK-EMPTY' without previous 'CHECK: line".format(
-                            check_file, 1, 3
-                        )
+                        "{}:{}:{}: error: found 'CHECK-EMPTY' without "
+                        "previous 'CHECK: line".format(check_file, 1, 3)
                     )
                     print(line)
                     print("  ^")
@@ -476,7 +492,8 @@ def main():
     # TODO: Maybe there is still a better workaround for this but we see there
     # TODO: is nothing too bad about simply reading the stdin until end.
     # TODO: Performance implications?
-    # "Getting exit code 141 when reading from stdin with a Python script with “set -o pipefail” set"
+    # "Getting exit code 141 when reading from stdin with a Python script
+    # with “set -o pipefail” set"
     # https://stackoverflow.com/questions/59436858/getting-exit-code-141-when-reading-from-stdin-with-a-python-script-with-set-o/59436997?noredirect=1#comment105058533_59436997
     # Also: Forcing the stdin to be UTF-8
     # Python 3: How to specify stdin encoding
@@ -619,7 +636,8 @@ def main():
                     still_actual_check = check
                     break
             else:
-                # No checks which are still actual have been found. Declare success.
+                # No checks which are still actual have been found.
+                # Declare success.
                 exit_handler(0)
 
             current_check = still_actual_check
@@ -663,7 +681,8 @@ def main():
         failed_column_num = failed_column_idx + 1
 
         print(
-            "command line:1:22: error: CHECK-NOT: excluded string found in input"
+            "command line:1:22: error: CHECK-NOT: excluded string found "
+            "in input"
         )
         print("-implicit-check-not='{}'".format(failed_check.original_check))
         print("                     ^")
@@ -702,7 +721,8 @@ def main():
     if current_check.check_type == CheckType.CHECK_EMPTY:
         last_read_line = input_lines[current_scan_base].rstrip()
         print(
-            "{}:{}:{}: error: CHECK-EMPTY: expected string not found in input".format(
+            "{}:{}:{}: error: CHECK-EMPTY: expected string not found "
+            "in input".format(
                 check_file,
                 current_check.check_line_idx + 1,
                 len(current_check.source_line) + 1,
@@ -737,7 +757,8 @@ def main():
             or current_check.match_type == MatchType.REGEX
         ):
             print(
-                "{}:{}:{}: error: {}: expected string not found in input".format(
+                "{}:{}:{}: error: {}: expected string not found "
+                "in input".format(
                     check_file,
                     current_check.check_line_idx + 1,
                     current_check.start_index + 1,
@@ -783,9 +804,8 @@ def main():
                 if candidate_line:
                     caret_pos = len(candidate_line) // 2 + 1
                     print(
-                        "<stdin>:{}:{}: note: possible intended match here".format(
-                            candidate_line_idx + 1, caret_pos
-                        )
+                        "<stdin>:{}:{}: note: possible intended "
+                        "match here".format(candidate_line_idx + 1, caret_pos)
                     )
                     print(candidate_line)
                     print("^".rjust(caret_pos, " "))
@@ -797,14 +817,15 @@ def main():
             current_check.match_type == MatchType.SUBSTRING
             or current_check.match_type == MatchType.REGEX
         ):
-            assert current_check_line_idx != None
+            assert current_check_line_idx is not None
             last_read_line = input_lines[current_check_line_idx].rstrip()
 
             if not args.strict_whitespace:
                 last_read_line = re.sub("\\s+", " ", last_read_line).strip()
 
             print(
-                "{}:{}:{}: error: CHECK-NOT: excluded string found in input".format(
+                "{}:{}:{}: error: CHECK-NOT: excluded string "
+                "found in input".format(
                     check_file,
                     current_check.check_line_idx + 1,
                     current_check.start_index + 1,
@@ -848,7 +869,8 @@ def main():
 
             if matching_line_idx == -1:
                 print(
-                    "{}:{}:{}: error: CHECK-NEXT: expected string not found in input".format(
+                    "{}:{}:{}: error: CHECK-NEXT: expected string not found in "
+                    "input".format(
                         check_file,
                         current_check.check_line_idx + 1,
                         current_check.start_index + 1,
@@ -869,7 +891,8 @@ def main():
             else:
                 if current_scan_base > 0:
                     print(
-                        "{}:{}:{}: error: CHECK-NEXT: is not on the line after the previous match".format(
+                        "{}:{}:{}: error: CHECK-NEXT: is not on the line after "
+                        "the previous match".format(
                             check_file,
                             current_check.check_line_idx + 1,
                             current_check.start_index + 1,
@@ -898,7 +921,8 @@ def main():
                     print(previous_matched_line)
                     print("^".rjust(len(previous_matched_line) + 1))
                     print(
-                        "<stdin>:{}:{}: note: non-matching line after previous match is here".format(
+                        "<stdin>:{}:{}: note: non-matching line after "
+                        "previous match is here".format(
                             current_scan_base + 1, 1
                         )
                     )
@@ -911,7 +935,8 @@ def main():
                         current_check.check_keyword
                     )
                     print(
-                        "{}:{}:{}: error: found 'CHECK-NEXT' without previous 'CHECK: line".format(
+                        "{}:{}:{}: error: found 'CHECK-NEXT' "
+                        "without previous 'CHECK: line".format(
                             check_file,
                             current_check.check_line_idx + 1,
                             check_expression_idx + 1,

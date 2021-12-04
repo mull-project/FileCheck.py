@@ -34,21 +34,23 @@ def get_filecheck_llvm_path(filecheck_exec):
     cwd = os.getcwd()
     os_string = get_os_filename_string()
 
-    template = '\\"{cwd}/tests/integration/tools/FileCheck/{filecheck_exec}-{os_string}\\"'
-    return template.format(
-        cwd=cwd, filecheck_exec=filecheck_exec, os_string=os_string
-    )
+    template = f'\\"{cwd}/tests/integration/tools/FileCheck/{filecheck_exec}-{os_string}\\"'
+    return template
 
 
 def get_filecheck_py_exec():
     cwd = os.getcwd()
-    return 'python \\"{cwd}/filecheck/FileCheck.py\\"'.format(cwd=cwd)
+    return f'python \\"{cwd}/filecheck/FileCheck.py\\"'
 
 
 def run_lit_tests(
-    c, filecheck_exec, filecheck_tester_exec, focus: Optional[str], llvm_only
+    context,
+    filecheck_exec,
+    filecheck_tester_exec,
+    focus: Optional[str],
+    llvm_only,
 ):
-    assert c
+    assert context
     assert filecheck_exec
     assert llvm_only is not None
 
@@ -58,24 +60,18 @@ def run_lit_tests(
     focus_or_none = f"--filter {focus}" if focus else ""
 
     command = one_line_command(
+        f"""
+            lit
+            --param REAL_ONLY={llvm_only_value}
+            --param FILECHECK_EXEC="{filecheck_exec}"
+            --param FILECHECK_TESTER_EXEC="{filecheck_tester_exec}"
+            -v
+            {focus_or_none}
+            {cwd}/tests/integration
         """
-        lit
-        --param REAL_ONLY={llvm_only_value}
-        --param FILECHECK_EXEC="{filecheck_exec}"
-        --param FILECHECK_TESTER_EXEC="{filecheck_tester_exec}"
-        -v
-        {focus_or_none}
-        {cwd}/tests/integration
-    """
-    ).format(
-        cwd=cwd,
-        filecheck_exec=filecheck_exec,
-        filecheck_tester_exec=filecheck_tester_exec,
-        focus_or_none=focus_or_none,
-        llvm_only_value=llvm_only_value,
     )
 
-    run_invoke_cmd(c, command)
+    run_invoke_cmd(context, command)
 
 
 @task
@@ -94,45 +90,83 @@ def lint_black_diff(context):
         raise invoke.exceptions.UnexpectedExit(result)
 
 
-@task(lint_black_diff)
+@task
+def lint_flake8(context):
+    command = one_line_command(
+        """
+        flake8 filecheck/ --statistics --max-line-length 80 --show-source
+        """
+    )
+    run_invoke_cmd(context, command)
+
+
+@task
+def lint_pylint(context):
+    command = one_line_command(
+        """
+        pylint
+          --rcfile=.pylint.ini
+          --disable=all
+          --fail-under=10.0
+          --enable=E1101,R0201,R0902,R0913,R1701,R1705,R1710,R1714,R1719,R1725,C0103,C0209,C0303,C0411,C1801,W0703,W0231,W0235,W0612,W0613,W0640,W0707,W1514
+          filecheck/ tasks.py
+        &&
+        pylint
+          --rcfile=.pylint.ini
+          --disable=c-extension-no-member
+          --exit-zero
+          filecheck/ tasks.py
+        """  # pylint: disable=line-too-long
+    )
+    try:
+        run_invoke_cmd(context, command)
+    except invoke.exceptions.UnexpectedExit as exc:
+        # pylink doesn't show an error message when exit code != 0, so we do.
+        print(f"invoke: pylint exited with error code {exc.result.exited}")
+        raise exc
+
+
+@task(lint_black_diff, lint_flake8)
 def lint(_):
     pass
 
 
 @task
-def test_filecheck_llvm(c, focus=None):
+def test_filecheck_llvm(context, focus=None):
     # filecheck_llvm_8_exec = get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC)
     filecheck_llvm_9_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
     filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
     # run_lit_tests(c, filecheck_llvm_8_exec, filecheck_tester_exec, True)
-    run_lit_tests(c, filecheck_llvm_9_exec, filecheck_tester_exec, focus, True)
+    run_lit_tests(
+        context, filecheck_llvm_9_exec, filecheck_tester_exec, focus, True
+    )
 
 
 @task
-def test_filecheck_py_using_file_check_llvm_tester(c, focus=None):
+def test_filecheck_py_using_file_check_llvm_tester(context, focus=None):
     filecheck_exec = get_filecheck_py_exec()
     filecheck_tester_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
 
-    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, focus, False)
+    run_lit_tests(context, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
 @task
-def test_filecheck_py_using_filecheck_py_tester(c, focus=None):
+def test_filecheck_py_using_filecheck_py_tester(context, focus=None):
     filecheck_exec = get_filecheck_py_exec()
     filecheck_tester_exec = filecheck_exec
 
-    run_lit_tests(c, filecheck_exec, filecheck_tester_exec, focus, False)
+    run_lit_tests(context, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
 @task(lint)
-def test(c, focus=None):
-    test_filecheck_llvm(c, focus)
-    test_filecheck_py_using_file_check_llvm_tester(c, focus)
+def test(context, focus=None):
+    test_filecheck_llvm(context, focus)
+    test_filecheck_py_using_file_check_llvm_tester(context, focus)
 
 
 @task
-def clean(c):
+def clean(context):
     find_command = one_line_command(
         """
         find
@@ -151,30 +185,28 @@ def clean(c):
     """
     )
 
-    find_result = run_invoke_cmd(c, find_command)
+    find_result = run_invoke_cmd(context, find_command)
     find_result_stdout = find_result.stdout.strip()
 
     echo_command = one_line_command(
-        """echo {find_result} | xargs rm -rfv""".format(
-            find_result=find_result_stdout
-        )
+        f"""echo {find_result_stdout} | xargs rm -rfv"""
     )
-    run_invoke_cmd(c, echo_command)
+    run_invoke_cmd(context, echo_command)
 
 
 @task
-def docs_sphinx(c, open=False):
+def docs_sphinx(context, open_doc=False):
     run_invoke_cmd(
-        c,
+        context,
         one_line_command(
             """
         cd docs && make html SPHINXOPTS="-W --keep-going -n"
     """
         ),
     )
-    if open:
+    if open_doc:
         run_invoke_cmd(
-            c,
+            context,
             one_line_command(
                 """
                 open docs/_build/html/index.html
@@ -186,13 +218,13 @@ def docs_sphinx(c, open=False):
 # https://github.com/github-changelog-generator/github-changelog-generator
 # gem install github_changelog_generator
 @task
-def changelog(c, github_token):
+def changelog(context, github_token):
     command = one_line_command(
+        f"""
+            CHANGELOG_GITHUB_TOKEN={github_token}
+            github_changelog_generator
+            --user mull-project
+            --project FileCheck.py
         """
-        CHANGELOG_GITHUB_TOKEN={github_token}
-        github_changelog_generator
-        --user mull-project
-        --project FileCheck.py
-    """
-    ).format(github_token=github_token)
-    run_invoke_cmd(c, command)
+    )
+    run_invoke_cmd(context, command)
