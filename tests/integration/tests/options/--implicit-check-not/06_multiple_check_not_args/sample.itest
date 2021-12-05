@@ -1,26 +1,26 @@
-; RUN: %printf "foo1\nfoo\nfoo\nHello" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "foo1" --implicit-check-not "foo2" --implicit-check-not "foo3" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix FOO1
+RUN: %printf "foo1\nfoo\nfoo\nHello" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "foo1" --implicit-check-not "foo2" --implicit-check-not "foo3" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix FOO1
 
-; FOO1:command line:1:22: error: CHECK-NOT: excluded string found in input
-; FOO1:-implicit-check-not='foo1'
-; FOO1:                     ^
-; FOO1:<stdin>:1:1: note: found here
-; FOO1:foo1
-; FOO1:^~~~
+FOO1:command line:1:22: error: CHECK-NOT: excluded string found in input
+FOO1:-implicit-check-not='foo1'
+FOO1:                     ^
+FOO1:<stdin>:1:1: note: found here
+FOO1:foo1
+FOO1:^~~~
 
-; RUN: %printf "foo\nfoo2\nfoo\nHello" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "foo1" --implicit-check-not "foo2" --implicit-check-not "foo3" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix FOO2
+RUN: %printf "foo\nfoo2\nfoo\nHello" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "foo1" --implicit-check-not "foo2" --implicit-check-not "foo3" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix FOO2
 
-; FOO2:command line:1:22: error: CHECK-NOT: excluded string found in input
-; FOO2:-implicit-check-not='foo2'
-; FOO2:                     ^
-; FOO2:<stdin>:2:1: note: found here
-; FOO2:foo2
-; FOO2:^~~~
+FOO2:command line:1:22: error: CHECK-NOT: excluded string found in input
+FOO2:-implicit-check-not='foo2'
+FOO2:                     ^
+FOO2:<stdin>:2:1: note: found here
+FOO2:foo2
+FOO2:^~~~
 
-; RUN: %printf "foo\nfoo\nfoo3\nHello" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "foo1" --implicit-check-not "foo2" --implicit-check-not "foo3" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix FOO3
+RUN: %printf "foo\nfoo\nfoo3\nHello" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not "foo1" --implicit-check-not "foo2" --implicit-check-not "foo3" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines --check-prefix FOO3
 
-; FOO3:command line:1:22: error: CHECK-NOT: excluded string found in input
-; FOO3:-implicit-check-not='foo3'
-; FOO3:                     ^
-; FOO3:<stdin>:3:1: note: found here
-; FOO3:foo3
-; FOO3:^~~~
+FOO3:command line:1:22: error: CHECK-NOT: excluded string found in input
+FOO3:-implicit-check-not='foo3'
+FOO3:                     ^
+FOO3:<stdin>:3:1: note: found here
+FOO3:foo3
+FOO3:^~~~
