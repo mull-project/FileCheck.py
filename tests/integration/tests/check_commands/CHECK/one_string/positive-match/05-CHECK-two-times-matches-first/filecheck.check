@@ -1,1 +1,1 @@
-; CHECK:{{^.*filecheck.check:1:(9|10): error: CHECK: expected string not found in input$}}
+CHECK:{{^.*filecheck.check:1:(9|10): error: CHECK: expected string not found in input$}}
