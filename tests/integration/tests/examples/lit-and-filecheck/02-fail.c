@@ -1,6 +1,6 @@
 /**
-; RUN: gcc "%s" -o %S/hello-world-2 && %S/hello-world-2 | %FILECHECK_EXEC %s; test $? = 1
-; CHECK: Wrong line
+RUN: gcc "%s" -o %S/hello-world-2 && %S/hello-world-2 | %FILECHECK_EXEC %s; test $? = 1
+CHECK: Wrong line
  */
 
 #include <stdio.h>
