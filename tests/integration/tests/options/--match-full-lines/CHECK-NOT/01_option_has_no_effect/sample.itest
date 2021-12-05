@@ -1,10 +1,10 @@
-; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
-; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
+RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
+RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --match-full-lines | %FILECHECK_TESTER_EXEC %s --match-full-lines --strict-whitespace
 
-; CHECK:{{^.*}}filecheck.check:1:14: error: CHECK-NOT: excluded string found in input{{$}}
-; CHECK:; CHECK-NOT: hello world
-; CHECK:             ^
-; CHECK:{{^<stdin>:.:.: note: found here$}}
-; CHECK:hello world hello world
-; CHECK:^~~~~~~~~~~
-; CHECK-EMPTY:
+CHECK:{{^.*}}filecheck.check:1:12: error: CHECK-NOT: excluded string found in input{{$}}
+CHECK:CHECK-NOT: hello world
+CHECK:           ^
+CHECK:{{^<stdin>:.:.: note: found here$}}
+CHECK:hello world hello world
+CHECK:^~~~~~~~~~~
+CHECK-EMPTY:

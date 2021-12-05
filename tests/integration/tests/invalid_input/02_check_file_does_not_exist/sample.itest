@@ -1,4 +1,4 @@
-; RUN: %expect_exit 2 %FILECHECK_EXEC "file/does/not/exist" | %FILECHECK_TESTER_EXEC "%s" --match-full-lines
+RUN: %expect_exit 2 %FILECHECK_EXEC "file/does/not/exist" | %FILECHECK_TESTER_EXEC "%s" --match-full-lines
 
-; CHECK: Could not open check file 'file/does/not/exist': No such file or directory
-; CHECK-EMPTY:
+CHECK: Could not open check file 'file/does/not/exist': No such file or directory
+CHECK-EMPTY:

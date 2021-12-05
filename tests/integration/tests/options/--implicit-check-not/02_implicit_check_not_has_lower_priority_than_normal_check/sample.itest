@@ -1,8 +1,8 @@
-; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not error | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --implicit-check-not error | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
 
-; CHECK:{{^.*}}filecheck.check:1:10: error: CHECK: expected string not found in input
-; CHECK:; CHECK: string 1
-; CHECK:         ^
-; CHECK:<stdin>:1:1: note: scanning from here
-; CHECK:error
-; CHECK:^
+CHECK:{{^.*}}filecheck.check:1:8: error: CHECK: expected string not found in input
+CHECK:CHECK: string 1
+CHECK:       ^
+CHECK:<stdin>:1:1: note: scanning from here
+CHECK:error
+CHECK:^

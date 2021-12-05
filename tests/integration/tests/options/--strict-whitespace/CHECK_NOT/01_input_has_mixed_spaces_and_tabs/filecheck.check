@@ -1,1 +1,1 @@
-; CHECK-NOT: hello world hello world
+CHECK-NOT: hello world hello world
