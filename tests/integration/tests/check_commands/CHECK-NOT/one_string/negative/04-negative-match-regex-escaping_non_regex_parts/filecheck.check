@@ -1,1 +1,1 @@
-; CHECK-NOT: {{^}}The following braces must be escaped by FileCheck: ( inside braces ): 0/1{{$}}
+CHECK-NOT: {{^}}The following braces must be escaped by FileCheck: ( inside braces ): 0/1{{$}}

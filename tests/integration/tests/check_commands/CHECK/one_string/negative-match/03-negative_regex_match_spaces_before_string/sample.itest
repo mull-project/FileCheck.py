@@ -1,12 +1,13 @@
-; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
 
-; CHECK:{{.*}}filecheck.check:1:10: error: CHECK: expected string not found in input{{$}}
-; CHECK-NEXT:{{^; CHECK: .....hello.....$}}
-; CHECK-NEXT:{{^         \^$}}
-; TODO: It is weird that FileCheck C++ eats whitespaces and therefore does not
-; TODO: show original line which was not possible to match.
-; TODO: We prefer to print original lines, so regex below accommodates this.
-; CHECK-NEXT:{{^<stdin>:1:(1|2): note: scanning from here$}}
-; CHECK-NEXT:{{^ (  )?h e llo$}}
-; CHECK-NEXT:{{^ ?\^$}}
-; CHECK-EMPTY:
+CHECK:{{.*}}filecheck.check:1:8: error: CHECK: expected string not found in input{{$}}
+CHECK-NEXT:{{^CHECK: .....hello.....$}}
+CHECK-NEXT:{{^       \^$}}
+
+TODO: It is weird that FileCheck C++ eats whitespaces and therefore does not
+TODO: show original line which was not possible to match.
+TODO: We prefer to print original lines, so regex below accommodates this.
+CHECK-NEXT:{{^<stdin>:1:(1|2): note: scanning from here$}}
+CHECK-NEXT:{{^ (  )?h e llo$}}
+CHECK-NEXT:{{^ ?\^$}}
+CHECK-EMPTY:
