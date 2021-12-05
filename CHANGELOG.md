@@ -2,11 +2,19 @@
 
 ## [Unreleased](https://github.com/mull-project/FileCheck.py/tree/HEAD)
 
-[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/v0.0.20...HEAD)
+[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/v0.0.21...HEAD)
 
 **Merged pull requests:**
 
+- Regenerate CHANGELOG [\#185](https://github.com/mull-project/FileCheck.py/pull/185) ([stanislaw](https://github.com/stanislaw))
 -  Bump version: 0.0.20 → 0.0.21  [\#184](https://github.com/mull-project/FileCheck.py/pull/184) ([stanislaw](https://github.com/stanislaw))
+
+## [v0.0.21](https://github.com/mull-project/FileCheck.py/tree/v0.0.21) (2021-12-05)
+
+[Full Changelog](https://github.com/mull-project/FileCheck.py/compare/v0.0.20...v0.0.21)
+
+**Merged pull requests:**
+
 - CHECK regex match: fix case when there are two+ "CHECK:" in a check line [\#183](https://github.com/mull-project/FileCheck.py/pull/183) ([stanislaw](https://github.com/stanislaw))
 -  Config: dedicate class to store configuration  [\#182](https://github.com/mull-project/FileCheck.py/pull/182) ([stanislaw](https://github.com/stanislaw))
 - CheckParser: dedicated class that parses CHECKs [\#181](https://github.com/mull-project/FileCheck.py/pull/181) ([stanislaw](https://github.com/stanislaw))
@@ -139,6 +147,7 @@
 - Switch from Makefile to Invoke \(closes \#102\) [\#107](https://github.com/mull-project/FileCheck.py/pull/107) ([stanislaw](https://github.com/stanislaw))
 - Update CHANGELOG [\#106](https://github.com/mull-project/FileCheck.py/pull/106) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.12 → 0.0.13 [\#105](https://github.com/mull-project/FileCheck.py/pull/105) ([stanislaw](https://github.com/stanislaw))
+-  Bump version: 0.0.11 → 0.0.12  [\#98](https://github.com/mull-project/FileCheck.py/pull/98) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.13](https://github.com/mull-project/FileCheck.py/tree/v0.0.13) (2020-03-25)
 
@@ -157,7 +166,6 @@
 -  CHECK-NOT: Fix edge case when CHECK\_NOT strings get shadowed by each  [\#104](https://github.com/mull-project/FileCheck.py/pull/104) ([stanislaw](https://github.com/stanislaw))
 - tests/integration: add FileCheck 9.0.1 Linux and macOS [\#101](https://github.com/mull-project/FileCheck.py/pull/101) ([stanislaw](https://github.com/stanislaw))
 - Update CHANGELOG [\#99](https://github.com/mull-project/FileCheck.py/pull/99) ([stanislaw](https://github.com/stanislaw))
--  Bump version: 0.0.11 → 0.0.12  [\#98](https://github.com/mull-project/FileCheck.py/pull/98) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.12](https://github.com/mull-project/FileCheck.py/tree/v0.0.12) (2020-02-16)
 
