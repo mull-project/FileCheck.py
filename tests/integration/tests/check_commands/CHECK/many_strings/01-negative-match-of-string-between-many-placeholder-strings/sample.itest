@@ -1,15 +1,16 @@
-; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --strict-whitespace --match-full-lines | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" --strict-whitespace --match-full-lines | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
 
-; CHECK:{{^.*}}filecheck.check:1:9: error: CHECK: expected string not found in input
-; CHECK-NEXT:{{^; CHECK:..STRINGGG..$}}
-; CHECK-NEXT:{{^        \^$}}
-; CHECK-NEXT:<stdin>:1:1: note: scanning from here
-; CHECK-NEXT:PLACEHOLDER BEFORE 1
-; CHECK-NEXT:^
-; TODO: Again, the "note: possible intended match here" feature needs revision, #38
-; TODO: https://github.com/stanislaw/FileCheck.py/issues/38.
-; TODO: Doing (1|17) and ".*\^" for now.
-; CHECK-NEXT:<stdin>:5:{{(1|4)}}: note: possible intended match here
-; CHECK-NEXT:STRING
-; CHECK-NEXT:{{^.*\^$}}
-; CHECK-EMPTY:
+CHECK:{{^.*}}filecheck.check:1:7: error: CHECK: expected string not found in input
+CHECK-NEXT:{{^CHECK:..STRINGGG..$}}
+CHECK-NEXT:{{^      \^$}}
+CHECK-NEXT:<stdin>:1:1: note: scanning from here
+CHECK-NEXT:PLACEHOLDER BEFORE 1
+CHECK-NEXT:^
+
+TODO: Again, the "note: possible intended match here" feature needs revision, #38
+TODO: https://github.com/stanislaw/FileCheck.py/issues/38.
+TODO: Doing (1|17) and ".*\^" for now.
+CHECK-NEXT:<stdin>:5:{{(1|4)}}: note: possible intended match here
+CHECK-NEXT:STRING
+CHECK-NEXT:{{^.*\^$}}
+CHECK-EMPTY:

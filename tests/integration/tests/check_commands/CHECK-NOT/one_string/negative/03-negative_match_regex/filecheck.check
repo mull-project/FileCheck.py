@@ -1,1 +1,1 @@
-; CHECK-NOT: {{^h.l.o$}}
+CHECK-NOT: {{^h.l.o$}}
