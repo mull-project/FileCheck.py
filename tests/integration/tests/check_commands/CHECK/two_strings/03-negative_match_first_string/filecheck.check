@@ -1,2 +1,2 @@
-; CHECK: foo
-; CHECK: hello2
+CHECK: foo
+CHECK: hello2
