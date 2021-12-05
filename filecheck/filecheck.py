@@ -452,17 +452,19 @@ def main():
                     expression=None,
                     source_line=line,
                     check_line_idx=line_idx,
-                    start_index=-1,
+                    start_index=check_match.start(2),
                 )
 
                 if len(checks) == 0:
-                    # TODO: 1 and 3?
                     print(
-                        f"{check_file_path}:{1}:{3}: error: "
+                        f"{check_file_path}:"
+                        f"{line_idx + 1}:"
+                        f"{check.start_index + 1}: "
+                        f"error: "
                         f"found 'CHECK-EMPTY' without previous 'CHECK: line"
                     )
                     print(line)
-                    print("  ^")
+                    print("^".rjust(check.start_index + 1, " "))
                     exit_handler(2)
 
                 checks.append(check)
