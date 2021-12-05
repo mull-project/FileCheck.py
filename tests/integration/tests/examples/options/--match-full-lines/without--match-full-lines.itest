@@ -1,1 +1,1 @@
-; RUN: printf "String1\nString2\nString3" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/without--match-full-lines.check"
+RUN: printf "String1\nString2\nString3" | %expect_exit 0 --expect-no-content %FILECHECK_EXEC "%S/without--match-full-lines.check"
