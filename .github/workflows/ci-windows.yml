@@ -50,5 +50,5 @@ jobs:
 
     - name: Run tests
       run: |
-        poetry run invoke test
+        poetry run invoke check
       shell: bash

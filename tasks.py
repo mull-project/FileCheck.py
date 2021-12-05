@@ -187,10 +187,20 @@ def test_filecheck_py_using_filecheck_py_tester(context, focus=None):
     run_lit_tests(context, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
-@task(lint, test_unit)
-def test(context, focus=None):
+@task
+def test_integration(context, focus=None):
     test_filecheck_llvm(context, focus)
     test_filecheck_py_using_file_check_llvm_tester(context, focus)
+
+
+@task(test_unit, test_integration)
+def test(_):
+    pass
+
+
+@task(lint, test)
+def check(_):
+    pass
 
 
 @task
