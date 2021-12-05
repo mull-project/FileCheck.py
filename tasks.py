@@ -107,7 +107,6 @@ def lint_pylint(context):
         pylint
           --rcfile=.pylint.ini
           --disable=c-extension-no-member
-          --exit-zero
           filecheck/ tasks.py
         """  # pylint: disable=line-too-long
     )
@@ -188,7 +187,7 @@ def test_filecheck_py_using_filecheck_py_tester(context, focus=None):
     run_lit_tests(context, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
-@task(lint)
+@task(lint, test_unit)
 def test(context, focus=None):
     test_filecheck_llvm(context, focus)
     test_filecheck_py_using_file_check_llvm_tester(context, focus)
