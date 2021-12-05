@@ -2,9 +2,9 @@
 
 Attempt to reimplement LLVM's FileCheck using Python.
 
-![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20macOS/badge.svg)
-![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20Linux/badge.svg)
-![](https://github.com/stanislaw/FileCheck.py/workflows/FileCheck.py%20on%20Windows/badge.svg)
+![](https://github.com/mull-project/FileCheck.py/workflows/FileCheck.py%20on%20macOS/badge.svg)
+![](https://github.com/mull-project/FileCheck.py/workflows/FileCheck.py%20on%20Linux/badge.svg)
+![](https://github.com/mull-project/FileCheck.py/workflows/FileCheck.py%20on%20Windows/badge.svg)
 
 ## Background
 
@@ -21,10 +21,10 @@ keep third-party binary artifacts in source code.
 
 Documentation is hosted on Read the Docs:
 
-[FileCheck.py documentation](https://filecheck.readthedocs.io/en/latest/index.html).
+[FileCheck.py documentation](https://filecheck.readthedocs.io/en/stable/index.html)
 
 ## Copyright
 
-Copyright (c) 2020 Stanislav Pankevich s.pankevich@gmail.com. See LICENSE for
+Copyright (c) 2021 Stanislav Pankevich s.pankevich@gmail.com. See LICENSE for
 details.
 
