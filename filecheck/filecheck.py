@@ -180,11 +180,6 @@ class CheckResult(Enum):
     CHECK_NOT_WITHOUT_MATCH = 5
 
 
-# Allow check prefixes only at the beginnings of lines or
-# after non-word characters.
-BEFORE_PREFIX = "^(.*?[^\\w-])?"
-
-
 def check_line(
     line, current_check, match_full_lines
 ):  # pylint: disable=too-many-return-statements
@@ -323,6 +318,11 @@ class CheckParser:
 
     @staticmethod
     def parse_check(line: str, line_idx, config: Config) -> Optional[Check]:
+        # Allow check prefixes only at the beginnings of lines or
+        # after non-word characters.
+        # /^((?!PART).)*$/ is a negative match.
+        # https://stackoverflow.com/a/6259570/598057
+        before_prefix = f"^(((?!{config.check_prefix}).)*?[^-\\w])?"
         line = line.rstrip()
 
         if not config.strict_whitespace:
@@ -332,23 +332,22 @@ class CheckParser:
         strict_whitespace_match = "" if config.strict_mode else " *"
 
         check_regex = (
-            f"{BEFORE_PREFIX}({config.check_prefix}):"
+            f"{before_prefix}({config.check_prefix}):"
             f"{strict_whitespace_match}(.*)"
         )
-
         check_match = re.search(check_regex, line)
         check_type = CheckType.CHECK
         if not check_match:
             check_regex = (
-                f"{BEFORE_PREFIX}({config.check_prefix}-NEXT):"
+                f"{before_prefix}({config.check_prefix}-NEXT):"
                 f"{strict_whitespace_match}(.*)"
             )
             check_match = re.search(check_regex, line)
             check_type = CheckType.CHECK_NEXT
 
         if check_match:
-            check_keyword = check_match.group(2)
-            check_expression = check_match.group(3)
+            check_keyword = check_match.group(3)
+            check_expression = check_match.group(4)
             if not config.strict_mode:
                 check_expression = check_expression.strip(" ")
 
@@ -386,20 +385,20 @@ class CheckParser:
                 expression=check_expression,
                 source_line=line,
                 check_line_idx=line_idx,
-                start_index=check_match.start(3),
+                start_index=check_match.start(4),
             )
             return check
 
         check_not_regex = (
-            f"{BEFORE_PREFIX}({config.check_prefix}-NOT):"
+            f"{before_prefix}({config.check_prefix}-NOT):"
             f"{strict_whitespace_match}(.*)"
         )
         check_match = re.search(check_not_regex, line)
         if check_match:
             match_type = MatchType.SUBSTRING
 
-            check_keyword = check_match.group(2)
-            check_expression = check_match.group(3)
+            check_keyword = check_match.group(3)
+            check_expression = check_match.group(4)
             if not config.strict_mode:
                 check_expression = check_expression.strip(" ")
 
@@ -416,14 +415,14 @@ class CheckParser:
                 expression=check_expression,
                 source_line=line,
                 check_line_idx=line_idx,
-                start_index=check_match.start(3),
+                start_index=check_match.start(4),
             )
             return check
 
-        check_empty_regex = f"{BEFORE_PREFIX}({config.check_prefix}-EMPTY):"
+        check_empty_regex = f"{before_prefix}({config.check_prefix}-EMPTY):"
         check_match = re.search(check_empty_regex, line)
         if check_match:
-            check_keyword = check_match.group(2)
+            check_keyword = check_match.group(3)
 
             check = Check(
                 check_type=CheckType.CHECK_EMPTY,
@@ -432,7 +431,7 @@ class CheckParser:
                 expression=None,
                 source_line=line,
                 check_line_idx=line_idx,
-                start_index=check_match.start(2),
+                start_index=check_match.start(3),
             )
             return check
 
