@@ -1,2 +1,2 @@
-; CHECK: string 1
-; CHECK-NEXT: foo
+CHECK: string 1
+CHECK-NEXT: foo
