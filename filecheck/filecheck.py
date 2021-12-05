@@ -11,7 +11,7 @@ from enum import Enum
 
 __version__ = "0.0.20"
 
-from typing import Optional
+from typing import Optional, List, Iterable
 
 
 class FailedCheck:
@@ -241,6 +241,157 @@ def implicit_check_line(check_not_check, strict_mode, line):
     return False
 
 
+class CheckParserEmptyCheckException(BaseException):
+    def __init__(self, check: Check):
+        super().__init__()
+        self.check = check
+
+
+class CheckParser:
+    @staticmethod
+    def parse_checks_from_file(
+        check_file_path: str, args, strict_mode: bool, check_prefix: str
+    ) -> List[Check]:
+        with open(check_file_path, encoding="utf-8") as check_file:
+            return CheckParser.parse_checks_from_strings(
+                check_file, args, strict_mode, check_prefix
+            )
+
+    @staticmethod
+    def parse_checks_from_strings(
+        input_strings: Iterable[str], args, strict_mode: bool, check_prefix: str
+    ) -> List[Check]:
+        checks = []
+        for line_idx, line in enumerate(input_strings):
+            check = CheckParser.parse_check(
+                line, line_idx, args, strict_mode, check_prefix
+            )
+            if check is None:
+                continue
+            if check.check_type == CheckType.CHECK_EMPTY and len(checks) == 0:
+                raise CheckParserEmptyCheckException(check)
+            checks.append(check)
+        return checks
+
+    @staticmethod
+    def parse_check(
+        line: str, line_idx, args, strict_mode: bool, check_prefix: str
+    ) -> Optional[Check]:
+        line = line.rstrip()
+
+        if not args.strict_whitespace:
+            line = canonicalize_whitespace(line)
+
+        # CHECK and CHECK-NEXT
+        strict_whitespace_match = "" if strict_mode else " *"
+
+        check_regex = (
+            f"{BEFORE_PREFIX}({check_prefix}):{strict_whitespace_match}(.*)"
+        )
+
+        check_match = re.search(check_regex, line)
+        check_type = CheckType.CHECK
+        if not check_match:
+            check_regex = (
+                f"{BEFORE_PREFIX}({check_prefix}-NEXT):"
+                f"{strict_whitespace_match}(.*)"
+            )
+            check_match = re.search(check_regex, line)
+            check_type = CheckType.CHECK_NEXT
+
+        if check_match:
+            check_keyword = check_match.group(2)
+            check_expression = check_match.group(3)
+            if not strict_mode:
+                check_expression = check_expression.strip(" ")
+
+            match_type = MatchType.SUBSTRING
+
+            if re.search(r"\{\{.*\}\}", check_expression):
+                regex_line = escape_non_regex_parts(check_expression)
+                regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", regex_line)
+                match_type = MatchType.REGEX
+                check_expression = regex_line
+                if strict_mode:
+                    if check_expression[0] != "^":
+                        check_expression = "^" + check_expression
+                    if check_expression[-1] != "$":
+                        check_expression = check_expression + "$"
+
+            # Replace line number expressions, e.g. `[[# @LINE + 3 ]]`
+            line_var_match = re.search(LINE_NUMBER_REGEX, check_expression)
+            while line_var_match is not None:
+                offset = int(line_var_match.group(2) or 0)
+                if line_var_match.group(1) == "-":
+                    offset = -offset
+                check_expression = re.sub(
+                    LINE_NUMBER_REGEX,
+                    str(line_idx + offset + 1),
+                    check_expression,
+                    1,
+                )
+                line_var_match = re.search(LINE_NUMBER_REGEX, check_expression)
+
+            check = Check(
+                check_type=check_type,
+                match_type=match_type,
+                check_keyword=check_keyword,
+                expression=check_expression,
+                source_line=line,
+                check_line_idx=line_idx,
+                start_index=check_match.start(3),
+            )
+            return check
+
+        check_not_regex = (
+            f"{BEFORE_PREFIX}({check_prefix}-NOT):"
+            f"{strict_whitespace_match}(.*)"
+        )
+        check_match = re.search(check_not_regex, line)
+        if check_match:
+            match_type = MatchType.SUBSTRING
+
+            check_keyword = check_match.group(2)
+            check_expression = check_match.group(3)
+            if not strict_mode:
+                check_expression = check_expression.strip(" ")
+
+            if re.search(r"\{\{.*\}\}", check_expression):
+                regex_line = escape_non_regex_parts(check_expression)
+                regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", regex_line)
+                match_type = MatchType.REGEX
+                check_expression = regex_line
+
+            check = Check(
+                check_type=CheckType.CHECK_NOT,
+                match_type=match_type,
+                check_keyword=check_keyword,
+                expression=check_expression,
+                source_line=line,
+                check_line_idx=line_idx,
+                start_index=check_match.start(3),
+            )
+            return check
+
+        check_empty_regex = f"{BEFORE_PREFIX}({check_prefix}-EMPTY):"
+        check_match = re.search(check_empty_regex, line)
+        if check_match:
+            check_keyword = check_match.group(2)
+
+            check = Check(
+                check_type=CheckType.CHECK_EMPTY,
+                match_type=MatchType.SUBSTRING,
+                check_keyword=check_keyword,
+                expression=None,
+                source_line=line,
+                check_line_idx=line_idx,
+                start_index=check_match.start(2),
+            )
+            return check
+
+        return None
+
+
 def main():
     # Force UTF-8 to be sent to stdout.
     # https://stackoverflow.com/a/3597849/598057
@@ -335,140 +486,21 @@ def main():
         print(error_message, file=sys.stderr)
         exit_handler(2)
 
-    checks = []
-    with open(check_file_path, encoding="utf-8") as check_file:
-        for line_idx, line in enumerate(check_file):
-            line = line.rstrip()
-
-            if not args.strict_whitespace:
-                line = canonicalize_whitespace(line)
-
-            # CHECK and CHECK-NEXT
-            strict_whitespace_match = "" if strict_mode else " *"
-
-            check_regex = (
-                f"{BEFORE_PREFIX}({check_prefix}):{strict_whitespace_match}(.*)"
-            )
-
-            check_match = re.search(check_regex, line)
-            check_type = CheckType.CHECK
-            if not check_match:
-                check_regex = (
-                    f"{BEFORE_PREFIX}({check_prefix}-NEXT):"
-                    f"{strict_whitespace_match}(.*)"
-                )
-                check_match = re.search(check_regex, line)
-                check_type = CheckType.CHECK_NEXT
-
-            if check_match:
-                check_keyword = check_match.group(2)
-                check_expression = check_match.group(3)
-                if not strict_mode:
-                    check_expression = check_expression.strip(" ")
-
-                match_type = MatchType.SUBSTRING
-
-                if re.search(r"\{\{.*\}\}", check_expression):
-                    regex_line = escape_non_regex_parts(check_expression)
-                    regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", regex_line)
-                    match_type = MatchType.REGEX
-                    check_expression = regex_line
-                    if strict_mode:
-                        if check_expression[0] != "^":
-                            check_expression = "^" + check_expression
-                        if check_expression[-1] != "$":
-                            check_expression = check_expression + "$"
-
-                # Replace line number expressions, e.g. `[[# @LINE + 3 ]]`
-                line_var_match = re.search(LINE_NUMBER_REGEX, check_expression)
-                while line_var_match is not None:
-                    offset = int(line_var_match.group(2) or 0)
-                    if line_var_match.group(1) == "-":
-                        offset = -offset
-                    check_expression = re.sub(
-                        LINE_NUMBER_REGEX,
-                        str(line_idx + offset + 1),
-                        check_expression,
-                        1,
-                    )
-                    line_var_match = re.search(
-                        LINE_NUMBER_REGEX, check_expression
-                    )
-
-                check = Check(
-                    check_type=check_type,
-                    match_type=match_type,
-                    check_keyword=check_keyword,
-                    expression=check_expression,
-                    source_line=line,
-                    check_line_idx=line_idx,
-                    start_index=check_match.start(3),
-                )
-
-                checks.append(check)
-                continue
-
-            check_not_regex = (
-                f"{BEFORE_PREFIX}({check_prefix}-NOT):"
-                f"{strict_whitespace_match}(.*)"
-            )
-            check_match = re.search(check_not_regex, line)
-            if check_match:
-                match_type = MatchType.SUBSTRING
-
-                check_keyword = check_match.group(2)
-                check_expression = check_match.group(3)
-                if not strict_mode:
-                    check_expression = check_expression.strip(" ")
-
-                if re.search(r"\{\{.*\}\}", check_expression):
-                    regex_line = escape_non_regex_parts(check_expression)
-                    regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", regex_line)
-                    match_type = MatchType.REGEX
-                    check_expression = regex_line
-
-                check = Check(
-                    check_type=CheckType.CHECK_NOT,
-                    match_type=match_type,
-                    check_keyword=check_keyword,
-                    expression=check_expression,
-                    source_line=line,
-                    check_line_idx=line_idx,
-                    start_index=check_match.start(3),
-                )
-
-                checks.append(check)
-                continue
-
-            check_empty_regex = f"{BEFORE_PREFIX}({check_prefix}-EMPTY):"
-            check_match = re.search(check_empty_regex, line)
-            if check_match:
-                check_keyword = check_match.group(2)
-
-                check = Check(
-                    check_type=CheckType.CHECK_EMPTY,
-                    match_type=MatchType.SUBSTRING,
-                    check_keyword=check_keyword,
-                    expression=None,
-                    source_line=line,
-                    check_line_idx=line_idx,
-                    start_index=check_match.start(2),
-                )
-
-                if len(checks) == 0:
-                    print(
-                        f"{check_file_path}:"
-                        f"{line_idx + 1}:"
-                        f"{check.start_index + 1}: "
-                        f"error: "
-                        f"found 'CHECK-EMPTY' without previous 'CHECK: line"
-                    )
-                    print(line)
-                    print("^".rjust(check.start_index + 1, " "))
-                    exit_handler(2)
-
-                checks.append(check)
-                continue
+    try:
+        checks = CheckParser.parse_checks_from_file(
+            check_file_path, args, strict_mode, check_prefix
+        )
+    except CheckParserEmptyCheckException as exception:
+        print(
+            f"{check_file_path}:"
+            f"{exception.check.check_line_idx + 1}:"
+            f"{exception.check.start_index + 1}: "
+            f"error: "
+            f"found 'CHECK-EMPTY' without previous 'CHECK: line"
+        )
+        print(exception.check.source_line)
+        print("^".rjust(exception.check.start_index + 1, " "))
+        exit_handler(2)
 
     check_iterator = iter(checks)
 
