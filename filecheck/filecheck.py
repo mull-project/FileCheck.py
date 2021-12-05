@@ -247,25 +247,73 @@ class CheckParserEmptyCheckException(BaseException):
         self.check = check
 
 
+class Config:
+    def __init__(  # pylint: disable = too-many-arguments
+        self,
+        check_file: str,
+        match_full_lines: bool,
+        strict_whitespace: bool,
+        check_prefix: Optional[str],
+        implicit_check_not: Optional[str],
+        dump_input: Optional[str],
+    ):
+        self.check_file: str = check_file
+        self.match_full_lines: bool = match_full_lines
+        self.strict_whitespace: bool = strict_whitespace
+        self.check_prefix: Optional[str] = (
+            check_prefix if check_prefix else "CHECK"
+        )
+        self.implicit_check_not: Optional[str] = implicit_check_not
+        self.dump_input: Optional[str] = dump_input
+        self.strict_mode = match_full_lines and strict_whitespace
+
+    @staticmethod
+    def create_parser():
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument("check_file_arg", type=str, help="TODO")
+        parser.add_argument(
+            "--strict-whitespace", action="store_true", help="TODO"
+        )
+        parser.add_argument(
+            "--match-full-lines", action="store_true", help="TODO"
+        )
+        parser.add_argument("--check-prefix", action="store", help="TODO")
+        parser.add_argument(
+            "--implicit-check-not", action="append", help="TODO"
+        )
+        parser.add_argument(
+            "--dump-input", action="store", choices=["fail"], help="TODO"
+        )
+        return parser
+
+    @staticmethod
+    def create(args):
+        return Config(
+            check_file=args.check_file_arg,
+            match_full_lines=args.match_full_lines,
+            strict_whitespace=args.strict_whitespace,
+            check_prefix=args.check_prefix,
+            implicit_check_not=args.implicit_check_not,
+            dump_input=args.dump_input,
+        )
+
+
 class CheckParser:
     @staticmethod
     def parse_checks_from_file(
-        check_file_path: str, args, strict_mode: bool, check_prefix: str
+        check_file_path: str, config: Config
     ) -> List[Check]:
         with open(check_file_path, encoding="utf-8") as check_file:
-            return CheckParser.parse_checks_from_strings(
-                check_file, args, strict_mode, check_prefix
-            )
+            return CheckParser.parse_checks_from_strings(check_file, config)
 
     @staticmethod
     def parse_checks_from_strings(
-        input_strings: Iterable[str], args, strict_mode: bool, check_prefix: str
+        input_strings: Iterable[str], config: Config
     ) -> List[Check]:
         checks = []
         for line_idx, line in enumerate(input_strings):
-            check = CheckParser.parse_check(
-                line, line_idx, args, strict_mode, check_prefix
-            )
+            check = CheckParser.parse_check(line, line_idx, config)
             if check is None:
                 continue
             if check.check_type == CheckType.CHECK_EMPTY and len(checks) == 0:
@@ -274,26 +322,25 @@ class CheckParser:
         return checks
 
     @staticmethod
-    def parse_check(
-        line: str, line_idx, args, strict_mode: bool, check_prefix: str
-    ) -> Optional[Check]:
+    def parse_check(line: str, line_idx, config: Config) -> Optional[Check]:
         line = line.rstrip()
 
-        if not args.strict_whitespace:
+        if not config.strict_whitespace:
             line = canonicalize_whitespace(line)
 
         # CHECK and CHECK-NEXT
-        strict_whitespace_match = "" if strict_mode else " *"
+        strict_whitespace_match = "" if config.strict_mode else " *"
 
         check_regex = (
-            f"{BEFORE_PREFIX}({check_prefix}):{strict_whitespace_match}(.*)"
+            f"{BEFORE_PREFIX}({config.check_prefix}):"
+            f"{strict_whitespace_match}(.*)"
         )
 
         check_match = re.search(check_regex, line)
         check_type = CheckType.CHECK
         if not check_match:
             check_regex = (
-                f"{BEFORE_PREFIX}({check_prefix}-NEXT):"
+                f"{BEFORE_PREFIX}({config.check_prefix}-NEXT):"
                 f"{strict_whitespace_match}(.*)"
             )
             check_match = re.search(check_regex, line)
@@ -302,7 +349,7 @@ class CheckParser:
         if check_match:
             check_keyword = check_match.group(2)
             check_expression = check_match.group(3)
-            if not strict_mode:
+            if not config.strict_mode:
                 check_expression = check_expression.strip(" ")
 
             match_type = MatchType.SUBSTRING
@@ -312,7 +359,7 @@ class CheckParser:
                 regex_line = re.sub(r"\{\{(.*?)\}\}", r"\1", regex_line)
                 match_type = MatchType.REGEX
                 check_expression = regex_line
-                if strict_mode:
+                if config.strict_mode:
                     if check_expression[0] != "^":
                         check_expression = "^" + check_expression
                     if check_expression[-1] != "$":
@@ -344,7 +391,7 @@ class CheckParser:
             return check
 
         check_not_regex = (
-            f"{BEFORE_PREFIX}({check_prefix}-NOT):"
+            f"{BEFORE_PREFIX}({config.check_prefix}-NOT):"
             f"{strict_whitespace_match}(.*)"
         )
         check_match = re.search(check_not_regex, line)
@@ -353,7 +400,7 @@ class CheckParser:
 
             check_keyword = check_match.group(2)
             check_expression = check_match.group(3)
-            if not strict_mode:
+            if not config.strict_mode:
                 check_expression = check_expression.strip(" ")
 
             if re.search(r"\{\{.*\}\}", check_expression):
@@ -373,7 +420,7 @@ class CheckParser:
             )
             return check
 
-        check_empty_regex = f"{BEFORE_PREFIX}({check_prefix}-EMPTY):"
+        check_empty_regex = f"{BEFORE_PREFIX}({config.check_prefix}-EMPTY):"
         check_match = re.search(check_empty_regex, line)
         if check_match:
             check_keyword = check_match.group(2)
@@ -395,11 +442,10 @@ class CheckParser:
 def main():
     # Force UTF-8 to be sent to stdout.
     # https://stackoverflow.com/a/3597849/598057
-    sys.stdout = open(
+    sys.stdout = open(  # pylint: disable=consider-using-with
         1, "w", encoding="utf-8", closefd=False
-    )  # pylint: disable=consider-using-with
+    )
 
-    args = None
     input_lines = None
 
     # TODO: Unify exit_handler() handling.
@@ -408,7 +454,7 @@ def main():
         # any additional formatting and hints.
         # Eventually it would be great to implement the same behavior.
         # https://llvm.org/docs/CommandGuide/FileCheck.html#cmdoption-filecheck-dump-input
-        if code != 0 and input_lines and args and args.dump_input:
+        if code != 0 and input_lines and config.dump_input:
             print("")
             print("Full input was:")
             for input_line in input_lines:
@@ -447,26 +493,15 @@ def main():
         )
         exit_handler(2)
 
-    parser = argparse.ArgumentParser()
+    parser = Config.create_parser()
+    config = Config.create(parser.parse_args())
 
-    parser.add_argument("check_file_arg", type=str, help="TODO")
-    parser.add_argument("--strict-whitespace", action="store_true", help="TODO")
-    parser.add_argument("--match-full-lines", action="store_true", help="TODO")
-    parser.add_argument("--check-prefix", action="store", help="TODO")
-    parser.add_argument("--implicit-check-not", action="append", help="TODO")
-    parser.add_argument(
-        "--dump-input", action="store", choices=["fail"], help="TODO"
-    )
+    strict_mode = config.match_full_lines and config.strict_whitespace
 
-    args = parser.parse_args()
-
-    strict_mode = args.match_full_lines and args.strict_whitespace
-
-    check_prefix = args.check_prefix if args.check_prefix else "CHECK"
     implicit_check_not_checks = []
 
-    if args.implicit_check_not:
-        for implicit_check_not_arg in args.implicit_check_not:
+    if config.implicit_check_not:
+        for implicit_check_not_arg in config.implicit_check_not:
             # LLVM FileCheck does rstrip() here for some reason that
             # does not seem reasonable. We still prefer to be compatible.
             stripped_check = implicit_check_not_arg.rstrip()
@@ -476,7 +511,7 @@ def main():
             )
             implicit_check_not_checks.append(implicit_check_not)
 
-    if not re.search("^[A-Za-z][A-Za-z0-9-_]+$", check_prefix):
+    if not re.search("^[A-Za-z][A-Za-z0-9-_]+$", config.check_prefix):
         sys.stdout.flush()
         error_message = (
             "Supplied check-prefix is invalid! Prefixes must be unique and "
@@ -487,9 +522,7 @@ def main():
         exit_handler(2)
 
     try:
-        checks = CheckParser.parse_checks_from_file(
-            check_file_path, args, strict_mode, check_prefix
-        )
+        checks = CheckParser.parse_checks_from_file(check_file_path, config)
     except CheckParserEmptyCheckException as exception:
         print(
             f"{check_file_path}:"
@@ -514,7 +547,8 @@ def main():
         current_check = next(check_iterator)
     except StopIteration:
         error_message = (
-            f"error: no check strings found with prefix '{check_prefix}:'"
+            f"error: "
+            f"no check strings found with prefix '{config.check_prefix}:'"
         )
         print(error_message, file=sys.stderr)
         sys.stdout.flush()
@@ -568,16 +602,16 @@ def main():
 
             unstripped_line = line
 
-            if not args.strict_whitespace:
+            if not config.strict_whitespace:
                 line = canonicalize_whitespace(line)
-                if args.match_full_lines:
+                if config.match_full_lines:
                     line = line.strip(" ")
 
             while True:
                 if not failed_check:
                     for current_not_check in current_not_checks:
                         check_result = check_line(
-                            line, current_not_check, args.match_full_lines
+                            line, current_not_check, config.match_full_lines
                         )
                         if check_result == CheckResult.CHECK_NOT_MATCH:
                             failed_check = FailedCheck(
@@ -596,7 +630,7 @@ def main():
                             break
 
                 check_result = check_line(
-                    line, current_check, args.match_full_lines
+                    line, current_check, config.match_full_lines
                 )
 
                 if check_result == CheckResult.FAIL_FATAL:
@@ -701,7 +735,7 @@ def main():
 
                 for not_check in current_not_checks:
                     if (
-                        check_line(line, not_check, args.match_full_lines)
+                        check_line(line, not_check, config.match_full_lines)
                         == CheckResult.CHECK_NOT_MATCH
                     ):
                         current_check_line_idx = line_idx
@@ -800,7 +834,8 @@ def main():
                 f"{check_file_path}:"
                 f"{current_check.check_line_idx + 1}:"
                 f"{current_check.start_index + 1}: "
-                f"error: {check_prefix}: expected string not found in input"
+                f"error: {config.check_prefix}: "
+                f"expected string not found in input"
             )
 
             print(current_check.source_line.rstrip())
@@ -853,7 +888,7 @@ def main():
             assert current_check_line_idx is not None
             last_read_line = input_lines[current_check_line_idx].rstrip()
 
-            if not args.strict_whitespace:
+            if not config.strict_whitespace:
                 last_read_line = re.sub("\\s+", " ", last_read_line).strip()
 
             print(

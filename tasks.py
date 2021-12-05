@@ -107,7 +107,6 @@ def lint_pylint(context):
         pylint
           --rcfile=.pylint.ini
           --disable=c-extension-no-member
-          --exit-zero
           filecheck/ tasks.py
         """  # pylint: disable=line-too-long
     )
@@ -122,6 +121,42 @@ def lint_pylint(context):
 @task(lint_black_diff, lint_flake8, lint_pylint)
 def lint(_):
     pass
+
+
+@task
+def test_unit(context):
+    run_invoke_cmd(
+        context,
+        one_line_command(
+            """
+            coverage run
+                --rcfile=.coveragerc
+                --branch
+                -m pytest
+                tests/unit/
+            """
+        ),
+    )
+    run_invoke_cmd(
+        context,
+        one_line_command(
+            """
+            coverage report --sort=cover
+            """
+        ),
+    )
+
+
+@task(test_unit)
+def test_coverage_report(context):
+    run_invoke_cmd(
+        context,
+        one_line_command(
+            """
+            coverage html
+            """
+        ),
+    )
 
 
 @task
@@ -152,7 +187,7 @@ def test_filecheck_py_using_filecheck_py_tester(context, focus=None):
     run_lit_tests(context, filecheck_exec, filecheck_tester_exec, focus, False)
 
 
-@task(lint)
+@task(lint, test_unit)
 def test(context, focus=None):
     test_filecheck_llvm(context, focus)
     test_filecheck_py_using_file_check_llvm_tester(context, focus)

@@ -1,0 +1,11 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+omit =
+    */.venv/*
+
+[report]
+fail_under = 13.63
+precision = 2
+skip_covered = true
+show_missing = true
