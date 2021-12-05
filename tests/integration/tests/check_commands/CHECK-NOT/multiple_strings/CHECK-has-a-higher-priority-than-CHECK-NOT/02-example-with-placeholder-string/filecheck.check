@@ -1,2 +1,2 @@
-; CHECK-NOT:{{.*String2.*}}
-; CHECK:String3
+CHECK-NOT:{{.*String2.*}}
+CHECK:String3

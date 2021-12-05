@@ -1,1 +1,1 @@
-; CHECK-NOT: hello
+CHECK-NOT: hello

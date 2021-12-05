@@ -1,14 +1,14 @@
-; RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
+RUN: %cat "%S/filecheck.input" | %expect_exit 1 %FILECHECK_EXEC "%S/filecheck.check" | %FILECHECK_TESTER_EXEC "%s" --strict-whitespace --match-full-lines
 
-; CHECK:{{.*}}filecheck.check:2:15: error: CHECK-NEXT: is not on the line after the previous match{{$}}
-; CHECK-NEXT:; CHECK-NEXT: string 3
-; CHECK-NEXT:              ^
-; CHECK-NEXT:<stdin>:3:1: note: 'next' match was here
-; CHECK-NEXT:string 3
-; CHECK-NEXT:^
-; CHECK-NEXT:<stdin>:1:9: note: previous match ended here
-; CHECK-NEXT:string 1
-; CHECK-NEXT:        ^
-; CHECK-NEXT:<stdin>:2:1: note: non-matching line after previous match is here
-; CHECK-NEXT:string 2
-; CHECK-NEXT:^
+CHECK:{{.*}}filecheck.check:2:13: error: CHECK-NEXT: is not on the line after the previous match{{$}}
+CHECK-NEXT:CHECK-NEXT: string 3
+CHECK-NEXT:            ^
+CHECK-NEXT:<stdin>:3:1: note: 'next' match was here
+CHECK-NEXT:string 3
+CHECK-NEXT:^
+CHECK-NEXT:<stdin>:1:9: note: previous match ended here
+CHECK-NEXT:string 1
+CHECK-NEXT:        ^
+CHECK-NEXT:<stdin>:2:1: note: non-matching line after previous match is here
+CHECK-NEXT:string 2
+CHECK-NEXT:^
