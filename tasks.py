@@ -125,6 +125,42 @@ def lint(_):
 
 
 @task
+def test_unit(context):
+    run_invoke_cmd(
+        context,
+        one_line_command(
+            """
+            coverage run
+                --rcfile=.coveragerc
+                --branch
+                -m pytest
+                tests/unit/
+            """
+        ),
+    )
+    run_invoke_cmd(
+        context,
+        one_line_command(
+            """
+            coverage report --sort=cover
+            """
+        ),
+    )
+
+
+@task(test_unit)
+def test_coverage_report(context):
+    run_invoke_cmd(
+        context,
+        one_line_command(
+            """
+            coverage html
+            """
+        ),
+    )
+
+
+@task
 def test_filecheck_llvm(context, focus=None):
     # filecheck_llvm_8_exec = get_filecheck_llvm_path(FILECHECK_LLVM_8_EXEC)
     filecheck_llvm_9_exec = get_filecheck_llvm_path(FILECHECK_LLVM_9_EXEC)
