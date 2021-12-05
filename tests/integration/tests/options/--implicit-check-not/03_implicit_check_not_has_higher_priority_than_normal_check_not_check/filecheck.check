@@ -1,2 +1,2 @@
-; CHECK-NOT: error
-; CHECK: string 1
+CHECK-NOT: error
+CHECK: string 1
