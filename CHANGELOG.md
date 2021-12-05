@@ -6,6 +6,25 @@
 
 **Merged pull requests:**
 
+-  Bump version: 0.0.20 → 0.0.21  [\#184](https://github.com/mull-project/FileCheck.py/pull/184) ([stanislaw](https://github.com/stanislaw))
+- CHECK regex match: fix case when there are two+ "CHECK:" in a check line [\#183](https://github.com/mull-project/FileCheck.py/pull/183) ([stanislaw](https://github.com/stanislaw))
+-  Config: dedicate class to store configuration  [\#182](https://github.com/mull-project/FileCheck.py/pull/182) ([stanislaw](https://github.com/stanislaw))
+- CheckParser: dedicated class that parses CHECKs [\#181](https://github.com/mull-project/FileCheck.py/pull/181) ([stanislaw](https://github.com/stanislaw))
+- Code climate: fix next batch of "; " occurences  [\#180](https://github.com/mull-project/FileCheck.py/pull/180) ([stanislaw](https://github.com/stanislaw))
+-  Code climate: convert several tests to --strict-whitespace  [\#179](https://github.com/mull-project/FileCheck.py/pull/179) ([stanislaw](https://github.com/stanislaw))
+-  Code climate: fix next batch of "; " occurences  [\#177](https://github.com/mull-project/FileCheck.py/pull/177) ([stanislaw](https://github.com/stanislaw))
+- Code climate: fix next batch of "; " occurences [\#176](https://github.com/mull-project/FileCheck.py/pull/176) ([stanislaw](https://github.com/stanislaw))
+- Code climate: fix a batch of "; RUN:" lines in the tests [\#175](https://github.com/mull-project/FileCheck.py/pull/175) ([stanislaw](https://github.com/stanislaw))
+- CHECK-EMPTY: finish long standing TODO about the error message [\#174](https://github.com/mull-project/FileCheck.py/pull/174) ([stanislaw](https://github.com/stanislaw))
+- Code climate: fix all Pylint warnings  [\#173](https://github.com/mull-project/FileCheck.py/pull/173) ([stanislaw](https://github.com/stanislaw))
+- Check: named tuple -\> proper class [\#172](https://github.com/mull-project/FileCheck.py/pull/172) ([stanislaw](https://github.com/stanislaw))
+- Code climate: introduce flake 8 and Pylint and fix all flake8 issues  [\#171](https://github.com/mull-project/FileCheck.py/pull/171) ([stanislaw](https://github.com/stanislaw))
+- Code climate: introduce black and reformat everything [\#170](https://github.com/mull-project/FileCheck.py/pull/170) ([stanislaw](https://github.com/stanislaw))
+- tasks: use improved one\_line\_command and run\_invoke\_cmd [\#169](https://github.com/mull-project/FileCheck.py/pull/169) ([stanislaw](https://github.com/stanislaw))
+- docs: create "Extra features" section, add a task to generate docs [\#168](https://github.com/mull-project/FileCheck.py/pull/168) ([stanislaw](https://github.com/stanislaw))
+-  tasks: add --focus parameter to run focused integration tests  [\#167](https://github.com/mull-project/FileCheck.py/pull/167) ([stanislaw](https://github.com/stanislaw))
+- Add support for relative line number expressions [\#166](https://github.com/mull-project/FileCheck.py/pull/166) ([obycode](https://github.com/obycode))
+- Regenerate CHANGELOG [\#165](https://github.com/mull-project/FileCheck.py/pull/165) ([stanislaw](https://github.com/stanislaw))
 - Bump version: 0.0.19 → 0.0.20 [\#164](https://github.com/mull-project/FileCheck.py/pull/164) ([stanislaw](https://github.com/stanislaw))
 
 ## [v0.0.20](https://github.com/mull-project/FileCheck.py/tree/v0.0.20) (2021-11-27)
