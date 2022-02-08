@@ -597,7 +597,7 @@ def main():
         failed_implicit_check = None
 
         while True:
-            line = line.rstrip()
+            line = line.rstrip('\n\r')
 
             unstripped_line = line
 
