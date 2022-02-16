@@ -9,7 +9,7 @@ import sys
 from difflib import SequenceMatcher
 from enum import Enum
 
-__version__ = "0.0.21"
+__version__ = "0.0.22"
 
 from typing import Optional, List, Iterable
 
