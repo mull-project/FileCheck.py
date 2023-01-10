@@ -8,14 +8,23 @@ authors = ["Stanislav Pankevich <s.pankevich@gmail.com>"]
 python = ">=3.6.2,<4.0"
 
 [tool.poetry.dev-dependencies]
-black = "21.9b0"
-bump2version = "0.5.11"
-coverage = "^5.4"
-flake8 = "^3.9.2"
-invoke = "1.3.0"
-lit = "^0.9"
-pylint = "2.12.2"
-pytest = "^6.2.2"
+black = ">=21.9b0"
+bump2version = ">=0.5.11"
+coverage = ">=5.4"
+flake8 = ">=3.9.2"
+invoke = ">=1.3.0"
+lit = ">=0.9"
+pylint = ">=2.12.2"
+pytest = ">=6.2.2"
+
+# FIXME: Problems with wrapt when running on CI with Python 3.11.
+# This fix seems to work, however there is another issue with pyinvoke.
+# waiting until the 3.11 issues are fixed with invoke:
+# https://github.com/pyinvoke/invoke/issues/833
+# Adding this dependency only to fix CI building on 3.11.
+# At some point, check again if this issue still exists.
+# https://github.com/GrahamDumpleton/wrapt/issues/196
+# wrapt = { version = ">=1.14.0", python = ">=3.11" }
 
 [tool.poetry.scripts]
 filecheck = "filecheck.filecheck:main"
