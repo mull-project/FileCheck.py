@@ -3,8 +3,15 @@ import platform
 import re
 from typing import Optional
 
-import invoke
-from invoke import task
+# Ugly but works:
+# https://github.com/pyinvoke/invoke/issues/833#issuecomment-1293148106
+import inspect
+
+if not hasattr(inspect, "getargspec"):
+    inspect.getargspec = inspect.getfullargspec
+
+from invoke import task  # pylint: disable=wrong-import-position
+import invoke  # pylint: disable=wrong-import-position
 
 FILECHECK_LLVM_8_EXEC = "FileCheck-8.0.1"
 FILECHECK_LLVM_9_EXEC = "FileCheck-9.0.1"

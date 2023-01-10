@@ -1,6 +1,11 @@
 name: "FileCheck.py on Windows"
 
-on: [pull_request]
+# Disabling building on Windows for now.
+on:
+  push:
+    branches: [ "nonsense-branch" ]
+#  pull_request:
+#    branches: [ "**" ]
 
 jobs:
   build:
@@ -8,15 +13,22 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: "Print Debug info"
+      run: |
+        python --version
+        echo $env:USERPROFILE
+        echo $env:PATH
+        echo "$PWD"
 
     - name: Upgrade pip
       run: |
@@ -24,17 +36,13 @@ jobs:
 
     - name: Install Poetry
       run: |
-        (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python
+        (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 
     - name: "Poetry: add to %PATH%"
       run: |
-        echo "$env:USERPROFILE\.poetry\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-    - name: "Print Debug info"
-      run: |
-        echo $env:USERPROFILE
-        echo $env:PATH
-        echo "$PWD"
+        # Either of these should work.
+        echo "$env:APPDATA\pypoetry" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "$env:APPDATA\Python\Scripts" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: "Poetry: print version"
       run: |
@@ -42,10 +50,14 @@ jobs:
 
     - name: "Poetry: configure settings"
       run: |
+        # https://github.com/python-poetry/poetry/issues/6098
+        poetry config virtualenvs.create true
         poetry config virtualenvs.in-project true
+        poetry config virtualenvs.prefer-active-python
 
     - name: "Poetry: Install dependencies"
       run: |
+        poetry run python --version
         poetry install
 
     - name: Run tests
