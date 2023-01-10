@@ -8,13 +8,13 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -24,11 +24,11 @@ jobs:
 
     - name: Install Poetry
       run: |
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+        curl -sSL https://install.python-poetry.org | python3 -
 
     - name: Add Poetry to PATH
       run: |
-        echo "PATH=$PATH:$HOME/.poetry/bin" >> $GITHUB_ENV
+        echo "PATH=$PATH:~/.local/bin" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |
