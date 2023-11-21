@@ -374,7 +374,7 @@ class CheckParser:
                     LINE_NUMBER_REGEX,
                     str(line_idx + offset + 1),
                     check_expression,
-                    1,
+                    count=1,
                 )
                 line_var_match = re.search(LINE_NUMBER_REGEX, check_expression)
 
