@@ -25,6 +25,7 @@ Documentation is hosted on Read the Docs:
 
 ## Copyright
 
-Copyright (c) 2021 Stanislav Pankevich s.pankevich@gmail.com. See LICENSE for
+Copyright (c) 2019-2023 Stanislav Pankevich s.pankevich@gmail.com. See
+LICENSE for
 details.
 

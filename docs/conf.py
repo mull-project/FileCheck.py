@@ -19,7 +19,7 @@ import guzzle_sphinx_theme
 # -- Project information -----------------------------------------------------
 
 project = "FileCheck.py"
-copyright = "2019, Stanislav Pankevich"
+copyright = "2019-2023, Stanislav Pankevich"
 author = "Stanislav Pankevich"
 
 # The full version, including alpha/beta/rc tags
