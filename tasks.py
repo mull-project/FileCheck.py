@@ -17,13 +17,17 @@ FILECHECK_LLVM_8_EXEC = "FileCheck-8.0.1"
 FILECHECK_LLVM_9_EXEC = "FileCheck-9.0.1"
 
 
-def one_line_command(string):
-    return re.sub("\\s+", " ", string).strip()
-
-
 def run_invoke_cmd(context, cmd) -> invoke.runners.Result:
+    def one_line_command(string):
+        return re.sub("\\s+", " ", string).strip()
+
     return context.run(
-        cmd, env=None, hide=False, warn=False, pty=False, echo=True
+        one_line_command(cmd),
+        env=None,
+        hide=False,
+        warn=False,
+        pty=False,
+        echo=True,
     )
 
 
@@ -66,8 +70,7 @@ def run_lit_tests(
     llvm_only_value = "1" if llvm_only else ""
     focus_or_none = f"--filter {focus}" if focus else ""
 
-    command = one_line_command(
-        f"""
+    command = f"""
             lit
             --param REAL_ONLY={llvm_only_value}
             --param FILECHECK_EXEC="{filecheck_exec}"
@@ -76,18 +79,15 @@ def run_lit_tests(
             {focus_or_none}
             {cwd}/tests/integration
         """
-    )
 
     run_invoke_cmd(context, command)
 
 
 @task
 def lint_black_diff(context):
-    command = one_line_command(
-        """
+    command = """
         black . --color 2>&1
         """
-    )
     result = run_invoke_cmd(context, command)
 
     # black always exits with 0, so we handle the output.
@@ -99,24 +99,20 @@ def lint_black_diff(context):
 
 @task
 def lint_flake8(context):
-    command = one_line_command(
-        """
+    command = """
         flake8 filecheck/ --statistics --max-line-length 80 --show-source
         """
-    )
     run_invoke_cmd(context, command)
 
 
 @task
 def lint_pylint(context):
-    command = one_line_command(
-        """
+    command = """
         pylint
           --rcfile=.pylint.ini
           --disable=c-extension-no-member
           filecheck/ tasks.py
         """  # pylint: disable=line-too-long
-    )
     try:
         run_invoke_cmd(context, command)
     except invoke.exceptions.UnexpectedExit as exc:
@@ -134,7 +130,7 @@ def lint(_):
 def test_unit(context):
     run_invoke_cmd(
         context,
-        one_line_command(
+        (
             """
             coverage run
                 --rcfile=.coveragerc
@@ -146,7 +142,7 @@ def test_unit(context):
     )
     run_invoke_cmd(
         context,
-        one_line_command(
+        (
             """
             coverage report --sort=cover
             """
@@ -158,7 +154,7 @@ def test_unit(context):
 def test_coverage_report(context):
     run_invoke_cmd(
         context,
-        one_line_command(
+        (
             """
             coverage html
             """
@@ -212,8 +208,7 @@ def check(_):
 
 @task
 def clean(context):
-    find_command = one_line_command(
-        """
+    find_command = """
         find
             .
             -type f \\(
@@ -228,14 +223,11 @@ def clean(context):
             -not -path "**Expected**"
             -not -path "**Input**"
     """
-    )
 
     find_result = run_invoke_cmd(context, find_command)
     find_result_stdout = find_result.stdout.strip()
 
-    echo_command = one_line_command(
-        f"""echo {find_result_stdout} | xargs rm -rfv"""
-    )
+    echo_command = f"""echo {find_result_stdout} | xargs rm -rfv"""
     run_invoke_cmd(context, echo_command)
 
 
@@ -243,7 +235,7 @@ def clean(context):
 def docs_sphinx(context, open_doc=False):
     run_invoke_cmd(
         context,
-        one_line_command(
+        (
             """
         cd docs && make html SPHINXOPTS="-W --keep-going -n"
     """
@@ -252,7 +244,7 @@ def docs_sphinx(context, open_doc=False):
     if open_doc:
         run_invoke_cmd(
             context,
-            one_line_command(
+            (
                 """
                 open docs/_build/html/index.html
             """
@@ -264,12 +256,64 @@ def docs_sphinx(context, open_doc=False):
 # gem install github_changelog_generator
 @task
 def changelog(context, github_token):
-    command = one_line_command(
-        f"""
+    command = f"""
             CHANGELOG_GITHUB_TOKEN={github_token}
             github_changelog_generator
             --user mull-project
             --project FileCheck.py
         """
-    )
     run_invoke_cmd(context, command)
+
+
+@task()
+def release(context, test_pypi=False, username=None, password=None):
+    """
+    A release can be made to PyPI or test package index (TestPyPI):
+    https://pypi.org/project/filecheck/
+    https://test.pypi.org/project/filecheck/
+    """
+
+    # When a username is provided, we also need password, and then we don't use
+    # tokens set up on a local machine.
+    assert username is None or password is not None
+
+    repository_argument_or_none = (
+        ""
+        if username
+        else (
+            "--repository filecheck_test"
+            if test_pypi
+            else "--repository filecheck_release"
+        )
+    )
+    user_password = f"-u{username} -p{password}" if username is not None else ""
+
+    run_invoke_cmd(
+        context,
+        """
+            rm -rfv dist/
+        """,
+    )
+    run_invoke_cmd(
+        context,
+        """
+            python3 -m build
+        """,
+    )
+    run_invoke_cmd(
+        context,
+        """
+            twine check dist/*
+        """,
+    )
+    # The token is in a core developer's .pypirc file.
+    # https://test.pypi.org/manage/account/token/
+    # https://packaging.python.org/en/latest/specifications/pypirc/#pypirc
+    run_invoke_cmd(
+        context,
+        f"""
+            twine upload dist/filecheck-*.tar.gz
+                {repository_argument_or_none}
+                {user_password}
+        """,
+    )
