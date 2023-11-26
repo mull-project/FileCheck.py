@@ -1,11 +1,10 @@
 name: "FileCheck.py on Windows"
 
-# Disabling building on Windows for now.
 on:
   push:
     branches: [ "nonsense-branch" ]
-#  pull_request:
-#    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
 
 jobs:
   build:
@@ -32,35 +31,13 @@ jobs:
 
     - name: Upgrade pip
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip 
 
-    - name: Install Poetry
+    - name: Install dev dependencies
       run: |
-        (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-
-    - name: "Poetry: add to %PATH%"
-      run: |
-        # Either of these should work.
-        echo "$env:APPDATA\pypoetry" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo "$env:APPDATA\Python\Scripts" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-    - name: "Poetry: print version"
-      run: |
-        poetry --version
-
-    - name: "Poetry: configure settings"
-      run: |
-        # https://github.com/python-poetry/poetry/issues/6098
-        poetry config virtualenvs.create true
-        poetry config virtualenvs.in-project true
-        poetry config virtualenvs.prefer-active-python
-
-    - name: "Poetry: Install dependencies"
-      run: |
-        poetry run python --version
-        poetry install
+        pip install -r requirements.dev.txt
 
     - name: Run tests
       run: |
-        poetry run invoke check
+        invoke check
       shell: bash
