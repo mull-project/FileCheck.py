@@ -3,6 +3,8 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+import os
+import sys
 
 # -- Path setup --------------------------------------------------------------
 
@@ -16,6 +18,20 @@
 
 import guzzle_sphinx_theme
 
+try:
+    filecheck_root_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+    if not os.path.isdir(filecheck_root_path):
+        raise FileNotFoundError
+    sys.path.append(filecheck_root_path)
+    from filecheck.filecheck import __version__ as filecheck_version
+except Exception as exception:
+    print(  # noqa: T201
+        f"Could not resolve a path to filecheck's root: {exception}"
+    )
+    sys.exit(1)
+
 # -- Project information -----------------------------------------------------
 
 project = "FileCheck.py"
@@ -23,7 +39,7 @@ copyright = "2019-2023, Stanislav Pankevich"
 author = "Stanislav Pankevich"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1"
+release = filecheck_version
 
 
 # -- General configuration ---------------------------------------------------
@@ -50,8 +66,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme_path = guzzle_sphinx_theme.html_theme_path()
 extensions.append("guzzle_sphinx_theme")
 html_theme = "guzzle_sphinx_theme"
-
-# html_theme = 'pyramid'
 
 html_theme_options = {
     "project_nav_name": "Mull",
