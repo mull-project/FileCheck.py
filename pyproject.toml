@@ -16,7 +16,9 @@ exclude = [
 [project]
 name = "filecheck"
 description = "Python port of LLVM's FileCheck, flexible pattern matching file verifier"
-authors = ["Stanislav Pankevich <s.pankevich@gmail.com>"]
+authors = [
+    { name = "Stanislav Pankevich", email = "s.pankevich@gmail.com" }
+]
 dynamic = ["version"]
 readme = "README.md"
 license = "Apache-2.0"
