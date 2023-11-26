@@ -1,37 +1,49 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "filecheck/filecheck.py"
+
+[tool.hatch.build]
+exclude = [
+  "/.*",
+  "/developer",
+  "/docs",
+  "/tests",
+]
+
+[project]
 name = "filecheck"
-version = "0.0.23"
 description = "Python port of LLVM's FileCheck, flexible pattern matching file verifier"
 authors = ["Stanislav Pankevich <s.pankevich@gmail.com>"]
+dynamic = ["version"]
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.6"
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.6.2,<4.0"
+dependencies = []
 
-[tool.poetry.dev-dependencies]
-black = ">=21.9b0"
-bump2version = ">=0.5.11"
-coverage = ">=5.4"
-flake8 = ">=3.9.2"
-invoke = ">=1.4.1"
-lit = ">=0.9"
-pylint = ">=2.12.2"
-pytest = ">=6.2.2"
-
-# FIXME: Problems with wrapt when running on CI with Python 3.11.
-# This fix seems to work, however there is another issue with pyinvoke.
-# waiting until the 3.11 issues are fixed with invoke:
-# https://github.com/pyinvoke/invoke/issues/833
-# Adding this dependency only to fix CI building on 3.11.
-# At some point, check again if this issue still exists.
-# https://github.com/GrahamDumpleton/wrapt/issues/196
-# wrapt = { version = ">=1.14.0", python = ">=3.11" }
-
-[tool.poetry.scripts]
+[project.scripts]
 filecheck = "filecheck.filecheck:main"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[project.urls]
+Changelog = "https://github.com/mull-project/FileCheck.py/blob/main/CHANGELOG.md"
+# Funding = "https://..."
+Homepage = "https://filecheck.readthedocs.io/en/stable/"
+Source = "https://github.com/mull-project/FileCheck.py"
 
 [tool.black]
 line-length = 80
