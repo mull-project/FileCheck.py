@@ -3,6 +3,15 @@
 Roadmap
 =======
 
+2024-07-10 STATUS UPDATE - PROJECT DISCONTINUED
+-----------------------------------------------
+
+The project has been discontinued in favor of another project: `antonlydike/filecheck <https://github.com/AntonLydike/filecheck>`_, where the developers are aiming to achieve greater compatibility with the upstream LLVM FileCheck and add more features that this project was lacking.
+
+The filecheck PyPI package has also been transferred to the owner of antonlydike/filecheck.
+
+----
+
 As described in :doc:`01-what-is-filecheck`, FileCheck.py is only a Python port
 for LLVM's FileCheck. It is not intended to be a replacement for LLVM's
 FileCheck.
