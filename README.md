@@ -1,10 +1,16 @@
-# FileCheck.py
+# FileCheck.py (Discontinued)
 
 Attempt to reimplement LLVM's FileCheck using Python.
 
 ![](https://github.com/mull-project/FileCheck.py/workflows/FileCheck.py%20on%20macOS/badge.svg)
 ![](https://github.com/mull-project/FileCheck.py/workflows/FileCheck.py%20on%20Linux/badge.svg)
 ![](https://github.com/mull-project/FileCheck.py/workflows/FileCheck.py%20on%20Windows/badge.svg)
+
+## 2024-07-10 STATUS UPDATE - PROJECT DISCONTINUED
+
+The project has been discontinued in favor of another project: [antonlydike/filecheck](https://github.com/AntonLydike/filecheck), where the developers are aiming to achieve greater compatibility with the upstream LLVM FileCheck and add more features that this project was lacking.
+
+The filecheck PyPI package has also been transferred to the owner of antonlydike/filecheck.
 
 ## Background
 
