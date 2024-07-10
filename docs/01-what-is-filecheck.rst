@@ -12,6 +12,13 @@ FileCheck is most often used in a combination with another tool called **LIT
 from the test files, FileCheck is used as a test matcher tool that checks output
 of the commands run by LIT.
 
+2024-07-10 STATUS UPDATE - PROJECT DISCONTINUED
+-----------------------------------------------
+
+The project has been discontinued in favor of another project: `antonlydike/filecheck <https://github.com/AntonLydike/filecheck>`_, where the developers are aiming to achieve greater compatibility with the upstream LLVM FileCheck and add more features that this project was lacking.
+
+The filecheck PyPI package has also been transferred to the owner of antonlydike/filecheck.
+
 Why Python port?
 ----------------
 
